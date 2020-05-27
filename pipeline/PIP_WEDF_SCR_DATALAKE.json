@@ -193,7 +193,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "V_FILE_NAME",
-								"value": ""
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
 							}
 						}
 					]
