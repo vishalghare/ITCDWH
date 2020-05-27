@@ -5,7 +5,14 @@
 			{
 				"name": "Copy WEDF RAW To STAGE",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -70,7 +77,14 @@
 			{
 				"name": "dataflow1",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Copy WEDF RAW To STAGE",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -82,11 +96,30 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "DF_WEDF_STAGE_DWH_LAKE",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"parameters": {
+							"P_DWH_FILE_NAME": {
+								"value": "'@{variables('V_DWH_FILE_NAME')}'",
+								"type": "Expression"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_DWH_FILE_NAME",
+					"value": {
+						"value": "@replace(variables('V_FILE_NAME'),'.csv','05272020.csv')",
+						"type": "Expression"
 					}
 				}
 			}
@@ -95,6 +128,9 @@
 			"V_FILE_NAME": {
 				"type": "String",
 				"defaultValue": "WEDF 2018 registration data_POC.csv"
+			},
+			"V_DWH_FILE_NAME": {
+				"type": "String"
 			}
 		},
 		"annotations": []

@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "WEDF.csv",
 				"folderPath": "WEDF",
 				"fileSystem": "target"
 			},
@@ -33,7 +32,7 @@
 				"type": "String"
 			},
 			{
-				"name": "Email3",
+				"name": "Email",
 				"type": "String"
 			},
 			{
@@ -122,10 +121,6 @@
 			},
 			{
 				"name": "Twitter",
-				"type": "String"
-			},
-			{
-				"name": "Email26",
 				"type": "String"
 			},
 			{
