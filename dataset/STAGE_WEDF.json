@@ -1,0 +1,141 @@
+{
+	"name": "STAGE_WEDF",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "WEDF.csv",
+				"folderPath": "STAGE",
+				"fileSystem": "source"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ProjectID",
+				"type": "String"
+			},
+			{
+				"name": "Context",
+				"type": "String"
+			},
+			{
+				"name": "Type of event",
+				"type": "String"
+			},
+			{
+				"name": "Email3",
+				"type": "String"
+			},
+			{
+				"name": "Phone number",
+				"type": "String"
+			},
+			{
+				"name": "Registration Date",
+				"type": "String"
+			},
+			{
+				"name": "Submission Date",
+				"type": "String"
+			},
+			{
+				"name": "Last name",
+				"type": "String"
+			},
+			{
+				"name": "Middle name",
+				"type": "String"
+			},
+			{
+				"name": "First name",
+				"type": "String"
+			},
+			{
+				"name": "Gender",
+				"type": "String"
+			},
+			{
+				"name": "Year of birth",
+				"type": "String"
+			},
+			{
+				"name": "Date of birth",
+				"type": "String"
+			},
+			{
+				"name": "Country",
+				"type": "String"
+			},
+			{
+				"name": "Organization/ Company name",
+				"type": "String"
+			},
+			{
+				"name": "Job title",
+				"type": "String"
+			},
+			{
+				"name": "Professional status",
+				"type": "String"
+			},
+			{
+				"name": "Type of entity",
+				"type": "String"
+			},
+			{
+				"name": "Sub-type of entity",
+				"type": "String"
+			},
+			{
+				"name": "Size",
+				"type": "String"
+			},
+			{
+				"name": "BSO ownership",
+				"type": "String"
+			},
+			{
+				"name": "Office Address",
+				"type": "String"
+			},
+			{
+				"name": "City",
+				"type": "String"
+			},
+			{
+				"name": "Post Code",
+				"type": "String"
+			},
+			{
+				"name": "Website",
+				"type": "String"
+			},
+			{
+				"name": "Twitter",
+				"type": "String"
+			},
+			{
+				"name": "Email26",
+				"type": "String"
+			},
+			{
+				"name": "FILE_NAME",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_TIMESTAMP",
+				"type": "String"
+			}
+		]
+	}
+}
