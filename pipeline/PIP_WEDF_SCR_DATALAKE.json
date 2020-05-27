@@ -3,16 +3,9 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy WEDF RAW To STAGE",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Set DWH FILE NAME",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"name": "Get WEDF Files",
+				"type": "GetMetadata",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -22,103 +15,209 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"additionalColumns": [
-							{
-								"name": "FILE_NAME",
-								"value": {
-									"value": "@variables('V_FILE_NAME')",
-									"type": "Expression"
-								}
-							},
-							{
-								"name": "LOAD_TIMESTAMP",
-								"value": {
-									"value": "@utcnow()",
-									"type": "Expression"
-								}
-							}
-						],
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
+					"dataset": {
 						"referenceName": "RAW_SRC",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "STAGE_WEDF",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
-				"name": "DF_WEDF_STAGE_DWH_LAKE",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "Copy WEDF RAW To STAGE",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataflow": {
-						"referenceName": "DF_WEDF_STAGE_DWH_LAKE",
-						"type": "DataFlowReference",
+						"type": "DatasetReference",
 						"parameters": {
-							"P_DWH_FILE_NAME": {
-								"value": "'@{variables('V_DWH_FILE_NAME')}'",
-								"type": "Expression"
-							}
+							"P_FILE_NAME": "*.csv"
 						}
 					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings"
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
 					}
 				}
 			},
 			{
-				"name": "Set DWH FILE NAME",
-				"type": "SetVariable",
-				"dependsOn": [],
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter Dir",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "V_DWH_FILE_NAME",
-					"value": {
-						"value": "@replace(variables('V_FILE_NAME'),'.csv','_20200527.csv')",
+					"items": {
+						"value": "@activity('Filter Dir').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy WEDF RAW To STAGE",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set DWH FILE NAME",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"additionalColumns": [
+										{
+											"name": "FILE_NAME",
+											"value": {
+												"value": "@variables('V_FILE_NAME')",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "LOAD_TIMESTAMP",
+											"value": {
+												"value": "@utcnow()",
+												"type": "Expression"
+											}
+										}
+									],
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "RAW_SRC",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "STAGE_WEDF",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "DF_WEDF_STAGE_DWH_LAKE",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [
+								{
+									"activity": "Copy WEDF RAW To STAGE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "DF_WEDF_STAGE_DWH_LAKE",
+									"type": "DataFlowReference",
+									"parameters": {
+										"P_DWH_FILE_NAME": {
+											"value": "'@{variables('V_DWH_FILE_NAME')}'",
+											"type": "Expression"
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								}
+							}
+						},
+						{
+							"name": "Set DWH FILE NAME",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set FILE NAME",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_DWH_FILE_NAME",
+								"value": {
+									"value": "@replace(variables('V_FILE_NAME'),'.csv','_20200527.csv')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set FILE NAME",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_FILE_NAME",
+								"value": ""
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Filter Dir",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get WEDF Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get WEDF Files').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().type, 'File')",
 						"type": "Expression"
 					}
 				}

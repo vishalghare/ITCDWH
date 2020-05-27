@@ -5,12 +5,20 @@
 			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"P_FILE_NAME": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "WEDF 2018 registration data_POC.csv",
+				"fileName": {
+					"value": "@dataset().P_FILE_NAME",
+					"type": "Expression"
+				},
 				"folderPath": "WEDF",
 				"container": "source"
 			},
