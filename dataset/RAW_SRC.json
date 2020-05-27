@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "WEDF 2018 registration data_POC.csv",
+				"fileName": "WEDF 2019 registration data_POC_1905.csv",
 				"folderPath": "WEDF",
 				"container": "source"
 			},
