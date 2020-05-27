@@ -118,7 +118,7 @@
 				"typeProperties": {
 					"variableName": "V_DWH_FILE_NAME",
 					"value": {
-						"value": "rtrim(variables('V_FILE_NAME'),'.csv')+'_'+toString(currentTimestamp(),'YYYYMMDD24HHMISS')+'.csv'",
+						"value": "@replace(variables('V_FILE_NAME'),'.csv','_20200527.csv')",
 						"type": "Expression"
 					}
 				}
