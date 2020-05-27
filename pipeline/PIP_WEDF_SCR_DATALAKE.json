@@ -7,7 +7,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Set variable1",
+						"activity": "Set DWH FILE NAME",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -75,7 +75,7 @@
 				]
 			},
 			{
-				"name": "dataflow1",
+				"name": "DF_WEDF_STAGE_DWH_LAKE",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [
 					{
@@ -111,14 +111,14 @@
 				}
 			},
 			{
-				"name": "Set variable1",
+				"name": "Set DWH FILE NAME",
 				"type": "SetVariable",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "V_DWH_FILE_NAME",
 					"value": {
-						"value": "@replace(variables('V_FILE_NAME'),'.csv','05272020.csv')",
+						"value": "rtrim(variables('V_FILE_NAME'),'.csv')+'_'+toString(currentTimestamp(),'YYYYMMDD24HHMISS')+'.csv'",
 						"type": "Expression"
 					}
 				}

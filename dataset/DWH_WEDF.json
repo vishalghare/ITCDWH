@@ -124,6 +124,34 @@
 				"type": "String"
 			},
 			{
+				"name": "LinkedIn",
+				"type": "String"
+			},
+			{
+				"name": "Date of birth2",
+				"type": "String"
+			},
+			{
+				"name": "Country of Residence",
+				"type": "String"
+			},
+			{
+				"name": "Nationality",
+				"type": "String"
+			},
+			{
+				"name": "Address",
+				"type": "String"
+			},
+			{
+				"name": "Cityname",
+				"type": "String"
+			},
+			{
+				"name": "Region",
+				"type": "String"
+			},
+			{
 				"name": "FILE_NAME",
 				"type": "String"
 			},
