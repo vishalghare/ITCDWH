@@ -1,0 +1,28 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "STAGE_OLAC",
+						"type": "DatasetReference"
+					},
+					"name": "SrcStageOLAC"
+				}
+			],
+			"sinks": [
+				{
+					"name": "DWHOLAC"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageOLAC\nSrcStageOLAC derive({Year of birth} = iif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth}),\n\t\t{} = 'OLAC/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(skipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DWHOLAC"
+		}
+	}
+}
