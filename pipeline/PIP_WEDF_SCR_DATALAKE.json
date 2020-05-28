@@ -92,7 +92,7 @@
 										}
 									],
 									"storeSettings": {
-										"type": "AzureBlobStorageReadSettings",
+										"type": "AzureBlobFSReadSettings",
 										"recursive": true
 									},
 									"formatSettings": {
