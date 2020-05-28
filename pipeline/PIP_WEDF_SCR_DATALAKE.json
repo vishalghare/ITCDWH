@@ -26,7 +26,8 @@
 						"childItems"
 					],
 					"storeSettings": {
-						"type": "AzureBlobStorageReadSettings"
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true
 					},
 					"formatSettings": {
 						"type": "DelimitedTextReadSettings"
@@ -155,7 +156,7 @@
 									"type": "DataFlowReference",
 									"parameters": {
 										"P_DWH_FILE_NAME": {
-											"value": "'@{variables('V_DWH_FILE_NAME')}'",
+											"value": "'@{variables('V_FILE_NAME')}'",
 											"type": "Expression"
 										}
 									}
@@ -228,8 +229,7 @@
 		],
 		"variables": {
 			"V_FILE_NAME": {
-				"type": "String",
-				"defaultValue": "WEDF 2018 registration data_POC.csv"
+				"type": "String"
 			},
 			"V_DWH_FILE_NAME": {
 				"type": "String"
