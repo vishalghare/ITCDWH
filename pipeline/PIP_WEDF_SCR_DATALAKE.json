@@ -5,7 +5,26 @@
 			{
 				"name": "Get WEDF Files",
 				"type": "GetMetadata",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set Raw File PATH",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Loaded File Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Failed File Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -27,7 +46,8 @@
 						"childItems"
 					],
 					"storeSettings": {
-						"type": "AzureBlobFSReadSettings"
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true
 					},
 					"formatSettings": {
 						"type": "DelimitedTextReadSettings"
@@ -180,24 +200,6 @@
 									"dependencyConditions": [
 										"Succeeded"
 									]
-								},
-								{
-									"activity": "Set Failed File Path",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "Set Loaded File Path",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "Set Raw File PATH",
-									"dependencyConditions": [
-										"Succeeded"
-									]
 								}
 							],
 							"userProperties": [],
@@ -205,45 +207,6 @@
 								"variableName": "V_DWH_FILE_NAME",
 								"value": {
 									"value": "@replace(variables('V_FILE_NAME'),'.csv','_20200527.csv')",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set FILE NAME",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "V_FILE_NAME",
-								"value": {
-									"value": "@item().name",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set Failed File Path",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "V_FILE_NAME",
-								"value": {
-									"value": "WEDF/FAILED",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set Loaded File Path",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "V_LOADED_PATH",
-								"value": {
-									"value": "WEDF/LOADED",
 									"type": "Expression"
 								}
 							}
@@ -375,19 +338,6 @@
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true
-								}
-							}
-						},
-						{
-							"name": "Set Raw File PATH",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "V_PATH",
-								"value": {
-									"value": "WEDF",
-									"type": "Expression"
 								}
 							}
 						},
@@ -650,6 +600,19 @@
 									"recursive": true
 								}
 							}
+						},
+						{
+							"name": "Set FILE NAME",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_FILE_NAME",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -673,6 +636,45 @@
 					},
 					"condition": {
 						"value": "@equals(item().type, 'File')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Failed File Path",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_FILE_NAME",
+					"value": {
+						"value": "WEDF/FAILED",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Loaded File Path",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_LOADED_PATH",
+					"value": {
+						"value": "WEDF/LOADED",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Raw File PATH",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_PATH",
+					"value": {
+						"value": "WEDF",
 						"type": "Expression"
 					}
 				}
