@@ -1,5 +1,5 @@
 {
-	"name": "STAGE_SHE_TRADES",
+	"name": "DWH_SHE_TRADES",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorage1",
@@ -10,9 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "SHE_TRADES.csv",
-				"folderPath": "STAGE",
-				"fileSystem": "source"
+				"folderPath": "SHE_TRADE",
+				"fileSystem": "target"
 			},
 			"columnDelimiter": "|",
 			"escapeChar": "\\",

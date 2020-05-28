@@ -1,0 +1,32 @@
+{
+	"name": "DF_SHE_TRADES_STAGE_DWH_LAKE",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "STAGE_SHE_TRADES",
+						"type": "DatasetReference"
+					},
+					"name": "SrcStageSheTrades"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DWH_SHE_TRADES",
+						"type": "DatasetReference"
+					},
+					"name": "DWHSHETRADES"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\t{Date of data collection} as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tCountry as string,\n\t\tEmail as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\tCity as string,\n\t\tSize as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of event} as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Middle name} as string,\n\t\t{Date of birth} as string,\n\t\t{Sub-type of entity} as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageSheTrades\nSrcStageSheTrades derive({Year of birth} = iif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth}),\n\t\tNEW_DATALAKE_FILE = 'SHE_TRADES/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\t{Date of data collection} as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tCountry as string,\n\t\tEmail as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\tCity as string,\n\t\tSize as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of event} as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Middle name} as string,\n\t\t{Date of birth} as string,\n\t\t{Sub-type of entity} as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHSHETRADES"
+		}
+	}
+}
