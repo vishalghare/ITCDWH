@@ -400,6 +400,234 @@
 											"computeType": "General"
 										}
 									}
+								},
+								{
+									"name": "Copy Failed Files_copy1",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Copy SHE TRADES RAW To STAGE",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILE_NAME": "@variables('V_FILE_NAME')",
+												"P_PATH": {
+													"value": "@variables('V_FAILED_PATH')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Failed Files from Landing_copy1",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Failed Files_copy1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "Delete Loaded Files from Landing",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Loaded Files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "Copy Loaded Files",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "DF_SHE_TRADES_STAGE_DWH_LAKE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILE_NAME": "@variables('V_FILE_NAME')",
+												"P_PATH": {
+													"value": "@variables('V_LOADED_PATH')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
 								}
 							]
 						}
