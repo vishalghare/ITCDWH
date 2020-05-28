@@ -26,8 +26,7 @@
 						"childItems"
 					],
 					"storeSettings": {
-						"type": "AzureBlobStorageReadSettings",
-						"recursive": true
+						"type": "AzureBlobFSReadSettings"
 					},
 					"formatSettings": {
 						"type": "DelimitedTextReadSettings"
