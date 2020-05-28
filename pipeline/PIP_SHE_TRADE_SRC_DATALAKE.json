@@ -223,7 +223,7 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Copy SHE TRADES RAW To STAGE",
+									"activity": "DF_SHE_TRADES_STAGE_DWH_LAKE",
 									"dependencyConditions": [
 										"Failed"
 									]
