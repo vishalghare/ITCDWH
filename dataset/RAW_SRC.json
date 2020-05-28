@@ -8,6 +8,9 @@
 		"parameters": {
 			"P_FILE_NAME": {
 				"type": "string"
+			},
+			"P_PATH": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -19,7 +22,10 @@
 					"value": "@dataset().P_FILE_NAME",
 					"type": "Expression"
 				},
-				"folderPath": "WEDF",
+				"folderPath": {
+					"value": "@dataset().P_PATH",
+					"type": "Expression"
+				},
 				"fileSystem": "source"
 			},
 			"columnDelimiter": "|",

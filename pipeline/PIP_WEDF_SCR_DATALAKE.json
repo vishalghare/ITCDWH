@@ -19,7 +19,8 @@
 						"referenceName": "RAW_SRC",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_FILE_NAME": "*.csv"
+							"P_FILE_NAME": "*.csv",
+							"P_PATH": "WEDF"
 						}
 					},
 					"fieldList": [
@@ -119,7 +120,8 @@
 										"P_FILE_NAME": {
 											"value": "@variables('V_FILE_NAME')",
 											"type": "Expression"
-										}
+										},
+										"P_PATH": "WEDF"
 									}
 								}
 							],
