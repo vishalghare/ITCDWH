@@ -229,8 +229,7 @@
 		],
 		"variables": {
 			"V_FILE_NAME": {
-				"type": "String",
-				"defaultValue": "WEDF 2018 registration data_POC.csv"
+				"type": "String"
 			},
 			"V_DWH_FILE_NAME": {
 				"type": "String"
