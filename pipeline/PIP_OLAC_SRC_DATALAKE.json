@@ -141,7 +141,7 @@
 							}
 						},
 						{
-							"name": "Copy SHE TRADES RAW To STAGE",
+							"name": "Copy LOAC RAW To STAGE",
 							"type": "Copy",
 							"dependsOn": [
 								{
@@ -166,7 +166,7 @@
 										{
 											"name": "FILE_NAME",
 											"value": {
-												"value": "@variables('V_FAILED_PATH')",
+												"value": "@variables('V_FILE_NAME')",
 												"type": "Expression"
 											}
 										},
@@ -227,7 +227,7 @@
 							"type": "ExecuteDataFlow",
 							"dependsOn": [
 								{
-									"activity": "Copy SHE TRADES RAW To STAGE",
+									"activity": "Copy LOAC RAW To STAGE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -263,7 +263,7 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Copy SHE TRADES RAW To STAGE",
+									"activity": "Copy LOAC RAW To STAGE",
 									"dependencyConditions": [
 										"Failed"
 									]
