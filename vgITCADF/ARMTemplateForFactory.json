@@ -709,6 +709,11 @@
 									"recursive": true,
 									"modifiedDatetimeStart": "2020-05-28T00:00:00.000Z",
 									"modifiedDatetimeEnd": "2020-05-30T00:00:00.000Z",
+									"wildcardFolderPath": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									},
+									"wildcardFileName": "*.csv",
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -1169,7 +1174,7 @@
 								"referenceName": "DWH_READ",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILE_NAME": "*.csv",
+									"P_FILE_NAME": "*.*",
 									"P_PATH": {
 										"value": "@variables('V_PATH')",
 										"type": "Expression"
