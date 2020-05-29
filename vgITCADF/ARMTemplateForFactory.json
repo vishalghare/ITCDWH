@@ -27,29 +27,6 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Filter Dir",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Get NTF Files",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get NTF Files').output.childItems",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().type, 'File')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
 						"name": "Delete Old Stage Data",
 						"type": "Delete",
 						"dependsOn": [],
@@ -73,596 +50,6 @@
 							"storeSettings": {
 								"type": "AzureBlobFSReadSettings",
 								"recursive": false
-							}
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Filter Dir",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Filter Dir').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Set FILE NAME",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobFSReadSettings",
-												"recursive": false,
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "MergeFiles"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"mappings": [
-												{
-													"source": {
-														"name": "ProjectID",
-														"type": "String"
-													},
-													"sink": {
-														"name": "ProjectID",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "Context",
-														"type": "String"
-													},
-													"sink": {
-														"name": "Context",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "FirmID",
-														"type": "String"
-													},
-													"sink": {
-														"name": "FirmID",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "Date of data collection",
-														"type": "String"
-													},
-													"sink": {
-														"name": "Date of data collection",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "Country",
-														"type": "String"
-													},
-													"sink": {
-														"name": "Country",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "interviewkey",
-														"type": "String"
-													},
-													"sink": {
-														"name": "interviewkey",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "interviewid",
-														"type": "String"
-													},
-													"sink": {
-														"name": "interviewid",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A01",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A01",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A02",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A02",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A03",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A03",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A04",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A04",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A06",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A06",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A07",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A07",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A09",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A09",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A10",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A10",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A11",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A11",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A12",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A12",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "A13",
-														"type": "String"
-													},
-													"sink": {
-														"name": "A13",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "B01",
-														"type": "String"
-													},
-													"sink": {
-														"name": "B01",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "B03",
-														"type": "String"
-													},
-													"sink": {
-														"name": "B03",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "B17",
-														"type": "String"
-													},
-													"sink": {
-														"name": "B17",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA03",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA03",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA04",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA04",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA07",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA07",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA08",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA08",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA11",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA11",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA12",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA12",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA13",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA13",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA14",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA14",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BA15",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BA15",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BB02",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BB02",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BB08",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BB08",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BB09",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BB09",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BC03",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BC03",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "BC04",
-														"type": "String"
-													},
-													"sink": {
-														"name": "BC04",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "C04",
-														"type": "String"
-													},
-													"sink": {
-														"name": "C04",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "C05",
-														"type": "String"
-													},
-													"sink": {
-														"name": "C05",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "DA01",
-														"type": "String"
-													},
-													"sink": {
-														"name": "DA01",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "DB01",
-														"type": "String"
-													},
-													"sink": {
-														"name": "DB01",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "DB02",
-														"type": "String"
-													},
-													"sink": {
-														"name": "DB02",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "DB03",
-														"type": "String"
-													},
-													"sink": {
-														"name": "DB03",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "FILE_NAME",
-														"type": "String"
-													},
-													"sink": {
-														"name": "FILE_NAME",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "LOAD_TIMESTAMP",
-														"type": "String"
-													},
-													"sink": {
-														"name": "LOAD_TIMESTAMP",
-														"type": "String"
-													}
-												}
-											]
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "DWH_READ",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DWH_STAGE",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": "NTF.csv"
-											}
-										}
-									]
-								},
-								{
-									"name": "Set FILE NAME",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_FILE_NAME",
-										"value": {
-											"value": "@item().name",
-											"type": "Expression"
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Get NTF Files",
-						"type": "GetMetadata",
-						"dependsOn": [
-							{
-								"activity": "Delete Old Stage Data",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set PATH",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "DWH_READ",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": "*.csv",
-									"P_PATH": {
-										"value": "@variables('V_PATH')",
-										"type": "Expression"
-									}
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobFSReadSettings",
-								"recursive": true
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
 							}
 						}
 					},
@@ -1191,6 +578,44 @@
 								}
 							}
 						]
+					},
+					{
+						"name": "DF_NFT_UNPIVOT",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NFT_UNPIVOT",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SrcSTGNTR": {
+										"P_FILE_NAME": "NTF_2.csv"
+									},
+									"TrgUnpovitNTR": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
 					}
 				],
 				"variables": {
@@ -1205,7 +630,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DWH_STAGE')]",
-				"[concat(variables('factoryId'), '/datasets/DWH_READ')]"
+				"[concat(variables('factoryId'), '/datasets/DWH_READ')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_NFT_UNPIVOT')]"
 			]
 		},
 		{
@@ -5750,6 +5176,78 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/STAGE_WEDF')]",
 				"[concat(variables('factoryId'), '/datasets/DWH_WEDF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_NFT_UNPIVOT')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "unpivot",
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "SrcSTGNTR"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_STAGE_FOLDER",
+								"type": "DatasetReference"
+							},
+							"name": "TrgUnpovitNTR"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Unpivot1"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcSTGNTR\nSrcSTGNTR unpivot(output(\n\t\tVariables as string,\n\t\tAnswer_KEY as string\n\t),\n\tungroupBy(ProjectID,\n\t\tContext,\n\t\tFirmID,\n\t\t{Date of data collection},\n\t\tCountry,\n\t\tinterviewkey,\n\t\tinterviewid,\n\t\tA01,\n\t\tA02,\n\t\tA03,\n\t\tA04,\n\t\tA06,\n\t\tA07,\n\t\tA09,\n\t\tA10,\n\t\tA11,\n\t\tA12,\n\t\tA13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP),\n\tlateral: false,\n\tignoreNullPivots: false) ~> Unpivot1\nUnpivot1 sink(input(\n\t\t{ProjectID|Context|FirmID|Date of data collection|Country|interviewkey|interviewid|A01|A02|A03|A04|A06|A07|A09|A10|A11|A12|A13|B01|B03|B17|BA03|BA04|BA07|BA08|BA11|BA12|BA13|BA14|BA15|BB02|BB08|BB09|BC03|BC04|C04|C05|DA01|DB01|DB02|DB03|FILE_NAME|LOAD_TIMESTAMP} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['NTF_UNPOVITE.csv'],\n\tpartitionBy('hash', 1)) ~> TrgUnpovitNTR"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DWH_STAGE')]",
+				"[concat(variables('factoryId'), '/datasets/DWH_STAGE_FOLDER')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DWH_STAGE_FOLDER')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "STAGE",
+						"fileSystem": "target"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ProjectID|Context|FirmID|Date of data collection|Country|interviewkey|interviewid|A01|A02|A03|A04|A06|A07|A09|A10|A11|A12|A13|B01|B03|B17|BA03|BA04|BA07|BA08|BA11|BA12|BA13|BA14|BA15|BB02|BB08|BB09|BC03|BC04|C04|C05|DA01|DB01|DB02|DB03|FILE_NAME|LOAD_TIMESTAMP",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		}
 	]
