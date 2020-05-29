@@ -611,7 +611,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "TestDIM",
+						"referenceName": "DF_DIM_SURVEY_DETAILS",
 						"type": "DataFlowReference",
 						"datasetParameters": {
 							"SrcNTF": {
