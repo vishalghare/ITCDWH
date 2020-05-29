@@ -2109,6 +2109,12 @@
 								"dependencyConditions": [
 									"Succeeded"
 								]
+							},
+							{
+								"activity": "Set PATH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
 							}
 						],
 						"policy": {
@@ -2125,7 +2131,10 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"P_FILE_NAME": "*.csv",
-									"P_PATH": "NTF"
+									"P_PATH": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									}
 								}
 							},
 							"fieldList": [
@@ -2138,6 +2147,16 @@
 							"formatSettings": {
 								"type": "DelimitedTextReadSettings"
 							}
+						}
+					},
+					{
+						"name": "Set PATH",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PATH",
+							"value": "NTF"
 						}
 					}
 				],
