@@ -28,7 +28,14 @@
 			{
 				"name": "Delete Old Stage Data",
 				"type": "Delete",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set PATH",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -182,7 +189,10 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_FILE_NAME": "*.csv",
-							"P_PATH": "NTF"
+							"P_PATH": {
+								"value": "@variables('V_PATH')",
+								"type": "Expression"
+							}
 						}
 					},
 					"fieldList": [
@@ -195,6 +205,16 @@
 					"formatSettings": {
 						"type": "DelimitedTextReadSettings"
 					}
+				}
+			},
+			{
+				"name": "Set PATH",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_PATH",
+					"value": "NTF"
 				}
 			}
 		],
