@@ -28,14 +28,7 @@
 			{
 				"name": "Delete Old Stage Data",
 				"type": "Delete",
-				"dependsOn": [
-					{
-						"activity": "Set PATH",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -170,6 +163,12 @@
 				"dependsOn": [
 					{
 						"activity": "Delete Old Stage Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set PATH",
 						"dependencyConditions": [
 							"Succeeded"
 						]
