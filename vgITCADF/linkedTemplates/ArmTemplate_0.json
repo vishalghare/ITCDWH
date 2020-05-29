@@ -1809,6 +1809,7 @@
 								"value": "@activity('Filter Dir').output.value",
 								"type": "Expression"
 							},
+							"isSequential": true,
 							"activities": [
 								{
 									"name": "Set FILE NAME",
