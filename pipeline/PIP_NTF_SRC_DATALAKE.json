@@ -124,6 +124,7 @@
 						"value": "@activity('Filter Dir').output.value",
 						"type": "Expression"
 					},
+					"isSequential": true,
 					"activities": [
 						{
 							"name": "Set FILE NAME",
@@ -132,7 +133,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "V_FILE_NAME",
-								"value": "@item().name"
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
 							}
 						},
 						{
