@@ -13,7 +13,7 @@
 				"folderPath": "STAGE",
 				"fileSystem": "target"
 			},
-			"columnDelimiter": ",",
+			"columnDelimiter": "|",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
