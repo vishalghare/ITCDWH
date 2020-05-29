@@ -28,16 +28,11 @@
 				},
 				"fileSystem": "target"
 			},
-			"columnDelimiter": ",",
+			"columnDelimiter": "|",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": [
-			{
-				"name": "ProjectID|Context|FirmID|Date of data collection|Country|interviewkey|interviewid|A01|A02|A03|A04|A06|A07|A09|A10|A11|A12|A13|B01|B03|B17|BA03|BA04|BA07|BA08|BA11|BA12|BA13|BA14|BA15|BB02|BB08|BB09|BC03|BC04|C04|C05|DA01|DB01|DB02|DB03|FILE_NAME|LOAD_TIMESTAMP",
-				"type": "String"
-			}
-		]
+		"schema": []
 	}
 }
