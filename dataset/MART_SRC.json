@@ -5,6 +5,11 @@
 			"referenceName": "AzureSqlDatabase1",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"P_TABLE_NAME": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
@@ -93,7 +98,10 @@
 		],
 		"typeProperties": {
 			"schema": "MART_OWNER",
-			"table": "DIM_SURVEY_DETAILS"
+			"table": {
+				"value": "@dataset().P_TABLE_NAME",
+				"type": "Expression"
+			}
 		}
 	}
 }
