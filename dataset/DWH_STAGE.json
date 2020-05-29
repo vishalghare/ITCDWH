@@ -1,0 +1,205 @@
+{
+	"name": "DWH_STAGE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_FILE_NAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().P_FILE_NAME",
+					"type": "Expression"
+				},
+				"folderPath": "STAGE",
+				"fileSystem": "target"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ProjectID",
+				"type": "String"
+			},
+			{
+				"name": "Context",
+				"type": "String"
+			},
+			{
+				"name": "FirmID",
+				"type": "String"
+			},
+			{
+				"name": "Date of data collection",
+				"type": "String"
+			},
+			{
+				"name": "Country",
+				"type": "String"
+			},
+			{
+				"name": "interviewkey",
+				"type": "String"
+			},
+			{
+				"name": "interviewid",
+				"type": "String"
+			},
+			{
+				"name": "A01",
+				"type": "String"
+			},
+			{
+				"name": "A02",
+				"type": "String"
+			},
+			{
+				"name": "A03",
+				"type": "String"
+			},
+			{
+				"name": "A04",
+				"type": "String"
+			},
+			{
+				"name": "A06",
+				"type": "String"
+			},
+			{
+				"name": "A07",
+				"type": "String"
+			},
+			{
+				"name": "A09",
+				"type": "String"
+			},
+			{
+				"name": "A10",
+				"type": "String"
+			},
+			{
+				"name": "A11",
+				"type": "String"
+			},
+			{
+				"name": "A12",
+				"type": "String"
+			},
+			{
+				"name": "A13",
+				"type": "String"
+			},
+			{
+				"name": "B01",
+				"type": "String"
+			},
+			{
+				"name": "B03",
+				"type": "String"
+			},
+			{
+				"name": "B17",
+				"type": "String"
+			},
+			{
+				"name": "BA03",
+				"type": "String"
+			},
+			{
+				"name": "BA04",
+				"type": "String"
+			},
+			{
+				"name": "BA07",
+				"type": "String"
+			},
+			{
+				"name": "BA08",
+				"type": "String"
+			},
+			{
+				"name": "BA11",
+				"type": "String"
+			},
+			{
+				"name": "BA12",
+				"type": "String"
+			},
+			{
+				"name": "BA13",
+				"type": "String"
+			},
+			{
+				"name": "BA14",
+				"type": "String"
+			},
+			{
+				"name": "BA15",
+				"type": "String"
+			},
+			{
+				"name": "BB02",
+				"type": "String"
+			},
+			{
+				"name": "BB08",
+				"type": "String"
+			},
+			{
+				"name": "BB09",
+				"type": "String"
+			},
+			{
+				"name": "BC03",
+				"type": "String"
+			},
+			{
+				"name": "BC04",
+				"type": "String"
+			},
+			{
+				"name": "C04",
+				"type": "String"
+			},
+			{
+				"name": "C05",
+				"type": "String"
+			},
+			{
+				"name": "DA01",
+				"type": "String"
+			},
+			{
+				"name": "DB01",
+				"type": "String"
+			},
+			{
+				"name": "DB02",
+				"type": "String"
+			},
+			{
+				"name": "DB03",
+				"type": "String"
+			},
+			{
+				"name": "FILE_NAME",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_TIMESTAMP",
+				"type": "String"
+			}
+		]
+	}
+}
