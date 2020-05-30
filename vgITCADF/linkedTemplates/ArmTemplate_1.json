@@ -13,6 +13,41 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_SHE_TRADES_STAGE_DWH_LAKE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "STAGE_SHE_TRADES",
+								"type": "DatasetReference"
+							},
+							"name": "SrcStageSheTrades"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_SHE_TRADES",
+								"type": "DatasetReference"
+							},
+							"name": "DWHSHETRADES"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\t{Date of data collection} as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tCountry as string,\n\t\tEmail as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\tCity as string,\n\t\tSize as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of event} as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Middle name} as string,\n\t\t{Date of birth} as string,\n\t\t{Sub-type of entity} as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageSheTrades\nSrcStageSheTrades derive({Year of birth} = iif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth}),\n\t\tNEW_DATALAKE_FILE = 'SHE_TRADES/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\t{Date of data collection} as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tCountry as string,\n\t\tEmail as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\tCity as string,\n\t\tSize as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of event} as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Middle name} as string,\n\t\t{Date of birth} as string,\n\t\t{Sub-type of entity} as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHSHETRADES"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_WEDF_STAGE_DWH_LAKE')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -43,6 +78,88 @@
 						}
 					],
 					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageWEDF\nSrcStageWEDF derive(Address = replace(Address, '\\\\n',' '),\n\t\t{Office Address} = replace({Office Address}, '\\\\n',' '),\n\t\tNEW_DATALAKE_FILE = 'WEDF/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHWEDF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_NTF_DIM_ENTITY')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "SrcNTF"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDIM"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "UpdDIMENTITY"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectColumn"
+						},
+						{
+							"name": "DistinctByAggregate"
+						},
+						{
+							"name": "SourceRecordHash"
+						},
+						{
+							"name": "SelectExistingCol"
+						},
+						{
+							"name": "ExstingRecordHash"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "Lookup1"
+						},
+						{
+							"name": "ConditionalSplit1"
+						},
+						{
+							"name": "RunInfo"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "RunInfo2"
+						},
+						{
+							"name": "AlterRow2"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as string,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nSrcNTF select(mapColumn(\n\t\tFIRM_ID = FirmID,\n\t\tENTITY_NAME = A04,\n\t\tADDRESS = A06,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumn\nSelectColumn aggregate(groupBy(ENTITY_NAME),\n\teach(match(name!='ENTITY_NAME'), $$ = last($$))) ~> DistinctByAggregate\nDistinctByAggregate derive(ENTITY_ID = upper(trim(ENTITY_NAME)),\n\t\tSOURCE_RECORD_HASH = sha2(256,\r\nENTITY_NAME,\r\nADDRESS,\r\nFIRM_ID\r\n)) ~> SourceRecordHash\nExistingDIM select(mapColumn(\n\t\tEXIST_ENTITY_ID = ENTITY_ID,\n\t\tEXIST_VERSION_NO = VERSION_NO,\n\t\tEXIST_ENTITY_NAME = ENTITY_NAME,\n\t\tEXIST_ADDRESS = ADDRESS,\n\t\tEXIST_FIRM_ID = FIRM_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectExistingCol\nSelectExistingCol derive(RECORD_HASH = sha2(256,\r\nEXIST_ENTITY_NAME,\r\nEXIST_ADDRESS,\r\nEXIST_FIRM_ID\r\n)) ~> ExstingRecordHash\nSourceRecordHash, ExstingRecordHash exists(SOURCE_RECORD_HASH == RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, ExstingRecordHash lookup(ENTITY_ID == EXIST_ENTITY_ID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 split(isNull(EXIST_ENTITY_ID),\n\tdisjoint: false) ~> ConditionalSplit1@(NewRecord, UpdateRecord)\nConditionalSplit1@NewRecord derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo alterRow(insertIf(1==1)) ~> AlterRow1\nConditionalSplit1@UpdateRecord derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo2\nRunInfo2 alterRow(updateIf(ENTITY_ID==EXIST_ENTITY_ID)) ~> AlterRow2\nAlterRow1 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as string,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID,\n\t\tENTITY_NAME,\n\t\tADDRESS,\n\t\tFIRM_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITY\nAlterRow2 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as string,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UpdDIMENTITY"
 				}
 			},
 			"dependsOn": []
@@ -632,7 +749,7 @@
 								"parameters": {},
 								"datasetParameters": {
 									"SrcSTGNTR": {
-										"P_FILE_NAME": "NTF_2.csv"
+										"P_FILE_NAME": "NTF.csv"
 									},
 									"TrgUnpovitNTR": {}
 								}
@@ -686,6 +803,46 @@
 								"computeType": "General"
 							}
 						}
+					},
+					{
+						"name": "DF_",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NTF_DIM_ENTITY",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NRF.csv"
+									},
+									"ExistingDIM": {},
+									"DIMENTITY": {},
+									"UpdDIMENTITY": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
 					}
 				],
 				"variables": {
@@ -698,7 +855,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_NTF_DIM_ENTITY')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PIP_NTF_SRC_DATALAKE')]",
@@ -2601,7 +2760,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_SHE_TRADES_STAGE_DWH_LAKE')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PIP_WEDF_SCR_DATALAKE')]",
@@ -3314,6 +3475,52 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/DF_WEDF_STAGE_DWH_LAKE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_TEMP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NTF_DIM_ENTITY",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NRF.csv"
+									},
+									"ExistingDIM": {},
+									"DIMENTITY": {},
+									"UpdDIMENTITY": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_NTF_DIM_ENTITY')]"
 			]
 		}
 	]
