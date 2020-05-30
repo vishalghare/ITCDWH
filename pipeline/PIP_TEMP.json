@@ -19,8 +19,8 @@
 						"referenceName": "dataflow1",
 						"type": "DataFlowReference",
 						"datasetParameters": {
-							"SrcNtf": {
-								"P_FILE_NAME": "NTF.csv"
+							"SrcNtfUNPOVITE": {
+								"P_FILE_NAME": "NTF_UNPOVITE.csv"
 							}
 						}
 					},
