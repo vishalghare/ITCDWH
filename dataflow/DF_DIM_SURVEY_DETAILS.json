@@ -13,7 +13,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "MART_SRC",
+						"referenceName": "MART_DIM_SURVEY_DETAILS",
 						"type": "DatasetReference"
 					},
 					"name": "ExistingDIM"
@@ -22,7 +22,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "MART_SRC",
+						"referenceName": "MART_DIM_SURVEY_DETAILS",
 						"type": "DatasetReference"
 					},
 					"name": "DIMSURVEYDETAILS"
