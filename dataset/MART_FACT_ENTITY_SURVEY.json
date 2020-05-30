@@ -1,0 +1,91 @@
+{
+	"name": "MART_FACT_ENTITY_SURVEY",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "PROJECT_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CONTEXT_SUB_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "COUNTRY_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SURVEY_DETAILS_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SURVEY_DATE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SURVEY_VARIABLE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SURVEY_VARIABLE_SELECTED_OPTION_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SURVEY_INTERVIEWEE_RESPONSE",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CHANGE_VALUE",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SOURCE",
+				"type": "varchar"
+			},
+			{
+				"name": "CREATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "UPDATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_CREATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DATE_UPDATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "MART_OWNER",
+			"table": "FACT_ENTITY_SURVEY"
+		}
+	}
+}
