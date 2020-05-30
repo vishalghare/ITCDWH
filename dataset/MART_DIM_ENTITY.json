@@ -127,6 +127,10 @@
 				"type": "varchar"
 			},
 			{
+				"name": "FIRM_ID",
+				"type": "varchar"
+			},
+			{
 				"name": "BATCH_ID",
 				"type": "int",
 				"precision": 10
