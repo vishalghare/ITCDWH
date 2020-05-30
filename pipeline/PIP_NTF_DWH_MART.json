@@ -650,7 +650,7 @@
 						"type": "DataFlowReference",
 						"datasetParameters": {
 							"SrcNTF": {
-								"P_FILE_NAME": "NRF.csv"
+								"P_FILE_NAME": "NTF.csv"
 							}
 						}
 					},
