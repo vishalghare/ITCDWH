@@ -16,10 +16,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DF_NTF_DIM_ENTITY",
+						"referenceName": "dataflow1",
 						"type": "DataFlowReference",
 						"datasetParameters": {
-							"SrcNTF": {
+							"SrcNtf": {
 								"P_FILE_NAME": "NTF.csv"
 							}
 						}
