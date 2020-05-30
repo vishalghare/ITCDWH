@@ -15,7 +15,8 @@
 			},
 			{
 				"name": "ENTITY_ID",
-				"type": "varchar"
+				"type": "int",
+				"precision": 10
 			},
 			{
 				"name": "VERSION_NO",
