@@ -21,9 +21,6 @@
 						"datasetParameters": {
 							"SrcNTF": {
 								"P_FILE_NAME": "NRF.csv"
-							},
-							"ExistingDIM": {
-								"P_TABLE_NAME": "DIM_ENTITY"
 							}
 						}
 					},
