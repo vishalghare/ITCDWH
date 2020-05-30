@@ -2028,7 +2028,8 @@
 					},
 					{
 						"name": "ENTITY_ID",
-						"type": "varchar"
+						"type": "int",
+						"precision": 10
 					},
 					{
 						"name": "VERSION_NO",
@@ -2183,6 +2184,110 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_SURVEY_DETAILS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SURVEY_DETAILS_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RECORD_HASH_VALUE",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIEWEE_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIERWER_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIEEE_TELEPHONE",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIEWEE_POSITION",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIEWEE_EMAIL",
+						"type": "varchar"
+					},
+					{
+						"name": "SUPERVISOR_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "TIME_INTERVIEW_STARTED",
+						"type": "varchar"
+					},
+					{
+						"name": "TIME_INTERVIEW_ENDED",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIEW_DURATION",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIEW_KEY",
+						"type": "varchar"
+					},
+					{
+						"name": "INTERVIEW_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_SURVEY_DETAILS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_DIM_SURVEY_DETAILS')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -2199,7 +2304,7 @@
 						},
 						{
 							"dataset": {
-								"referenceName": "MART_SRC",
+								"referenceName": "MART_DIM_SURVEY_DETAILS",
 								"type": "DatasetReference"
 							},
 							"name": "ExistingDIM"
@@ -2208,7 +2313,7 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "MART_SRC",
+								"referenceName": "MART_DIM_SURVEY_DETAILS",
 								"type": "DatasetReference"
 							},
 							"name": "DIMSURVEYDETAILS"
@@ -2234,12 +2339,12 @@
 							"name": "DISTINCT"
 						}
 					],
-					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nSrcNTF select(mapColumn(\n\t\tINTERVIEW_KEY = interviewkey,\n\t\tINTERVIEW_ID = interviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nDISTINCT derive(SOURCE_RECORD_HASH = sha2(256,\r\nINTERVIEWEE_NAME,\r\nINTERVIERWER_NAME,\r\nINTERVIEEE_TELEPHONE,\r\nINTERVIEWEE_POSITION,\r\nINTERVIEWEE_EMAIL,\r\nSUPERVISOR_NAME,\r\nTIME_INTERVIEW_STARTED,\r\nTIME_INTERVIEW_ENDED,\r\nINTERVIEW_DURATION,\r\nINTERVIEWEE_NAME,\r\nINTERVIEW_ID)) ~> SourceRecordHash\nSourceRecordHash, ExistingDIM exists(SOURCE_RECORD_HASH == RECORD_HASH_VALUE,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentTimestamp(),\n\t\tDATE_UPDATED = currentTimestamp()) ~> RunInfor\nRunInfor alterRow(insertIf(1==1)) ~> AlterRow1\nSelectColumns aggregate(groupBy(INTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tFILE_NAME),\n\tCOUNT = count()) ~> DISTINCT\nAlterRow1 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as string,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tRECORD_HASH_VALUE = SOURCE_RECORD_HASH,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS"
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nSrcNTF select(mapColumn(\n\t\tINTERVIEW_KEY = interviewkey,\n\t\tINTERVIEW_ID = interviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nDISTINCT derive(SOURCE_RECORD_HASH = sha2(256,\r\nINTERVIEWEE_NAME,\r\nINTERVIERWER_NAME,\r\nINTERVIEEE_TELEPHONE,\r\nINTERVIEWEE_POSITION,\r\nINTERVIEWEE_EMAIL,\r\nSUPERVISOR_NAME,\r\nTIME_INTERVIEW_STARTED,\r\nTIME_INTERVIEW_ENDED,\r\nINTERVIEW_DURATION,\r\nINTERVIEWEE_NAME,\r\nINTERVIEW_ID)) ~> SourceRecordHash\nSourceRecordHash, ExistingDIM exists(SOURCE_RECORD_HASH == RECORD_HASH_VALUE,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentTimestamp(),\n\t\tDATE_UPDATED = currentTimestamp()) ~> RunInfor\nRunInfor alterRow(insertIf(1==1)) ~> AlterRow1\nSelectColumns aggregate(groupBy(INTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tFILE_NAME),\n\tCOUNT = count()) ~> DISTINCT\nAlterRow1 sink(input(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tRECORD_HASH_VALUE = SOURCE_RECORD_HASH,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DWH_STAGE')]",
-				"[concat(variables('factoryId'), '/datasets/MART_SRC')]"
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_SURVEY_DETAILS')]"
 			]
 		},
 		{
@@ -2317,44 +2422,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/STAGE_NTF')]",
 				"[concat(variables('factoryId'), '/datasets/DWH_NTF')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DF_OLAC_STAGE_DWH_LAKE')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "STAGE_OLAC",
-								"type": "DatasetReference"
-							},
-							"name": "SrcStageOLAC"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DWH_OLAC",
-								"type": "DatasetReference"
-							},
-							"name": "DWHOLAC"
-						}
-					],
-					"transformations": [
-						{
-							"name": "DerivedColumn1"
-						}
-					],
-					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageOLAC\nSrcStageOLAC derive({Year of birth} = case({Year of birth}=='N/A', \r\n'',\r\niif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth})\r\n),\n\t\tNEW_DATALAKE_FILE = 'OLAC/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHOLAC"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/STAGE_OLAC')]",
-				"[concat(variables('factoryId'), '/datasets/DWH_OLAC')]"
 			]
 		}
 	]
