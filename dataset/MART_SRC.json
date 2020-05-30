@@ -14,56 +14,121 @@
 		"type": "AzureSqlTable",
 		"schema": [
 			{
-				"name": "SURVEY_DETAILS_SR_KEY",
+				"name": "ENTITY_SR_KEY",
 				"type": "int",
 				"precision": 10
 			},
 			{
-				"name": "RECORD_HASH_VALUE",
+				"name": "ENTITY_ID",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIEWEE_NAME",
+				"name": "VERSION_NO",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_NAME",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIERWER_NAME",
+				"name": "ENTITY_EMAIL_DOMAIN_NAME",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIEEE_TELEPHONE",
+				"name": "ADDRESS",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIEWEE_POSITION",
+				"name": "CITY",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIEWEE_EMAIL",
+				"name": "REGION",
 				"type": "varchar"
 			},
 			{
-				"name": "SUPERVISOR_NAME",
+				"name": "PHONE NUMBER",
 				"type": "varchar"
 			},
 			{
-				"name": "TIME_INTERVIEW_STARTED",
+				"name": "WEBSITE",
 				"type": "varchar"
 			},
 			{
-				"name": "TIME_INTERVIEW_ENDED",
+				"name": "TWITTER",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIEW_DURATION",
+				"name": "LINKEDIN",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIEW_KEY",
+				"name": "BSO_OWNERSHIP",
 				"type": "varchar"
 			},
 			{
-				"name": "INTERVIEW_ID",
+				"name": "POST_CODE",
+				"type": "varchar"
+			},
+			{
+				"name": "POBOX",
+				"type": "varchar"
+			},
+			{
+				"name": "CITY_REGION",
+				"type": "varchar"
+			},
+			{
+				"name": "CATEGORY",
+				"type": "varchar"
+			},
+			{
+				"name": "CONFIDENTIAL",
+				"type": "varchar"
+			},
+			{
+				"name": "SOCIAL_MEDIA",
+				"type": "varchar"
+			},
+			{
+				"name": "OTHER_EMAILS",
+				"type": "varchar"
+			},
+			{
+				"name": "OTHER_PHONE_NUMBERS",
+				"type": "varchar"
+			},
+			{
+				"name": "OTHER_INFORMATION",
+				"type": "varchar"
+			},
+			{
+				"name": "MAILING_ADDRESS_STREET1",
+				"type": "varchar"
+			},
+			{
+				"name": "MAILING_ADDRESS_STREET2",
+				"type": "varchar"
+			},
+			{
+				"name": "MAILING_ADDRESS_CITY",
+				"type": "varchar"
+			},
+			{
+				"name": "MAILING_STATE_PROVICE",
+				"type": "varchar"
+			},
+			{
+				"name": "MAILING_POST_CODE",
+				"type": "varchar"
+			},
+			{
+				"name": "MAILING_COUNTRY",
+				"type": "varchar"
+			},
+			{
+				"name": "MAILING_FORMAT_UN",
 				"type": "varchar"
 			},
 			{
@@ -99,7 +164,7 @@
 		"typeProperties": {
 			"schema": "MART_OWNER",
 			"table": {
-				"value": "@dataset().P_TABLE_NAME",
+				"value": "DIM_ENTITY",
 				"type": "Expression"
 			}
 		}

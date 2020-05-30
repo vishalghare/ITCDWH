@@ -580,7 +580,7 @@
 						"type": "DataFlowReference",
 						"datasetParameters": {
 							"SrcSTGNTR": {
-								"P_FILE_NAME": "NTF_2.csv"
+								"P_FILE_NAME": "NTF.csv"
 							}
 						}
 					},
