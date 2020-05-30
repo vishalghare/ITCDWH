@@ -2288,140 +2288,235 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DF_DIM_SURVEY_DETAILS')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PROJECT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"type": "MappingDataFlow",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "PROJECT_TITLE",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
 				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "DWH_STAGE",
-								"type": "DatasetReference"
-							},
-							"name": "SrcNTF"
-						},
-						{
-							"dataset": {
-								"referenceName": "MART_DIM_SURVEY_DETAILS",
-								"type": "DatasetReference"
-							},
-							"name": "ExistingDIM"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "MART_DIM_SURVEY_DETAILS",
-								"type": "DatasetReference"
-							},
-							"name": "DIMSURVEYDETAILS"
-						}
-					],
-					"transformations": [
-						{
-							"name": "SelectColumns"
-						},
-						{
-							"name": "SourceRecordHash"
-						},
-						{
-							"name": "Exists"
-						},
-						{
-							"name": "RunInfor"
-						},
-						{
-							"name": "AlterRow1"
-						},
-						{
-							"name": "DISTINCT"
-						}
-					],
-					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nSrcNTF select(mapColumn(\n\t\tINTERVIEW_KEY = interviewkey,\n\t\tINTERVIEW_ID = interviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nDISTINCT derive(SOURCE_RECORD_HASH = sha2(256,\r\nINTERVIEWEE_NAME,\r\nINTERVIERWER_NAME,\r\nINTERVIEEE_TELEPHONE,\r\nINTERVIEWEE_POSITION,\r\nINTERVIEWEE_EMAIL,\r\nSUPERVISOR_NAME,\r\nTIME_INTERVIEW_STARTED,\r\nTIME_INTERVIEW_ENDED,\r\nINTERVIEW_DURATION,\r\nINTERVIEWEE_NAME,\r\nINTERVIEW_ID)) ~> SourceRecordHash\nSourceRecordHash, ExistingDIM exists(SOURCE_RECORD_HASH == RECORD_HASH_VALUE,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentTimestamp(),\n\t\tDATE_UPDATED = currentTimestamp()) ~> RunInfor\nRunInfor alterRow(insertIf(1==1)) ~> AlterRow1\nSelectColumns aggregate(groupBy(INTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tFILE_NAME),\n\tCOUNT = count()) ~> DISTINCT\nAlterRow1 sink(input(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tRECORD_HASH_VALUE = SOURCE_RECORD_HASH,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS"
+					"schema": "MART_OWNER",
+					"table": "DIM_PROJECT"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DWH_STAGE')]",
-				"[concat(variables('factoryId'), '/datasets/MART_DIM_SURVEY_DETAILS')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DF_NFT_UNPIVOT')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_CONTEXT_SUB_TYPE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "unpivot",
-				"type": "MappingDataFlow",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CONTEXT_SUB_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CONTEXT_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "CONTEXT_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "CONTEXT_SUB_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "CONTEXT_SUB_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
 				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "DWH_STAGE",
-								"type": "DatasetReference"
-							},
-							"name": "SrcSTGNTR"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DWH_STAGE_FOLDER",
-								"type": "DatasetReference"
-							},
-							"name": "TrgUnpovitNTR"
-						}
-					],
-					"transformations": [
-						{
-							"name": "Unpivot1"
-						}
-					],
-					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcSTGNTR\nSrcSTGNTR unpivot(output(\n\t\tVariables as string,\n\t\tAnswer_KEY as string\n\t),\n\tungroupBy(ProjectID,\n\t\tContext,\n\t\tFirmID,\n\t\t{Date of data collection},\n\t\tCountry,\n\t\tinterviewkey,\n\t\tinterviewid,\n\t\tA01,\n\t\tA02,\n\t\tA03,\n\t\tA04,\n\t\tA06,\n\t\tA07,\n\t\tA09,\n\t\tA10,\n\t\tA11,\n\t\tA12,\n\t\tA13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP),\n\tlateral: false,\n\tignoreNullPivots: true) ~> Unpivot1\nUnpivot1 sink(input(\n\t\t{ProjectID|Context|FirmID|Date of data collection|Country|interviewkey|interviewid|A01|A02|A03|A04|A06|A07|A09|A10|A11|A12|A13|B01|B03|B17|BA03|BA04|BA07|BA08|BA11|BA12|BA13|BA14|BA15|BB02|BB08|BB09|BC03|BC04|C04|C05|DA01|DB01|DB02|DB03|FILE_NAME|LOAD_TIMESTAMP} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['NTF_UNPOVITE.csv'],\n\tpartitionBy('hash', 1)) ~> TrgUnpovitNTR"
+					"schema": "MART_OWNER",
+					"table": "DIM_CONTEXT_SUB_TYPE"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DWH_STAGE')]",
-				"[concat(variables('factoryId'), '/datasets/DWH_STAGE_FOLDER')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DF_NTF_STAGE_DWH_LAKE')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_COUNTRY')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"type": "MappingDataFlow",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "COUNTRY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COUNTRY_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "COUNTRY_NAME_EN",
+						"type": "varchar"
+					},
+					{
+						"name": "COUNTRY_NAME_ES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COUNTRY_NAME_FR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ISO2_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ISO3_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "LEAST_DEVELPED_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "LAND_LCKD_DEVELOPING_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "SMALL_ISLAND_DEVELOPING_STATES",
+						"type": "varchar"
+					},
+					{
+						"name": "DEVELOPED_DEVELOPING_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
 				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "STAGE_NTF",
-								"type": "DatasetReference"
-							},
-							"name": "SrcStageNTF"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DWH_NTF",
-								"type": "DatasetReference"
-							},
-							"name": "DWHNTF"
-						}
-					],
-					"transformations": [
-						{
-							"name": "DerivedColumn1"
-						}
-					],
-					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageNTF\nSrcStageNTF derive(NEW_DATALAKE_FILE = 'NTF/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHNTF"
+					"schema": "MART_OWNER",
+					"table": "DIM_COUNTRY"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/STAGE_NTF')]",
-				"[concat(variables('factoryId'), '/datasets/DWH_NTF')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		}
 	]
