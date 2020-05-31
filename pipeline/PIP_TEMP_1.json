@@ -45,7 +45,7 @@
 						"referenceName": "MART_TEST_NTF",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_TABLE_NAME": "MART_TEST_NTF_UNPOVITE"
+							"P_TABLE_NAME": "MART_TEST_NTT"
 						}
 					}
 				]
@@ -74,7 +74,8 @@
 						"type": "DelimitedTextSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
-							"recursive": true
+							"recursive": false,
+							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
 							"type": "DelimitedTextReadSettings"
@@ -100,7 +101,7 @@
 						"referenceName": "MART_TEST_NTF",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_TABLE_NAME": "MART_TEST_NTF"
+							"P_TABLE_NAME": "MART_TEST_NTF_UNPOVITE"
 						}
 					}
 				]
