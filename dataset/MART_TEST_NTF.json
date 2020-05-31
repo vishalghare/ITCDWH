@@ -1,0 +1,16 @@
+{
+	"name": "MART_TEST_NTF",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "MART_OWMER",
+			"table": "MART_TEST_NTF"
+		}
+	}
+}

@@ -70,8 +70,8 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
-							"modifiedDatetimeStart": "2020-05-28T00:00:00.000Z",
-							"modifiedDatetimeEnd": "2020-06-01T00:00:00.000Z",
+							"modifiedDatetimeStart": "2020-05-30T00:00:00.000Z",
+							"modifiedDatetimeEnd": "2020-05-31T23:00:00.000Z",
 							"wildcardFolderPath": {
 								"value": "@variables('V_PATH')",
 								"type": "Expression"
