@@ -5,12 +5,17 @@
 			"referenceName": "AzureSqlDatabase1",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"P_TABLE_NAME": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
 			"schema": "MART_OWMER",
-			"table": "MART_TEST_NTF"
+			"table": "P_TABLE_NAME"
 		}
 	}
 }
