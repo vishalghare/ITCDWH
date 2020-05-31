@@ -551,7 +551,7 @@
 									"parameters": {
 										"P_FILE_NAME": "@variables('V_FILE_NAME')",
 										"P_PATH": {
-											"value": "@variables('V_FAILED_PATH')",
+											"value": "@variables('V_LOADED_PATH')",
 											"type": "Expression"
 										}
 									}
