@@ -1,0 +1,14 @@
+{
+	"name": "PIP_SHE_TRADE_DWH_MART",
+	"properties": {
+		"variables": {
+			"V_FILE_NAME": {
+				"type": "String"
+			},
+			"V_PATH": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
