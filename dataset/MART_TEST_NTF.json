@@ -15,7 +15,10 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "MART_OWMER",
-			"table": "P_TABLE_NAME"
+			"table": {
+				"value": "@dataset().P_TABLE_NAME",
+				"type": "Expression"
+			}
 		}
 	}
 }
