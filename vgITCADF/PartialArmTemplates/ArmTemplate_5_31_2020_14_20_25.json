@@ -1,0 +1,935 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "vgITCADF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_NTF_DWH_MART')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Delete Old Stage Data",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "NTF.csv"
+								}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": false
+							}
+						}
+					},
+					{
+						"name": "Set PATH",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PATH",
+							"value": "NTF"
+						}
+					},
+					{
+						"name": "Copy NTF File to Satge",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set PATH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Delete Old Stage Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"modifiedDatetimeStart": "2020-05-30T00:00:00.000Z",
+									"modifiedDatetimeEnd": "2020-05-31T23:00:00.000Z",
+									"wildcardFolderPath": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									},
+									"wildcardFileName": "*.csv",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "MergeFiles"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ProjectID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ProjectID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Context",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Context",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FirmID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FirmID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Date of data collection",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Date of data collection",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Country",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Country",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "interviewkey",
+											"type": "String"
+										},
+										"sink": {
+											"name": "interviewkey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "interviewid",
+											"type": "String"
+										},
+										"sink": {
+											"name": "interviewid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A06",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A06",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A07",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A07",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A09",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A09",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A10",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A10",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A11",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A11",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A12",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A12",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A13",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A13",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B17",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B17",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA07",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA07",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA08",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA08",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA11",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA11",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA12",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA12",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA13",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA13",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA14",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA14",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA15",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA15",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB08",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB08",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB09",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB09",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BC03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BC03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BC04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BC04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "C04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "C04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "C05",
+											"type": "String"
+										},
+										"sink": {
+											"name": "C05",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DA01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DA01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FILE_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FILE_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "LOAD_TIMESTAMP",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LOAD_TIMESTAMP",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DWH_READ",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "*.*",
+									"P_PATH": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "NTF.csv"
+								}
+							}
+						]
+					},
+					{
+						"name": "DF_NFT_UNPIVOT",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NFT_UNPIVOT",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcSTGNTR": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_DIM_SURVEY_DETAILS",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_DIM_SURVEY_DETAILS",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_NTF_DIM_ENTITY",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NTF_DIM_ENTITY",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"variables": {
+					"V_FILE_NAME": {
+						"type": "String"
+					},
+					"V_PATH": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_TEMP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy data1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow1",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcNtfUNPOVITE": {
+										"P_FILE_NAME": "NTF_UNPOVITE.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "NTF.csv"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "MART_TEST_NTF",
+								"type": "DatasetReference"
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]",
+				"[concat(variables('factoryId'), '/datasets/MART_TEST_NTF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "SrcNtfUNPOVITE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PROJECT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROJECT"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_CONTEXT_SUB_TYPE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCONTEXTSUBTYPE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_COUNTRY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCOUNTRY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_SURVEY_DETAILS",
+								"type": "DatasetReference"
+							},
+							"name": "DIMSURVEYDETAILS"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_DATE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMSURVEYDATE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_SURVEY_VARIABLE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMSURVEYVARIABLE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_SURVEY_VARIABLE_OPTION",
+								"type": "DatasetReference"
+							},
+							"name": "DIMSURVEYVARIABLEOPTION"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_FACT_ENTITY_SURVEY",
+								"type": "DatasetReference"
+							},
+							"name": "FACTENTITYSURVEY"
+						}
+					],
+					"transformations": [
+						{
+							"name": "LkpPROJECT"
+						},
+						{
+							"name": "LkpCONTEXT"
+						},
+						{
+							"name": "LkpCOUNTRY"
+						},
+						{
+							"name": "LkpSURVEYDETAILS"
+						},
+						{
+							"name": "Select1"
+						},
+						{
+							"name": "LkpSURVEYDATE"
+						},
+						{
+							"name": "LkpSURVEYVARIABLE"
+						},
+						{
+							"name": "LkpSURVEYVARIABLEOPTION"
+						},
+						{
+							"name": "DIMPROJECT1"
+						},
+						{
+							"name": "DIMCONTEXTSUBTYPE1"
+						},
+						{
+							"name": "DIMCOUNTRY1"
+						},
+						{
+							"name": "DIMSURVEYDETAILS1"
+						},
+						{
+							"name": "DIMSURVEYDATE1"
+						},
+						{
+							"name": "DIMSURVEYVARIABLE1"
+						},
+						{
+							"name": "DIMSURVEYVARIABLEOPTION1"
+						},
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as timestamp,\n\t\tVariables as string,\n\t\tAnswer_KEY as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNtfUNPOVITE\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCONTEXT_TYPE_CODE as string,\n\t\tCONTEXT_TYPE_DESC as string,\n\t\tCONTEXT_SUB_TYPE_CODE as string,\n\t\tCONTEXT_SUB_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCONTEXTSUBTYPE\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYDETAILS\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYDATE\nsource(output(\n\t\tSURVEY_VARIABLE_SR_KEY as integer,\n\t\tVARIABLE_NAME as string,\n\t\tSURVEY_QUESTIONIRE_VERSION_NO as string,\n\t\tQUENTION_TITLE as string,\n\t\tVARIABLE_DESC as string,\n\t\tRESPONSE_TYPE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYVARIABLE\nsource(output(\n\t\tSURVEY_VARIABLE_OPTION_SR_KEY as integer,\n\t\tVARIABLE_NAME as string,\n\t\tSURVEY_QUESTIONIRE_VERSION_NO as string,\n\t\tQUENTION_TITLE as string,\n\t\tOPTIONS_CODE as string,\n\t\tOPTIONS_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYVARIABLEOPTION\nSelect1, DIMPROJECT1 lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPROJECT\nLkpPROJECT, DIMCONTEXTSUBTYPE1 lookup(upper(trim(Context)) == upper(trim(CONTEXT_TYPE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpCONTEXT\nLkpCONTEXT, DIMCOUNTRY1 lookup(upper(trim(Country)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpCOUNTRY\nLkpCOUNTRY, DIMSURVEYDETAILS1 lookup(Select1@INTERVIEWEE_NAME == DIMSURVEYDETAILS1@INTERVIEWEE_NAME\n\t&& Select1@INTERVIERWER_NAME == DIMSURVEYDETAILS1@INTERVIERWER_NAME\n\t&& Select1@INTERVIEEE_TELEPHONE == DIMSURVEYDETAILS1@INTERVIEEE_TELEPHONE\n\t&& Select1@INTERVIEWEE_POSITION == DIMSURVEYDETAILS1@INTERVIEWEE_POSITION\n\t&& Select1@INTERVIEWEE_EMAIL == DIMSURVEYDETAILS1@INTERVIEWEE_EMAIL\n\t&& Select1@SUPERVISOR_NAME == DIMSURVEYDETAILS1@SUPERVISOR_NAME\n\t&& Select1@TIME_INTERVIEW_STARTED == DIMSURVEYDETAILS1@TIME_INTERVIEW_STARTED\n\t&& Select1@TIME_INTERVIEW_ENDED == DIMSURVEYDETAILS1@TIME_INTERVIEW_ENDED\n\t&& Select1@INTERVIEW_DURATION == DIMSURVEYDETAILS1@INTERVIEW_DURATION\n\t&& interviewkey == INTERVIEW_KEY\n\t&& interviewid == INTERVIEW_ID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYDETAILS\nSrcNtfUNPOVITE select(mapColumn(\n\t\tProjectID,\n\t\tContext,\n\t\tFirmID,\n\t\t{Date of data collection},\n\t\tCountry,\n\t\tinterviewkey,\n\t\tinterviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tA04,\n\t\tA06,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP,\n\t\tVariables,\n\t\tAnswer_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nLkpSURVEYDETAILS, DIMSURVEYDATE1 lookup(toDate({Date of data collection},'MM/dd/yyyy') == DATE_TIME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYDATE\nLkpSURVEYDATE, DIMSURVEYVARIABLE1 lookup(Variables == VARIABLE_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYVARIABLE\nLkpSURVEYVARIABLE, DIMSURVEYVARIABLEOPTION1 lookup(Variables == DIMSURVEYVARIABLEOPTION1@VARIABLE_NAME\n\t&& Answer_KEY == OPTIONS_CODE,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYVARIABLEOPTION\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMPROJECT1\nDIMCONTEXTSUBTYPE select(mapColumn(\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCONTEXT_TYPE_DESC,\n\t\tCONTEXT_SUB_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMCONTEXTSUBTYPE1\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMCOUNTRY1\nDIMSURVEYDETAILS select(mapColumn(\n\t\tSURVEY_DETAILS_SR_KEY,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS1\nDIMSURVEYDATE select(mapColumn(\n\t\tSURVEY_DATE_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDATE1\nDIMSURVEYVARIABLE select(mapColumn(\n\t\tSURVEY_VARIABLE_SR_KEY,\n\t\tVARIABLE_NAME,\n\t\tSURVEY_INTERVIEWEE_RESPONSE = RESPONSE_TYPE\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYVARIABLE1\nDIMSURVEYVARIABLEOPTION select(mapColumn(\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY = SURVEY_VARIABLE_OPTION_SR_KEY,\n\t\tVARIABLE_NAME,\n\t\tOPTIONS_CODE\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYVARIABLEOPTION1\nLkpSURVEYVARIABLEOPTION derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tPROJECT_SR_KEY as integer,\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tSURVEY_DATE_SR_KEY as integer,\n\t\tSURVEY_VARIABLE_SR_KEY as integer,\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY as integer,\n\t\tSURVEY_INTERVIEWEE_RESPONSE as integer,\n\t\tCHANGE_VALUE as integer,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tSURVEY_DETAILS_SR_KEY,\n\t\tSURVEY_DATE_SR_KEY,\n\t\tSURVEY_VARIABLE_SR_KEY,\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY,\n\t\tSURVEY_INTERVIEWEE_RESPONSE,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FACTENTITYSURVEY"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_TEST_NTF')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "MART_OWMER",
+					"table": "MART_TEST_NTF"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
