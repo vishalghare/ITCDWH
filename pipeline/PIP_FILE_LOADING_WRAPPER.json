@@ -1,0 +1,102 @@
+{
+    "name": "PIP_FILE_LOADING_WRAPPER",
+    "properties": {
+        "activities": [
+            {
+                "name": "Retrieve_Metadata",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "queryTimeout": "02:00:00"
+                    },
+                    "dataset": {
+                        "referenceName": "DWH_SQL_PARAMETER_DATASET",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "P_TABLE_NAME": "META_FILE_LOAD"
+                        }
+                    },
+                    "firstRowOnly": false
+                }
+            },
+            {
+                "name": "ForEachSource",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Retrieve_Metadata",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Retrieve_Metadata').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": false,
+                    "activities": [
+                        {
+                            "name": "Execute Source File Loading",
+                            "type": "ExecutePipeline",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "pipeline": {
+                                    "referenceName": "PIP_FILE_LOADING",
+                                    "type": "PipelineReference"
+                                },
+                                "waitOnCompletion": true,
+                                "parameters": {
+                                    "P_FILE_NAME_FORMAT": {
+                                        "value": "@{item().FILE_NAME_FORMAT}",
+                                        "type": "Expression"
+                                    },
+                                    "P_FILE_PATH": {
+                                        "value": "@{item().FILE_PATH}",
+                                        "type": "Expression"
+                                    },
+                                    "P_FIELD_SEPARATOR": {
+                                        "value": "@{item().FIELD_SEPARATOR}",
+                                        "type": "Expression"
+                                    },
+                                    "P_STAGE_TABLE": {
+                                        "value": "@{item().STAGE_TABLE}",
+                                        "type": "Expression"
+                                    },
+                                    "P_TARGET_TABLE": {
+                                        "value": "@{item().TARGET_TABLE}",
+                                        "type": "Expression"
+                                    },
+                                    "P_SOURCE": {
+                                        "value": "@{item().SOURCE}",
+                                        "type": "Expression"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "variables": {
+            "V_FILE_NAME": {
+                "type": "String"
+            }
+        },
+        "annotations": []
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
