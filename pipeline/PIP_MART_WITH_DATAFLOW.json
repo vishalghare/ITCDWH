@@ -1,0 +1,246 @@
+{
+    "name": "PIP_MART_WITH_DATAFLOW",
+    "properties": {
+        "activities": [
+            {
+                "name": "DF_DIM_AGE_GROUP",
+                "type": "ExecuteDataFlow",
+                "dependsOn": [
+                    {
+                        "activity": "Set BATCH_NBR",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataflow": {
+                        "referenceName": "DF_DIM_AGE_GROUP",
+                        "type": "DataFlowReference",
+                        "parameters": {
+                            "P_PERIOD_START": {
+                                "value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
+                                "type": "Expression"
+                            },
+                            "P_PERIOD_END": {
+                                "value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
+                                "type": "Expression"
+                            },
+                            "P_BATCH_NBR": {
+                                "value": "@activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR",
+                                "type": "Expression"
+                            },
+                            "P_SNAP_DATE": {
+                                "value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
+                                "type": "Expression"
+                            }
+                        },
+                        "datasetParameters": {
+                            "DwhAgeGroup": {
+                                "P_TABLE_NAME": "NULL"
+                            },
+                            "ExitingMartDimAgeGroup": {
+                                "P_TABLE_NAME": "NULL"
+                            },
+                            "DimAgeGroup": {
+                                "P_TABLE_NAME": "DIM_AGE_GROUP"
+                            },
+                            "DimAgeGroupU": {
+                                "P_TABLE_NAME": "DIM_AGE_GROUP"
+                            }
+                        }
+                    },
+                    "compute": {
+                        "coreCount": 8,
+                        "computeType": "General"
+                    }
+                }
+            },
+            {
+                "name": "GetPipelineRunInfo",
+                "type": "Lookup",
+                "dependsOn": [
+                    {
+                        "activity": "Start the Pipeline",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "sqlReaderQuery": {
+                            "value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
+                            "type": "Expression"
+                        },
+                        "queryTimeout": "02:00:00"
+                    },
+                    "dataset": {
+                        "referenceName": "DWH_SQL_PARAMETER_DATASET",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "P_TABLE_NAME": "NULL"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "Set PERIOD_START",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "GetPipelineRunInfo",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "V_PERIOD_START",
+                    "value": {
+                        "value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Set SNAP_DATE",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "GetPipelineRunInfo",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "V_SNAP_DATE",
+                    "value": {
+                        "value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Set BATCH_NBR",
+                "description": "",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "Set PERIOD END",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Set SNAP_DATE",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Set PERIOD_START",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "V_BATCH_NBR",
+                    "value": {
+                        "value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Set PERIOD END",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "GetPipelineRunInfo",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "V_PERIOD_END",
+                    "value": {
+                        "value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Start the Pipeline",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[DWH].[PRC_DWH_START_PIPELINE]",
+                    "storedProcedureParameters": {
+                        "P_IN_PIPELINE_NAME": {
+                            "value": "PIP_MART_MASTER_DIM",
+                            "type": "String"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlDB",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "parameters": {
+            "P_PIPELINE_NAME": {
+                "type": "string"
+            }
+        },
+        "variables": {
+            "V_PERIOD_START": {
+                "type": "String"
+            },
+            "V_PERIOD_END": {
+                "type": "String"
+            },
+            "V_SNAP_DATE": {
+                "type": "String"
+            },
+            "V_BATCH_NBR": {
+                "type": "String"
+            }
+        },
+        "annotations": []
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
