@@ -2,7 +2,7 @@
 	"name": "SRC_FILE_PARAMETER_DATASET",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
@@ -20,7 +20,7 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
+				"type": "AzureBlobStorageLocation",
 				"fileName": {
 					"value": "@dataset().P_FILE_NAME",
 					"type": "Expression"
@@ -29,7 +29,7 @@
 					"value": "@dataset().P_PATH",
 					"type": "Expression"
 				},
-				"fileSystem": "source"
+				"container": "source"
 			},
 			"columnDelimiter": {
 				"value": "@dataset().P_FIELD_SEPARATOR",

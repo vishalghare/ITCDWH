@@ -2,7 +2,7 @@
 	"name": "RAW_SRC",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
@@ -17,16 +17,10 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().P_FILE_NAME",
-					"type": "Expression"
-				},
-				"folderPath": {
-					"value": "@dataset().P_PATH",
-					"type": "Expression"
-				},
-				"fileSystem": "source"
+				"type": "AzureBlobStorageLocation",
+				"fileName": "WEDF.csv",
+				"folderPath": "  WEDF",
+				"container": "source"
 			},
 			"columnDelimiter": "|",
 			"escapeChar": "\\",
