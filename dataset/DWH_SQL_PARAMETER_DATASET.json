@@ -1,40 +1,40 @@
 {
-    "name": "DWH_SQL_PARAMETER_DATASET",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "AzureSqlDB",
-            "type": "LinkedServiceReference"
-        },
-        "parameters": {
-            "P_TABLE_NAME": {
-                "type": "string"
-            }
-        },
-        "annotations": [],
-        "type": "AzureSqlTable",
-        "schema": [
-            {
-                "name": "CONTEXT",
-                "type": "text"
-            },
-            {
-                "name": "SOURCE",
-                "type": "text"
-            },
-            {
-                "name": "LOAD_TIMESTAMP",
-                "type": "datetime",
-                "precision": 23,
-                "scale": 3
-            }
-        ],
-        "typeProperties": {
-            "schema": "DWH",
-            "table": {
-                "value": "@dataset().P_TABLE_NAME",
-                "type": "Expression"
-            }
-        }
-    },
-    "type": "Microsoft.DataFactory/factories/datasets"
+	"name": "DWH_SQL_PARAMETER_DATASET",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_TABLE_NAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CONTEXT",
+				"type": "text"
+			},
+			{
+				"name": "SOURCE",
+				"type": "text"
+			},
+			{
+				"name": "LOAD_TIMESTAMP",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "DWH",
+			"table": {
+				"value": "@dataset().P_TABLE_NAME",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
 }
