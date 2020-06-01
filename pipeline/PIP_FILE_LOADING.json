@@ -1,0 +1,778 @@
+{
+    "name": "PIP_FILE_LOADING",
+    "properties": {
+        "activities": [
+            {
+                "name": "Get File Using Metadata",
+                "type": "GetMetadata",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "P_FILE_NAME": {
+                                "value": "@pipeline().parameters.P_FILE_NAME_FORMAT",
+                                "type": "Expression"
+                            },
+                            "P_PATH": {
+                                "value": "@pipeline().parameters.P_FILE_PATH",
+                                "type": "Expression"
+                            },
+                            "P_FIELD_SEPARATOR": {
+                                "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    "fieldList": [
+                        "childItems"
+                    ],
+                    "storeSettings": {
+                        "type": "AzureBlobStorageReadSettings",
+                        "recursive": false
+                    },
+                    "formatSettings": {
+                        "type": "DelimitedTextReadSettings"
+                    }
+                }
+            },
+            {
+                "name": "ForEachFiles",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "File Type Filter",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('File Type Filter').output.value",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "Set Stage Table",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_STAGE_TABLE",
+                                "value": {
+                                    "value": "@{pipeline().parameters.P_STAGE_TABLE}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Set Final Target Table",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_TARGET_TABLE",
+                                "value": {
+                                    "value": "@{pipeline().parameters.P_TARGET_TABLE}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Set Clean Query",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set Stage Table",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                {
+                                    "activity": "Set Final Target Table",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                {
+                                    "activity": "Set Failed File Path",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                {
+                                    "activity": "Set Loaded File Path",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                {
+                                    "activity": "Set Source Name",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_CLEAN_TEMP_QUERY",
+                                "value": {
+                                    "value": "TRUNCATE TABLE DWH.@{variables('V_STAGE_TABLE')}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Set Source Query",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy Source File To Stage",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_SOURCE_QUERY",
+                                "value": {
+                                    "value": "SELECT A.*,  'ITC' SOURCE, '@{item().name}' FILE_NAME, GETDATE ()  LOAD_TIMESTAMP FROM DWH.@{variables('V_STAGE_TABLE')} A",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Copy Source File To Stage",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set Clean Query",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": false,
+                                        "enablePartitionDiscovery": false
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "AzureSqlSink",
+                                    "preCopyScript": {
+                                        "value": "@{variables('V_CLEAN_TEMP_QUERY')}",
+                                        "type": "Expression"
+                                    },
+                                    "disableMetricsCollection": false
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@pipeline().parameters.P_FILE_PATH",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "DWH_SQL_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_TABLE_NAME": {
+                                            "value": "@{variables('V_STAGE_TABLE')}",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Copy Stage to Target Table",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set Source Query",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "AzureSqlSource",
+                                    "sqlReaderQuery": {
+                                        "value": "@variables('V_SOURCE_QUERY')",
+                                        "type": "Expression"
+                                    },
+                                    "queryTimeout": "02:00:00"
+                                },
+                                "sink": {
+                                    "type": "AzureSqlSink"
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "DWH_SQL_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_TABLE_NAME": "Select NULL"
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "DWH_SQL_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_TABLE_NAME": {
+                                            "value": "@{variables('V_TARGET_TABLE')}",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Move Failed Files",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy Source File To Stage",
+                                    "dependencyConditions": [
+                                        "Failed"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@pipeline().parameters.P_FILE_PATH",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@variables('V_FAILED_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Move success Files",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy Stage to Target Table",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@pipeline().parameters.P_FILE_PATH",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@variables('V_LOADED_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Set Failed File Path",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_FAILED_PATH",
+                                "value": {
+                                    "value": "@{pipeline().parameters.P_FILE_PATH}/failed",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Set Loaded File Path",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_LOADED_PATH",
+                                "value": {
+                                    "value": "@{pipeline().parameters.P_FILE_PATH}/loaded",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Delete After Moved to Failed",
+                            "type": "Delete",
+                            "dependsOn": [
+                                {
+                                    "activity": "Move Failed Files",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataset": {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@pipeline().parameters.P_FILE_PATH",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": "|"
+                                    }
+                                },
+                                "enableLogging": false,
+                                "storeSettings": {
+                                    "type": "AzureBlobStorageReadSettings",
+                                    "recursive": false
+                                }
+                            }
+                        },
+                        {
+                            "name": "Delete After Moved to Loaded",
+                            "type": "Delete",
+                            "dependsOn": [
+                                {
+                                    "activity": "Move success Files",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataset": {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@pipeline().parameters.P_FILE_PATH",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": "|"
+                                    }
+                                },
+                                "enableLogging": false,
+                                "storeSettings": {
+                                    "type": "AzureBlobStorageReadSettings",
+                                    "recursive": false
+                                }
+                            }
+                        },
+                        {
+                            "name": "Set Source Name",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_SOURCE_NAME",
+                                "value": {
+                                    "value": "@pipeline().parameters.P_SOURCE",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Move Failed Files_copy1",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy Stage to Target Table",
+                                    "dependencyConditions": [
+                                        "Failed"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@pipeline().parameters.P_FILE_PATH",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@variables('V_FAILED_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Delete After Moved to Failed_copy1",
+                            "type": "Delete",
+                            "dependsOn": [
+                                {
+                                    "activity": "Move Failed Files_copy1",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataset": {
+                                    "referenceName": "SRC_FILE_PARAMETER_DATASET",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_FILE_NAME": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "P_PATH": {
+                                            "value": "@pipeline().parameters.P_FILE_PATH",
+                                            "type": "Expression"
+                                        },
+                                        "P_FIELD_SEPARATOR": {
+                                            "value": "@pipeline().parameters.P_FIELD_SEPARATOR",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                "enableLogging": false,
+                                "storeSettings": {
+                                    "type": "AzureBlobStorageReadSettings",
+                                    "recursive": false
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "File Type Filter",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get File Using Metadata",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get File Using Metadata').output.childItems",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@equals(item().type, 'File')",
+                        "type": "Expression"
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "P_FILE_NAME_FORMAT": {
+                "type": "string"
+            },
+            "P_FILE_PATH": {
+                "type": "string"
+            },
+            "P_FIELD_SEPARATOR": {
+                "type": "string"
+            },
+            "P_STAGE_TABLE": {
+                "type": "string"
+            },
+            "P_TARGET_TABLE": {
+                "type": "string"
+            },
+            "P_SOURCE": {
+                "type": "string"
+            }
+        },
+        "variables": {
+            "V_SOURCE_QUERY": {
+                "type": "String"
+            },
+            "V_CLEAN_TEMP_QUERY": {
+                "type": "String"
+            },
+            "V_STAGE_TABLE": {
+                "type": "String"
+            },
+            "V_TARGET_TABLE": {
+                "type": "String"
+            },
+            "V_FAILED_PATH": {
+                "type": "String"
+            },
+            "V_LOADED_PATH": {
+                "type": "String"
+            },
+            "V_SOURCE_NAME": {
+                "type": "String"
+            }
+        },
+        "annotations": []
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
