@@ -18,8 +18,14 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "WEDF 2018 registration data_POC.csv",
-				"folderPath": "  WEDF",
+				"fileName": {
+					"value": "@dataset().P_FILE_NAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().P_PATH",
+					"type": "Expression"
+				},
 				"fileSystem": "source"
 			},
 			"columnDelimiter": "|",
