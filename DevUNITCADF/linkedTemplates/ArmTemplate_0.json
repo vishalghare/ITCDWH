@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "DevUNITCADF"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
 		"AzureDataLakeStorage1_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
@@ -24,6 +28,19 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -1904,183 +1921,6 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "FACT_ENTITY_SURVEY"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_SRC')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_TABLE_NAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ENTITY_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ENTITY_ID",
-						"type": "varchar"
-					},
-					{
-						"name": "VERSION_NO",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ENTITY_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "ENTITY_EMAIL_DOMAIN_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "ADDRESS",
-						"type": "varchar"
-					},
-					{
-						"name": "CITY",
-						"type": "varchar"
-					},
-					{
-						"name": "REGION",
-						"type": "varchar"
-					},
-					{
-						"name": "PHONE NUMBER",
-						"type": "varchar"
-					},
-					{
-						"name": "WEBSITE",
-						"type": "varchar"
-					},
-					{
-						"name": "TWITTER",
-						"type": "varchar"
-					},
-					{
-						"name": "LINKEDIN",
-						"type": "varchar"
-					},
-					{
-						"name": "BSO_OWNERSHIP",
-						"type": "varchar"
-					},
-					{
-						"name": "POST_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "POBOX",
-						"type": "varchar"
-					},
-					{
-						"name": "CITY_REGION",
-						"type": "varchar"
-					},
-					{
-						"name": "CATEGORY",
-						"type": "varchar"
-					},
-					{
-						"name": "CONFIDENTIAL",
-						"type": "varchar"
-					},
-					{
-						"name": "SOCIAL_MEDIA",
-						"type": "varchar"
-					},
-					{
-						"name": "OTHER_EMAILS",
-						"type": "varchar"
-					},
-					{
-						"name": "OTHER_PHONE_NUMBERS",
-						"type": "varchar"
-					},
-					{
-						"name": "OTHER_INFORMATION",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_ADDRESS_STREET1",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_ADDRESS_STREET2",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_ADDRESS_CITY",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_STATE_PROVICE",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_POST_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_COUNTRY",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_FORMAT_UN",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": {
-						"value": "DIM_ENTITY",
-						"type": "Expression"
-					}
 				}
 			},
 			"dependsOn": [

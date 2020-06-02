@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "DevUNITCADF"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
 		"AzureDataLakeStorage1_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
@@ -3230,8 +3234,8 @@
 								"referenceName": "RAW_SRC",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILE_NAME": "*.csv",
-									"P_PATH": "NTF"
+									"P_PATH": "NTF",
+									"P_FILE_NAME": "*.csv"
 								}
 							},
 							"fieldList": [
@@ -5497,8 +5501,8 @@
 								"referenceName": "RAW_SRC",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILE_NAME": "*.csv",
-									"P_PATH": "WEDF"
+									"P_PATH": "WEDF",
+									"P_FILE_NAME": "*.*"
 								}
 							},
 							"fieldList": [
@@ -5596,12 +5600,12 @@
 											"referenceName": "RAW_SRC",
 											"type": "DatasetReference",
 											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
 												"P_PATH": {
 													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
 													"type": "Expression"
 												}
 											}
@@ -5677,266 +5681,6 @@
 									}
 								},
 								{
-									"name": "Copy Failed Files",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Copy WEDF RAW To STAGE",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"additionalColumns": [
-												{
-													"name": "FILE_NAME",
-													"value": {
-														"value": "@variables('V_FILE_NAME')",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "LOAD_TIMESTAMP",
-													"value": {
-														"value": "@utcnow()",
-														"type": "Expression"
-													}
-												}
-											],
-											"storeSettings": {
-												"type": "AzureBlobFSReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": "@variables('V_FILE_NAME')",
-												"P_PATH": {
-													"value": "@variables('V_FAILED_PATH')",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Delete Failed Files from Landing",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Copy Failed Files",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												}
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobFSReadSettings",
-											"recursive": true
-										}
-									}
-								},
-								{
-									"name": "Copy Failed Files_copy1",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "DF_WEDF_STAGE_DWH_LAKE",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"additionalColumns": [
-												{
-													"name": "FILE_NAME",
-													"value": {
-														"value": "@variables('V_FILE_NAME')",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "LOAD_TIMESTAMP",
-													"value": {
-														"value": "@utcnow()",
-														"type": "Expression"
-													}
-												}
-											],
-											"storeSettings": {
-												"type": "AzureBlobFSReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": "@variables('V_FILE_NAME')",
-												"P_PATH": {
-													"value": "@variables('V_FAILED_PATH')",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Delete Failed Files from Landing_copy1",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Copy Failed Files_copy1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												}
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobFSReadSettings",
-											"recursive": true
-										}
-									}
-								},
-								{
 									"name": "Copy Loaded Files",
 									"type": "Copy",
 									"dependsOn": [
@@ -6000,12 +5744,12 @@
 											"referenceName": "RAW_SRC",
 											"type": "DatasetReference",
 											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
 												"P_PATH": {
 													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
 													"type": "Expression"
 												}
 											}
@@ -6016,9 +5760,12 @@
 											"referenceName": "RAW_SRC",
 											"type": "DatasetReference",
 											"parameters": {
-												"P_FILE_NAME": "@variables('V_FILE_NAME')",
 												"P_PATH": {
 													"value": "@variables('V_LOADED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
 													"type": "Expression"
 												}
 											}
@@ -6026,7 +5773,7 @@
 									]
 								},
 								{
-									"name": "Delete Failed Files from Landing_copy1_copy1",
+									"name": "Delete Loaded Files from Landing",
 									"type": "Delete",
 									"dependsOn": [
 										{
@@ -6049,12 +5796,12 @@
 											"referenceName": "RAW_SRC",
 											"type": "DatasetReference",
 											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
 												"P_PATH": {
 													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
 													"type": "Expression"
 												}
 											}
@@ -6076,6 +5823,272 @@
 										"value": {
 											"value": "@item().name",
 											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Copy Failed Files",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "DF_WEDF_STAGE_DWH_LAKE",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"additionalColumns": [
+												{
+													"name": "FILE_NAME",
+													"value": {
+														"value": "@variables('V_FILE_NAME')",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "LOAD_TIMESTAMP",
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													}
+												}
+											],
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_FAILED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Failed Files from Landing",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Failed Files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "Copy Failed Files_copy1",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Copy WEDF RAW To STAGE",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"additionalColumns": [
+												{
+													"name": "FILE_NAME",
+													"value": {
+														"value": "@variables('V_FILE_NAME')",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "LOAD_TIMESTAMP",
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													}
+												}
+											],
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_FAILED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Failed Files from Landing_copy1",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Failed Files_copy1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
 										}
 									}
 								}
@@ -8242,10 +8255,10 @@
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"P_FILE_NAME": {
+					"P_PATH": {
 						"type": "string"
 					},
-					"P_PATH": {
+					"P_FILE_NAME": {
 						"type": "string"
 					}
 				},
@@ -8390,7 +8403,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
+					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -8408,7 +8421,7 @@
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobFSLocation",
+						"type": "AzureBlobStorageLocation",
 						"fileName": {
 							"value": "@dataset().P_FILE_NAME",
 							"type": "Expression"
@@ -8417,7 +8430,7 @@
 							"value": "@dataset().P_PATH",
 							"type": "Expression"
 						},
-						"fileSystem": "source"
+						"container": "source"
 					},
 					"columnDelimiter": {
 						"value": "@dataset().P_FIELD_SEPARATOR",
@@ -8435,7 +8448,7 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
@@ -8654,7 +8667,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "OLAC.csv",
 						"folderPath": "STAGE",
 						"fileSystem": "source"
 					},
@@ -9109,6 +9121,19 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",

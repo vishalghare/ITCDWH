@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "DevUNITCADF"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
 		"AzureDataLakeStorage1_accountKey": {
 			"value": ""
 		},
