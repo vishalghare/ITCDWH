@@ -152,41 +152,11 @@
 				]
 			},
 			{
-				"name": "DF_DWH_TO_STAGE_ALL_COL_copy1",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "Copy data1_copy1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataflow": {
-						"referenceName": "DF_DWH_TO_STAGE_ALL_COL",
-						"type": "DataFlowReference"
-					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
-					}
-				}
-			},
-			{
 				"name": "Copy data1_copy1_copy1",
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "DF_DWH_TO_STAGE_ALL_COL_copy1",
+						"activity": "dataflow2",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -245,7 +215,37 @@
 				]
 			},
 			{
-				"name": "DF_DWH_TO_STAGE_ALL_COL_copy1_copy1",
+				"name": "dataflow2",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Copy data1_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "CRM",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					}
+				}
+			},
+			{
+				"name": "dataflow21",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [
 					{
@@ -265,7 +265,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DF_DWH_TO_STAGE_ALL_COL",
+						"referenceName": "SHE_TRADE",
 						"type": "DataFlowReference"
 					},
 					"compute": {
