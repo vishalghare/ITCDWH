@@ -233,22 +233,6 @@
 							"typeProperties": {
 								"source": {
 									"type": "DelimitedTextSource",
-									"additionalColumns": [
-										{
-											"name": "FILE_NAME",
-											"value": {
-												"value": "@variables('V_FILE_NAME')",
-												"type": "Expression"
-											}
-										},
-										{
-											"name": "LOAD_TIMESTAMP",
-											"value": {
-												"value": "@utcnow()",
-												"type": "Expression"
-											}
-										}
-									],
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true
@@ -379,22 +363,6 @@
 							"typeProperties": {
 								"source": {
 									"type": "DelimitedTextSource",
-									"additionalColumns": [
-										{
-											"name": "FILE_NAME",
-											"value": {
-												"value": "@variables('V_FILE_NAME')",
-												"type": "Expression"
-											}
-										},
-										{
-											"name": "LOAD_TIMESTAMP",
-											"value": {
-												"value": "@utcnow()",
-												"type": "Expression"
-											}
-										}
-									],
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true
@@ -512,22 +480,6 @@
 							"typeProperties": {
 								"source": {
 									"type": "DelimitedTextSource",
-									"additionalColumns": [
-										{
-											"name": "FILE_NAME",
-											"value": {
-												"value": "@variables('V_FILE_NAME')",
-												"type": "Expression"
-											}
-										},
-										{
-											"name": "LOAD_TIMESTAMP",
-											"value": {
-												"value": "@utcnow()",
-												"type": "Expression"
-											}
-										}
-									],
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true
