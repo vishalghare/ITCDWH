@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": "ALL_COL_FILE_NEW.csv",
 				"folderPath": "STAGE",
 				"fileSystem": "target"
 			},
