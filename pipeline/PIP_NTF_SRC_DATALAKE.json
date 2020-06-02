@@ -38,8 +38,8 @@
 						"referenceName": "RAW_SRC",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_FILE_NAME": "*.csv",
-							"P_PATH": "NTF"
+							"P_PATH": "NTF",
+							"P_FILE_NAME": "*.csv"
 						}
 					},
 					"fieldList": [
