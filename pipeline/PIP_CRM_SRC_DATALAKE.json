@@ -28,7 +28,7 @@
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "V_LOADED_PATH",
+					"variableName": "V_FAILED_PATH",
 					"value": "CRM/FAILED"
 				}
 			},
