@@ -1,5 +1,5 @@
 {
-	"name": "DWH_STAGE_ALL_WRITE",
+	"name": "DWH_MART_STAGE_ALL",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorage1",
@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": "ALL_COL_FILE.csv",
 				"folderPath": "STAGE",
 				"fileSystem": "target"
 			},
