@@ -19,7 +19,7 @@
 						"referenceName": "DWH_STAGE",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_FILE_NAME": "SHE_TRADES.csv"
+							"P_FILE_NAME": "ALL_COL_FILE.csv"
 						}
 					},
 					"enableLogging": false,
