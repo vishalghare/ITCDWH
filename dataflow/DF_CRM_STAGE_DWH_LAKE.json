@@ -1,0 +1,32 @@
+{
+	"name": "DF_CRM_STAGE_DWH_LAKE",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "STAGE_CRM",
+						"type": "DatasetReference"
+					},
+					"name": "SrcStageCRM"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DWH_CRM",
+						"type": "DatasetReference"
+					},
+					"name": "DWHCRM"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tWebsite as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\tConfidential as string,\n\t\tSize as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\t{First Name} as string,\n\t\t{Last Name} as string,\n\t\tAccount as string,\n\t\t{Professional status} as string,\n\t\t{Job title} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\tSkype as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Type of tool} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageCRM\nSrcStageCRM derive(NEW_DATALAKE_FILE = 'CRM/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tWebsite as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\tConfidential as string,\n\t\tSize as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\t{First Name} as string,\n\t\t{Last Name} as string,\n\t\tAccount as string,\n\t\t{Professional status} as string,\n\t\t{Job title} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\tSkype as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Type of tool} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DWHCRM"
+		}
+	}
+}

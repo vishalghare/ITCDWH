@@ -1,0 +1,265 @@
+{
+	"name": "STAGE_CRM",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "CRM.csv",
+				"folderPath": "STAGE",
+				"fileSystem": "source"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Account Name",
+				"type": "String"
+			},
+			{
+				"name": "English Name",
+				"type": "String"
+			},
+			{
+				"name": "Acronym",
+				"type": "String"
+			},
+			{
+				"name": "Account Type",
+				"type": "String"
+			},
+			{
+				"name": "Account Sub-Type",
+				"type": "String"
+			},
+			{
+				"name": "Office Address: Country",
+				"type": "String"
+			},
+			{
+				"name": "Category",
+				"type": "String"
+			},
+			{
+				"name": "Parent Account",
+				"type": "String"
+			},
+			{
+				"name": "Website",
+				"type": "String"
+			},
+			{
+				"name": "Email",
+				"type": "String"
+			},
+			{
+				"name": "Phone number",
+				"type": "String"
+			},
+			{
+				"name": "Confidential",
+				"type": "String"
+			},
+			{
+				"name": "Size",
+				"type": "String"
+			},
+			{
+				"name": "Activity",
+				"type": "String"
+			},
+			{
+				"name": "Product",
+				"type": "String"
+			},
+			{
+				"name": "Women Managed",
+				"type": "String"
+			},
+			{
+				"name": "Youth Managed",
+				"type": "String"
+			},
+			{
+				"name": "Social media",
+				"type": "String"
+			},
+			{
+				"name": "Other emails",
+				"type": "String"
+			},
+			{
+				"name": "Other phone numbers",
+				"type": "String"
+			},
+			{
+				"name": "Other information",
+				"type": "String"
+			},
+			{
+				"name": "Ownership and management",
+				"type": "String"
+			},
+			{
+				"name": "Trade Forum",
+				"type": "String"
+			},
+			{
+				"name": "Office Address: Street 1",
+				"type": "String"
+			},
+			{
+				"name": "Office Address: Street 2",
+				"type": "String"
+			},
+			{
+				"name": "Office Address: City",
+				"type": "String"
+			},
+			{
+				"name": "Office Address: State/Province",
+				"type": "String"
+			},
+			{
+				"name": "Office Address: ZIP/Postal Code",
+				"type": "String"
+			},
+			{
+				"name": "Mailing address is equal to office address",
+				"type": "String"
+			},
+			{
+				"name": "Mailing Address: Street 1",
+				"type": "String"
+			},
+			{
+				"name": "Mailing Address: Street 2",
+				"type": "String"
+			},
+			{
+				"name": "Mailing Address: City",
+				"type": "String"
+			},
+			{
+				"name": "Mailing Address: State/Province",
+				"type": "String"
+			},
+			{
+				"name": "Mailing Address: ZIP/Postal Code",
+				"type": "String"
+			},
+			{
+				"name": "Mailing Address: Country",
+				"type": "String"
+			},
+			{
+				"name": "UN Mailing Format",
+				"type": "String"
+			},
+			{
+				"name": "Project Number",
+				"type": "String"
+			},
+			{
+				"name": "Salutation",
+				"type": "String"
+			},
+			{
+				"name": "First Name",
+				"type": "String"
+			},
+			{
+				"name": "Last Name",
+				"type": "String"
+			},
+			{
+				"name": "Account",
+				"type": "String"
+			},
+			{
+				"name": "Professional status",
+				"type": "String"
+			},
+			{
+				"name": "Job title",
+				"type": "String"
+			},
+			{
+				"name": "Gender",
+				"type": "String"
+			},
+			{
+				"name": "Year of birth",
+				"type": "String"
+			},
+			{
+				"name": "Phone",
+				"type": "String"
+			},
+			{
+				"name": "Preferred Language",
+				"type": "String"
+			},
+			{
+				"name": "Skype",
+				"type": "String"
+			},
+			{
+				"name": "Use account address",
+				"type": "String"
+			},
+			{
+				"name": "Event title",
+				"type": "String"
+			},
+			{
+				"name": "Event type",
+				"type": "String"
+			},
+			{
+				"name": "Type of tool",
+				"type": "String"
+			},
+			{
+				"name": "Course name",
+				"type": "String"
+			},
+			{
+				"name": "Start date",
+				"type": "String"
+			},
+			{
+				"name": "End date",
+				"type": "String"
+			},
+			{
+				"name": "Event date",
+				"type": "String"
+			},
+			{
+				"name": "SME Trade Academy",
+				"type": "String"
+			},
+			{
+				"name": "SheTrades",
+				"type": "String"
+			},
+			{
+				"name": "FILE_NAME",
+				"type": "String"
+			},
+			{
+				"name": "LOAD_TIMESTAMP",
+				"type": "String"
+			}
+		]
+	}
+}
