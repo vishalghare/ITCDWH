@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
-				"type": "Copy",
+				"name": "dataflow1",
+				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -15,96 +15,33 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": false,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
+					"dataflow": {
+						"referenceName": "dataflow1",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"SrcWEDF": {
+								"P_FILE_NAME": "WEDF 2019 registration data_POC_1905_20200602_082542.csv",
+								"P_PATH": "WEDF"
+							},
+							"SrcCRM": {
+								"P_FILE_NAME": "Data_input_from_Dynamics_to_Data_Warehouse_Techm - Account Form_20200602_111523.csv",
+								"P_PATH": "CRM"
+							},
+							"SrcSHETRADES": {
+								"P_FILE_NAME": "SheTrades Global 2019_POC_1905_20200602_082228.csv",
+								"P_PATH": "SHE_TRADES"
+							},
+							"SrcOLAC": {
+								"P_FILE_NAME": "Data collection 2019_OLAC_POC_20200602_082236.csv",
+								"P_PATH": "OLAC"
+							}
 						}
 					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"tableOption": "autoCreate"
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "DWH_STAGE",
-						"type": "DatasetReference",
-						"parameters": {
-							"P_FILE_NAME": "NTF.csv"
-						}
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
 					}
-				],
-				"outputs": [
-					{
-						"referenceName": "MART_TEST_NTF",
-						"type": "DatasetReference",
-						"parameters": {
-							"P_TABLE_NAME": "MART_TEST_NTT"
-						}
-					}
-				]
-			},
-			{
-				"name": "Copy data2",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Copy data1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"tableOption": "autoCreate"
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "DWH_STAGE",
-						"type": "DatasetReference",
-						"parameters": {
-							"P_FILE_NAME": "NTF_UNPOVITE.csv"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "MART_TEST_NTF",
-						"type": "DatasetReference",
-						"parameters": {
-							"P_TABLE_NAME": "MART_TEST_NTF_UNPOVITE"
-						}
-					}
-				]
+				}
 			}
 		],
 		"annotations": []
