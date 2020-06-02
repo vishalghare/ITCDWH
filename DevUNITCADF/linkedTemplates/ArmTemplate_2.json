@@ -13,6 +13,158 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_SHE_TRADES_DIM_ENTITY')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "SrcSheTrades"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDIM"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExstingDim1"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExstingDimMaxID"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "FilterProfessionalStatu"
+						},
+						{
+							"name": "SelectIN"
+						},
+						{
+							"name": "AggDistinct"
+						},
+						{
+							"name": "SelectExits"
+						},
+						{
+							"name": "LatestEntityID"
+						},
+						{
+							"name": "Join1"
+						},
+						{
+							"name": "ExstingRecordHash"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "SourceRecordHash"
+						},
+						{
+							"name": "DerivedColumn"
+						},
+						{
+							"name": "Lookup1"
+						},
+						{
+							"name": "NewRecords"
+						},
+						{
+							"name": "Join2"
+						},
+						{
+							"name": "SurrogateKey1"
+						},
+						{
+							"name": "RunInfor"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "ExstingRecordHashSelect"
+						},
+						{
+							"name": "RunInfo2"
+						},
+						{
+							"name": "AlterRow2"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of platform} as short,\n\t\t{SheTrades Project} as string,\n\t\t{Date of data collection} as short,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tCountry as string,\n\t\tEmail as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\tCity as string,\n\t\tSize as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of event} as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as timestamp,\n\t\t{Submission Date} as timestamp,\n\t\t{Middle name} as string,\n\t\t{Date of birth} as date,\n\t\t{Sub-type of entity} as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcSheTrades\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExstingDim1\nsource(output(\n\t\tMAX_VAL as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'Select IsNULL(Max(ENTITY_ID),0) MAX_VAL\\nFROM MART_OWNER.DIM_ENTITY',\n\tformat: 'query') ~> ExstingDimMaxID\nSrcSheTrades filter(upper(trim({Professional status}))=='SELF-EMPLOYED/ FREELANCER') ~> FilterProfessionalStatu\nFilterProfessionalStatu select(mapColumn(\n\t\tProjectID,\n\t\tEMAIL = Email,\n\t\tENTITY_NAME = {Organization/ Company name},\n\t\tCITY = City,\n\t\tBSO_OWNERSHIP = {BSO ownership},\n\t\tADDRESS = {Office Address},\n\t\tPOST_CODE = {Post Code},\n\t\tWEBSITE = Website,\n\t\tTWITTER = Twitter,\n\t\tLINKEDIN = LinkedIn,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP,\n\t\tSOURCE = FILE_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectIN\nSelectIN aggregate(groupBy({Organization/ Company name} = ENTITY_NAME),\n\teach(match(name!='ENTITY_NAME'), $$ = last($$))) ~> AggDistinct\nExistingDIM select(mapColumn(\n\t\tEXIST_ENTITY_ID = ENTITY_ID,\n\t\tEXIST_VERSION_NO = VERSION_NO,\n\t\tEXIST_ENTITY_NAME = ENTITY_NAME,\n\t\tEXIST_ENTITY_EMAIL_DOMAIN_NAME = ENTITY_EMAIL_DOMAIN_NAME,\n\t\tEXIST_ADDRESS = ADDRESS,\n\t\tEXIST_CITY = CITY,\n\t\tEXIST_WEBSITE = WEBSITE,\n\t\tEXIST_TWITTER = TWITTER,\n\t\tEXIST_LINKEDIN = LINKEDIN,\n\t\tEXIST_BSO_OWNERSHIP = BSO_OWNERSHIP,\n\t\tEXIST_POST_CODE = POST_CODE,\n\t\tEXIST_SOURCE = SOURCE\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectExits\nExstingDim1 aggregate(groupBy(ENTITY_NAME,\n\t\tENTITY_ID),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestEntityID\nSelectExits, LatestEntityID join(EXIST_ENTITY_ID == ENTITY_ID\n\t&& EXIST_ENTITY_NAME == ENTITY_NAME\n\t&& EXIST_VERSION_NO == VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nJoin1 derive(RECORD_HASH = sha2(256,\r\nEXIST_ENTITY_NAME,\r\nEXIST_ENTITY_EMAIL_DOMAIN_NAME,\r\nEXIST_ADDRESS,\r\nEXIST_CITY,\r\nEXIST_WEBSITE,\r\nEXIST_TWITTER,\r\nEXIST_LINKEDIN,\r\nEXIST_SOURCE,\r\nEXIST_BSO_OWNERSHIP,\r\nEXIST_POST_CODE\r\n)) ~> ExstingRecordHash\nSourceRecordHash, ExstingRecordHashSelect exists(SOURCE_RECORD_HASH == RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nDerivedColumn derive(SOURCE_RECORD_HASH = sha2(256,\r\n{Organization/ Company name},\r\nENTITY_EMAIL_DOMAIN_NAME,\r\nADDRESS,\r\nCITY,\r\nWEBSITE,\r\nTWITTER,\r\nLINKEDIN,\r\nFILE_NAME,\r\nBSO_OWNERSHIP,\r\nPOST_CODE\r\n)) ~> SourceRecordHash\nAggDistinct derive(ENTITY_EMAIL_DOMAIN_NAME = substring(EMAIL, instr(EMAIL, '@')+1)) ~> DerivedColumn\nExists1, ExstingRecordHashSelect lookup({Organization/ Company name} == EXIST_ENTITY_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 split(isNull(EXIST_ENTITY_ID),\n\tdisjoint: false) ~> NewRecords@(NewRecords, UpdateRecord)\nNewRecords@NewRecords, ExstingDimMaxID join(1==1,\n\tjoinType:'cross',\n\tbroadcast: 'auto')~> Join2\nJoin2 keyGenerate(output(Dim_Surrogate_Key1 as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1 derive(ENTITY_ID = MAX_VAL + Dim_Surrogate_Key1,\n\t\tVERSION_NO = 1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfor\nRunInfor alterRow(insertIf(1==1)) ~> AlterRow1\nExstingRecordHash select(mapColumn(\n\t\tEXIST_ENTITY_ID,\n\t\tEXIST_VERSION_NO,\n\t\tEXIST_ENTITY_NAME,\n\t\tRECORD_HASH\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ExstingRecordHashSelect\nNewRecords@UpdateRecord derive(VERSION_NO = EXIST_VERSION_NO + 1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo2\nRunInfo2 alterRow(insertIf(1==1)) ~> AlterRow2\nAlterRow1 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID,\n\t\tVERSION_NO,\n\t\tENTITY_EMAIL_DOMAIN_NAME,\n\t\tADDRESS,\n\t\tCITY,\n\t\tWEBSITE,\n\t\tTWITTER,\n\t\tLINKEDIN,\n\t\tBSO_OWNERSHIP,\n\t\tPOST_CODE,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITY\nAlterRow2 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\t{PHONE NUMBER} as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID = EXIST_ENTITY_ID,\n\t\tVERSION_NO,\n\t\tENTITY_NAME = EXIST_ENTITY_NAME,\n\t\tENTITY_EMAIL_DOMAIN_NAME,\n\t\tADDRESS,\n\t\tCITY,\n\t\tWEBSITE,\n\t\tTWITTER,\n\t\tLINKEDIN,\n\t\tBSO_OWNERSHIP,\n\t\tPOST_CODE,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITY1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SHE_TRADES_STAGE_DWH_LAKE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "STAGE_SHE_TRADES",
+								"type": "DatasetReference"
+							},
+							"name": "SrcStageSheTrades"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_SHE_TRADES",
+								"type": "DatasetReference"
+							},
+							"name": "DWHSHETRADES"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\t{Date of data collection} as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tCountry as string,\n\t\tEmail as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\tCity as string,\n\t\tSize as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of event} as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Middle name} as string,\n\t\t{Date of birth} as string,\n\t\t{Sub-type of entity} as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageSheTrades\nSrcStageSheTrades derive({Year of birth} = iif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth}),\n\t\tNEW_DATALAKE_FILE = 'SHE_TRADES/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\t{Date of data collection} as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tCountry as string,\n\t\tEmail as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\tCity as string,\n\t\tSize as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of event} as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Middle name} as string,\n\t\t{Date of birth} as string,\n\t\t{Sub-type of entity} as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHSHETRADES"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_WEDF_STAGE_DWH_LAKE')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -43,6 +195,41 @@
 						}
 					],
 					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageWEDF\nSrcStageWEDF derive(Address = replace(Address, '\\\\n',' '),\n\t\t{Office Address} = replace({Office Address}, '\\\\n',' '),\n\t\tNEW_DATALAKE_FILE = 'WEDF/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHWEDF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_CRM_STAGE_DWH_LAKE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "STAGE_CRM",
+								"type": "DatasetReference"
+							},
+							"name": "SrcStageCRM"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_CRM",
+								"type": "DatasetReference"
+							},
+							"name": "DWHCRM"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tWebsite as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\tConfidential as string,\n\t\tSize as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\t{First Name} as string,\n\t\t{Last Name} as string,\n\t\tAccount as string,\n\t\t{Professional status} as string,\n\t\t{Job title} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\tSkype as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Type of tool} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageCRM\nSrcStageCRM derive(NEW_DATALAKE_FILE = 'CRM/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tWebsite as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\tConfidential as string,\n\t\tSize as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\t{First Name} as string,\n\t\t{Last Name} as string,\n\t\tAccount as string,\n\t\t{Professional status} as string,\n\t\t{Job title} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\tSkype as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Type of tool} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DWHCRM"
 				}
 			},
 			"dependsOn": []
@@ -2345,7 +2532,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_SHE_TRADES_DIM_ENTITY')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PIP_SHE_TRADE_SRC_DATALAKE')]",
@@ -2389,8 +2578,8 @@
 								"referenceName": "RAW_SRC",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILE_NAME": "*.csv",
-									"P_PATH": "SHE_TRADES"
+									"P_PATH": "SHE_TRADES",
+									"P_FILE_NAME": "*.csv"
 								}
 							},
 							"fieldList": [
@@ -2979,7 +3168,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_SHE_TRADES_STAGE_DWH_LAKE')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PIP_TEMP')]",
@@ -3750,6 +3941,654 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/DF_WEDF_STAGE_DWH_LAKE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_CRM_SRC_DATALAKE')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Set Loaded File Path",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_LOADED_PATH",
+							"value": "CRM/LOADED"
+						}
+					},
+					{
+						"name": "Set Raw File PATH",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PATH",
+							"value": "CRM"
+						}
+					},
+					{
+						"name": "Set Failed File Path",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_LOADED_PATH",
+							"value": "CRM/FAILED"
+						}
+					},
+					{
+						"name": "Get CRM Files",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Set Loaded File Path",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Failed File Path",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Raw File PATH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "RAW_SRC",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_PATH": "CRM",
+									"P_FILE_NAME": "*.*"
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Filter Dir",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get CRM Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get CRM Files').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'File')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter Dir",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter Dir').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Set FILE NAME",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_FILE_NAME",
+										"value": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Copy CRM RAW To STAGE",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Set FILE NAME",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"additionalColumns": [
+												{
+													"name": "FILE_NAME",
+													"value": {
+														"value": "@variables('V_FILE_NAME')",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "LOAD_TIMESTAMP",
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													}
+												}
+											],
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "STAGE_CRM",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								},
+								{
+									"name": "DF_CRM_STAGE_DWH_LAKE",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Copy CRM RAW To STAGE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_CRM_STAGE_DWH_LAKE",
+											"type": "DataFlowReference",
+											"parameters": {
+												"P_DWH_FILE_NAME": {
+													"value": "'@{variables('V_FILE_NAME')}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"SrcStageCRM": {},
+												"DWHCRM": {}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "Copy Failed Files_copy1",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Copy CRM RAW To STAGE",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": false,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_FAILED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Failed Files from Landing_copy1",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Failed Files_copy1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": false
+										}
+									}
+								},
+								{
+									"name": "Copy Failed Files 1",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "DF_CRM_STAGE_DWH_LAKE",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": false,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_FAILED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Failed Files from Landing 1",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Failed Files 1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": false
+										}
+									}
+								},
+								{
+									"name": "Copy Loaded Files",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "DF_CRM_STAGE_DWH_LAKE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": false,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_LOADED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Loaded Files from Landing",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Loaded Files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": false
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"variables": {
+					"V_FILE_NAME": {
+						"type": "String"
+					},
+					"V_DWH_FILE_NAME": {
+						"type": "String"
+					},
+					"V_FAILED_PATH": {
+						"type": "String"
+					},
+					"V_LOADED_PATH": {
+						"type": "String"
+					},
+					"V_PATH": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_CRM_STAGE_DWH_LAKE')]"
 			]
 		}
 	]
