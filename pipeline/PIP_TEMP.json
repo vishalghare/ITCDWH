@@ -16,13 +16,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DF_FACT_ENTITY_SURVEY",
-						"type": "DataFlowReference",
-						"datasetParameters": {
-							"SrcNtfUNPOVITE": {
-								"P_FILE_NAME": "NTF_UNPOVITE.csv"
-							}
-						}
+						"referenceName": "DF_DIM_PARTICIPANT",
+						"type": "DataFlowReference"
 					},
 					"compute": {
 						"coreCount": 8,
