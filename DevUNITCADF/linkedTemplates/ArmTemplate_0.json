@@ -2698,7 +2698,7 @@
 						"type": "varchar"
 					},
 					{
-						"name": "PHONE NUMBER",
+						"name": "PHONE_NUMBER",
 						"type": "varchar"
 					},
 					{
