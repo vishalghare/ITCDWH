@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "dataflow1",
+				"name": "DF_DIM_PARTICIPANT",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
