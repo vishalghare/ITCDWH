@@ -4135,13 +4135,13 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PIP_TEMP')]",
+			"name": "[concat(parameters('factoryName'), '/PIP_ALL_DIM_PARTICIPANT')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "dataflow1",
+						"name": "DF_DIM_PARTICIPANT",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -4178,7 +4178,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PIP_TEMP_1')]",
+			"name": "[concat(parameters('factoryName'), '/PIP_ALL_DIM_ENTITY')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {

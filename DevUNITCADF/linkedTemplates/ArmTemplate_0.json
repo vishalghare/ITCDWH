@@ -2825,6 +2825,189 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PARTICIPANT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PARTICIPANT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PARTICIPANT_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "VERSION_NO",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EMAIL",
+						"type": "varchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "MIDDLE_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "GENDER",
+						"type": "varchar"
+					},
+					{
+						"name": "YEAR_OF_BIRTH",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NATIONALITY",
+						"type": "varchar"
+					},
+					{
+						"name": "JOB_TITLE",
+						"type": "varchar"
+					},
+					{
+						"name": "ADDRESS",
+						"type": "varchar"
+					},
+					{
+						"name": "ID",
+						"type": "varchar"
+					},
+					{
+						"name": "USERNAME",
+						"type": "varchar"
+					},
+					{
+						"name": "HOWLONG",
+						"type": "varchar"
+					},
+					{
+						"name": "PRIOR_EXPERIENCE",
+						"type": "varchar"
+					},
+					{
+						"name": "SALUTATION",
+						"type": "varchar"
+					},
+					{
+						"name": "CITY_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "POBOX",
+						"type": "varchar"
+					},
+					{
+						"name": "POST_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "SKYPE",
+						"type": "varchar"
+					},
+					{
+						"name": "AIM",
+						"type": "varchar"
+					},
+					{
+						"name": "YAHOO",
+						"type": "varchar"
+					},
+					{
+						"name": "MSN",
+						"type": "varchar"
+					},
+					{
+						"name": "CITY_REGION",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_INFORMATION",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_PHONE_NUMBERS",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_EMAILS",
+						"type": "varchar"
+					},
+					{
+						"name": "SOCIAL_MEDIA",
+						"type": "varchar"
+					},
+					{
+						"name": "PREFERRED_LANGUAGE",
+						"type": "varchar"
+					},
+					{
+						"name": "CONFIDENTIAL",
+						"type": "varchar"
+					},
+					{
+						"name": "PHONE_NUMBER",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PARTICIPANT"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_PROJECT')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2882,110 +3065,6 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_PROJECT"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_SURVEY_DETAILS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "SURVEY_DETAILS_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "RECORD_HASH_VALUE",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIEWEE_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIERWER_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIEEE_TELEPHONE",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIEWEE_POSITION",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIEWEE_EMAIL",
-						"type": "varchar"
-					},
-					{
-						"name": "SUPERVISOR_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "TIME_INTERVIEW_STARTED",
-						"type": "varchar"
-					},
-					{
-						"name": "TIME_INTERVIEW_ENDED",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIEW_DURATION",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIEW_KEY",
-						"type": "varchar"
-					},
-					{
-						"name": "INTERVIEW_ID",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_SURVEY_DETAILS"
 				}
 			},
 			"dependsOn": [
