@@ -1,0 +1,75 @@
+{
+	"name": "MART_DIM_INT_STD_INDUSTRY_CODES_ISIC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "INT_STD_INDUSTRY_CODES_ISIC_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ISIC_SECTION",
+				"type": "varchar"
+			},
+			{
+				"name": "ISIC_DIVISION",
+				"type": "varchar"
+			},
+			{
+				"name": "ISIC_GROUP",
+				"type": "varchar"
+			},
+			{
+				"name": "ISIC_CLASS",
+				"type": "varchar"
+			},
+			{
+				"name": "ISIC_DESC",
+				"type": "varchar"
+			},
+			{
+				"name": "ISIC_CODE",
+				"type": "varchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SOURCE",
+				"type": "varchar"
+			},
+			{
+				"name": "CREATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "UPDATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_CREATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DATE_UPDATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "MART_OWNER",
+			"table": "DIM_INT_STD_INDUSTRY_CODES_ISIC"
+		}
+	}
+}
