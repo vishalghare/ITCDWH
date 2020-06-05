@@ -13,6 +13,249 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_GENDER')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "GENDER_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "GENDER_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "GENDER_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_GENDER"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PARTICIPANT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PARTICIPANT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PARTICIPANT_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "VERSION_NO",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EMAIL",
+						"type": "varchar"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "MIDDLE_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "GENDER",
+						"type": "varchar"
+					},
+					{
+						"name": "YEAR_OF_BIRTH",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NATIONALITY",
+						"type": "varchar"
+					},
+					{
+						"name": "JOB_TITLE",
+						"type": "varchar"
+					},
+					{
+						"name": "ADDRESS",
+						"type": "varchar"
+					},
+					{
+						"name": "ID",
+						"type": "varchar"
+					},
+					{
+						"name": "USERNAME",
+						"type": "varchar"
+					},
+					{
+						"name": "HOWLONG",
+						"type": "varchar"
+					},
+					{
+						"name": "PRIOR_EXPERIENCE",
+						"type": "varchar"
+					},
+					{
+						"name": "SALUTATION",
+						"type": "varchar"
+					},
+					{
+						"name": "CITY_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "POBOX",
+						"type": "varchar"
+					},
+					{
+						"name": "POST_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "SKYPE",
+						"type": "varchar"
+					},
+					{
+						"name": "AIM",
+						"type": "varchar"
+					},
+					{
+						"name": "YAHOO",
+						"type": "varchar"
+					},
+					{
+						"name": "MSN",
+						"type": "varchar"
+					},
+					{
+						"name": "CITY_REGION",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_INFORMATION",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_PHONE_NUMBERS",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_EMAILS",
+						"type": "varchar"
+					},
+					{
+						"name": "SOCIAL_MEDIA",
+						"type": "varchar"
+					},
+					{
+						"name": "PREFERRED_LANGUAGE",
+						"type": "varchar"
+					},
+					{
+						"name": "CONFIDENTIAL",
+						"type": "varchar"
+					},
+					{
+						"name": "PHONE_NUMBER",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PARTICIPANT"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_PLATFORM_TYPE')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -4137,229 +4380,6 @@
 				"annotations": []
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PIP_MART_WITH_DATAFLOW')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "GetPipelineRunInfo",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Start the Pipeline",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00"
-							},
-							"dataset": {
-								"referenceName": "DWH_SQL_PARAMETER_DATASET",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_TABLE_NAME": "NULL"
-								}
-							}
-						}
-					},
-					{
-						"name": "Set PERIOD_START",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "GetPipelineRunInfo",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_PERIOD_START",
-							"value": {
-								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set SNAP_DATE",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "GetPipelineRunInfo",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_SNAP_DATE",
-							"value": {
-								"value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set BATCH_NBR",
-						"description": "",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Set PERIOD END",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set SNAP_DATE",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set PERIOD_START",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_BATCH_NBR",
-							"value": {
-								"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set PERIOD END",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "GetPipelineRunInfo",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_PERIOD_END",
-							"value": {
-								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Start the Pipeline",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[DWH].[PRC_DWH_START_PIPELINE]",
-							"storedProcedureParameters": {
-								"P_IN_PIPELINE_NAME": {
-									"value": "PIP_MART_MASTER_DIM",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_PIPELINE_NAME": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"V_PERIOD_START": {
-						"type": "String"
-					},
-					"V_PERIOD_END": {
-						"type": "String"
-					},
-					"V_SNAP_DATE": {
-						"type": "String"
-					},
-					"V_BATCH_NBR": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DF_CRM_STAGE_DWH_LAKE')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "STAGE_CRM",
-								"type": "DatasetReference"
-							},
-							"name": "SrcStageCRM"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DWH_CRM",
-								"type": "DatasetReference"
-							},
-							"name": "DWHCRM"
-						}
-					],
-					"transformations": [
-						{
-							"name": "DerivedColumn1"
-						}
-					],
-					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tWebsite as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\tConfidential as string,\n\t\tSize as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\t{First Name} as string,\n\t\t{Last Name} as string,\n\t\tAccount as string,\n\t\t{Professional status} as string,\n\t\t{Job title} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\tSkype as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Type of tool} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageCRM\nSrcStageCRM derive(NEW_DATALAKE_FILE = 'CRM/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tWebsite as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\tConfidential as string,\n\t\tSize as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\t{First Name} as string,\n\t\t{Last Name} as string,\n\t\tAccount as string,\n\t\t{Professional status} as string,\n\t\t{Job title} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\tSkype as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Type of tool} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DWHCRM"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/STAGE_CRM')]"
-			]
 		}
 	]
 }

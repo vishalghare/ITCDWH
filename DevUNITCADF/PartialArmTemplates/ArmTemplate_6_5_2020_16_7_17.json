@@ -1,0 +1,1216 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "DevUNITCADF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_NTF_DWH_MART')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Delete Old Stage Data",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "NTF.csv"
+								}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": false
+							}
+						}
+					},
+					{
+						"name": "Set PATH",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PATH",
+							"value": "NTF"
+						}
+					},
+					{
+						"name": "Copy NTF File to Satge",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set PATH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Delete Old Stage Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"modifiedDatetimeStart": "2020-05-30T00:00:00.000Z",
+									"modifiedDatetimeEnd": "2020-06-05T23:00:00.000Z",
+									"wildcardFolderPath": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									},
+									"wildcardFileName": "*.csv",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "MergeFiles"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ProjectID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ProjectID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Context",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Context",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FirmID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FirmID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Date of data collection",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Date of data collection",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Country",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Country",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "interviewkey",
+											"type": "String"
+										},
+										"sink": {
+											"name": "interviewkey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "interviewid",
+											"type": "String"
+										},
+										"sink": {
+											"name": "interviewid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A06",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A06",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A07",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A07",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A09",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A09",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A10",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A10",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A11",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A11",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A12",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A12",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A13",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A13",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B17",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B17",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA07",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA07",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA08",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA08",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA11",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA11",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA12",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA12",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA13",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA13",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA14",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA14",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA15",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA15",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB08",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB08",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB09",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB09",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BC03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BC03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BC04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BC04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "C04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "C04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "C05",
+											"type": "String"
+										},
+										"sink": {
+											"name": "C05",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DA01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DA01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FILE_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FILE_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "LOAD_TIMESTAMP",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LOAD_TIMESTAMP",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DWH_READ",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "*.*",
+									"P_PATH": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "NTF.csv"
+								}
+							}
+						]
+					},
+					{
+						"name": "DF_NFT_UNPIVOT",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NFT_UNPIVOT",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcSTGNTR": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_DIM_SURVEY_DETAILS",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_DIM_SURVEY_DETAILS",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_NTF_DIM_ENTITY",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NTF_DIM_ENTITY",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_FACT_ENTITY_SURVEY",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "DF_NFT_UNPIVOT",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DF_DIM_SURVEY_DETAILS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DF_NTF_DIM_ENTITY",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_FACT_ENTITY_SURVEY",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcNtfUNPOVITE": {
+										"P_FILE_NAME": "NTF_UNPOVITE.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"variables": {
+					"V_FILE_NAME": {
+						"type": "String"
+					},
+					"V_PATH": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DIM_PROFESSIONAL_STATUS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROFESSIONAL_STATUS_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROFESSIONAL_STATUS_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PROFESSIONAL_STATUS"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_GENDER')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "GENDER_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "GENDER_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "GENDER_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_GENDER"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_DIM_PARTICIPANT')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_MART_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "SrcAll"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PARTICIPANT",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDIM"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PARTICIPANT",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDIM1"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PARTICIPANT",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDimMAX"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PARTICIPANT",
+								"type": "DatasetReference"
+							},
+							"name": "iDIMPARTICIPANT"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectReqColumns"
+						},
+						{
+							"name": "DerivedDIMCol"
+						},
+						{
+							"name": "SelectDIMCol"
+						},
+						{
+							"name": "AggDistinct"
+						},
+						{
+							"name": "SourceHASHRecords"
+						},
+						{
+							"name": "LatestRecord"
+						},
+						{
+							"name": "Join1"
+						},
+						{
+							"name": "ExitingHASHRecords"
+						},
+						{
+							"name": "SelectExiting"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "Lookup1"
+						},
+						{
+							"name": "ConditionalSplit1"
+						},
+						{
+							"name": "SurrogateKey1"
+						},
+						{
+							"name": "JoinMaxID"
+						},
+						{
+							"name": "RunInfo"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "RunInfo2"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\t{Type of tool} as string,\n\t\t{Area of change} as string,\n\t\t{Service themes} as string,\n\t\t{Date of data collection} as string,\n\t\tid as string,\n\t\tCourse_name as string,\n\t\tUsername as string,\n\t\tTitle as string,\n\t\tidnumber as string,\n\t\tFunctional_title as string,\n\t\tHowlong as string,\n\t\tPriorexperience as string,\n\t\t{Country code} as string,\n\t\tPobox as string,\n\t\tPostalcode as string,\n\t\tSkype as string,\n\t\tAim as string,\n\t\tYahoo as string,\n\t\tMsn as string,\n\t\tProfile_field_Supervisor as string,\n\t\t{Service theme} as string,\n\t\tCityregion as string,\n\t\tCertification_date as string,\n\t\tCertified as string,\n\t\tCohort as string,\n\t\tUniqueid as string,\n\t\tUser_id as string,\n\t\tEnrol_time as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of training} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\tLocation as string,\n\t\t{Name of the entity} as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tConfidential as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\tAccount as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcAll\nsource(output(\n\t\tPARTICIPANT_SR_KEY as integer,\n\t\tPARTICIPANT_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tEMAIL as string,\n\t\tLAST_NAME as string,\n\t\tMIDDLE_NAME as string,\n\t\tFIRST_NAME as string,\n\t\tGENDER as string,\n\t\tYEAR_OF_BIRTH as integer,\n\t\tNATIONALITY as string,\n\t\tJOB_TITLE as string,\n\t\tADDRESS as string,\n\t\tID as string,\n\t\tUSERNAME as string,\n\t\tHOWLONG as string,\n\t\tPRIOR_EXPERIENCE as string,\n\t\tSALUTATION as string,\n\t\tCITY_NAME as string,\n\t\tPOBOX as string,\n\t\tPOST_CODE as string,\n\t\tSKYPE as string,\n\t\tAIM as string,\n\t\tYAHOO as string,\n\t\tMSN as string,\n\t\tCITY_REGION as string,\n\t\tOTHER_INFORMATION as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_EMAILS as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tPREFERRED_LANGUAGE as string,\n\t\tCONFIDENTIAL as string,\n\t\tPHONE_NUMBER as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nsource(output(\n\t\tPARTICIPANT_SR_KEY as integer,\n\t\tPARTICIPANT_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tEMAIL as string,\n\t\tLAST_NAME as string,\n\t\tMIDDLE_NAME as string,\n\t\tFIRST_NAME as string,\n\t\tGENDER as string,\n\t\tYEAR_OF_BIRTH as integer,\n\t\tNATIONALITY as string,\n\t\tJOB_TITLE as string,\n\t\tADDRESS as string,\n\t\tID as string,\n\t\tUSERNAME as string,\n\t\tHOWLONG as string,\n\t\tPRIOR_EXPERIENCE as string,\n\t\tSALUTATION as string,\n\t\tCITY_NAME as string,\n\t\tPOBOX as string,\n\t\tPOST_CODE as string,\n\t\tSKYPE as string,\n\t\tAIM as string,\n\t\tYAHOO as string,\n\t\tMSN as string,\n\t\tCITY_REGION as string,\n\t\tOTHER_INFORMATION as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_EMAILS as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tPREFERRED_LANGUAGE as string,\n\t\tCONFIDENTIAL as string,\n\t\tPHONE_NUMBER as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM1\nsource(output(\n\t\tMAX_VAL as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'Select IsNULL(Max(PARTICIPANT_ID),0) MAX_VAL\\nFROM MART_OWNER.DIM_PARTICIPANT',\n\tformat: 'query') ~> ExistingDimMAX\nSrcAll select(mapColumn(\n\t\tEmail,\n\t\t{Phone number},\n\t\t{Last name},\n\t\t{Middle name},\n\t\t{First name},\n\t\tGender,\n\t\t{Year of birth},\n\t\t{Date of birth},\n\t\t{Job title},\n\t\t{Professional status},\n\t\t{Office Address},\n\t\tCity,\n\t\t{Post Code},\n\t\t{Date of birth2},\n\t\tNationality,\n\t\tAddress,\n\t\tCityname,\n\t\tid,\n\t\tUsername,\n\t\tTitle,\n\t\tFunctional_title,\n\t\tHowlong,\n\t\tPriorexperience,\n\t\tPobox,\n\t\tPostalcode,\n\t\tSkype,\n\t\tAim,\n\t\tYahoo,\n\t\tMsn,\n\t\tCityregion,\n\t\tUniqueid,\n\t\tUser_id,\n\t\tConfidential,\n\t\t{Social media},\n\t\t{Other emails},\n\t\t{Other phone numbers},\n\t\t{Other information},\n\t\t{Office Address: Street 1},\n\t\t{Office Address: Street 2},\n\t\t{Office Address: City},\n\t\tSalutation,\n\t\tPhone,\n\t\t{Preferred Language},\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectReqColumns\nSelectReqColumns derive(UNIQUE_PARTICIPANT_ID = case(isNull(Email)==false(),\r\n     Email,\r\n     concat({First name}, {Last name},Gender,{Year of birth})\r\n     ),\n\t\tEMAIL = Email,\n\t\tLAST_NAME = {Last name},\n\t\tMIDDLE_NAME = {Middle name},\n\t\tFIRST_NAME = {First name},\n\t\tGENDER = Gender,\n\t\tYEAR_OF_BIRTH = {Year of birth},\n\t\tNATIONALITY = Nationality,\n\t\tJOB_TITLE = case(isNull({Job title})==false(),\r\n     {Job title},\r\n     isNull(Functional_title)==false(),\r\n     Functional_title,\r\n     ''),\n\t\tADDRESS = iif({Professional status}=='Self-employed/ freelancer', \r\n    case(isNull(Address)==false(),\r\n            Address,\r\n         isNull({Office Address})==false(),\r\n            {Office Address},\r\n         isNull({Office Address: Street 1})==false(),\r\n            {Office Address: Street 1},\r\n         ''),\r\n    ''),\n\t\tID = case(isNull(id)==false(),\r\n    id,\r\n    isNull(Uniqueid)==false(),\r\n    Uniqueid,\r\n    ''),\n\t\tUSERNAME = case(isNull(Username)==false(),\r\n    Username,\r\n    isNull(User_id)==false(),\r\n    User_id,\r\n    ''),\n\t\tHOWLONG = Howlong,\n\t\tPRIOR_EXPERIENCE = Priorexperience,\n\t\tSALUTATION = case(isNull(Title)==false(),\r\n    Title,\r\n    isNull(Salutation)==false(),\r\n    Salutation,\r\n    ''),\n\t\tCITY_NAME = case(isNull(City)==false(),\r\n    City,\r\n    isNull(Cityname)==false(),\r\n    Cityname,\r\n        isNull({Office Address: City})==false(),\r\n    {Office Address: City},\r\n    ''),\n\t\tPOBOX = case(isNull(Pobox)==false(),\r\n    Pobox,\r\n    isNull({Office Address: Street 2})==false(),\r\n    {Office Address: Street 2},\r\n    ''),\n\t\tPOST_CODE = case(isNull({Post Code})==false(),\r\n    {Post Code},\r\n    isNull(Postalcode)==false(),\r\n    Postalcode,\r\n    ''),\n\t\tSKYPE = Skype,\n\t\tAIM = Aim,\n\t\tYAHOO = Yahoo,\n\t\tMSN = Msn,\n\t\tSOURCE = FILE_NAME,\n\t\tCITY_REGION = Cityregion,\n\t\tOTHER_INFORMATION = {Other information},\n\t\tOTHER_PHONE_NUMBERS = {Other phone numbers},\n\t\tOTHER_EMAILS = {Other emails},\n\t\tSOCIAL_MEDIA = {Social media},\n\t\tPREFERRED_LANGUAGE = {Preferred Language},\n\t\tCONFIDENTIAL = Confidential,\n\t\t{PHONE NUMBER} = Phone) ~> DerivedDIMCol\nDerivedDIMCol select(mapColumn(\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP,\n\t\tUNIQUE_PARTICIPANT_ID,\n\t\tEMAIL = DerivedDIMCol@EMAIL,\n\t\tLAST_NAME,\n\t\tMIDDLE_NAME,\n\t\tFIRST_NAME,\n\t\tGENDER = DerivedDIMCol@GENDER,\n\t\tYEAR_OF_BIRTH,\n\t\tNATIONALITY = DerivedDIMCol@NATIONALITY,\n\t\tJOB_TITLE,\n\t\tADDRESS = DerivedDIMCol@ADDRESS,\n\t\tID = DerivedDIMCol@ID,\n\t\tUSERNAME = DerivedDIMCol@USERNAME,\n\t\tHOWLONG = DerivedDIMCol@HOWLONG,\n\t\tPRIOR_EXPERIENCE,\n\t\tSALUTATION = DerivedDIMCol@SALUTATION,\n\t\tCITY_NAME,\n\t\tPOBOX = DerivedDIMCol@POBOX,\n\t\tPOST_CODE,\n\t\tSKYPE = DerivedDIMCol@SKYPE,\n\t\tAIM = DerivedDIMCol@AIM,\n\t\tMSN = DerivedDIMCol@MSN,\n\t\tSOURCE,\n\t\tCITY_REGION,\n\t\tOTHER_INFORMATION,\n\t\tOTHER_PHONE_NUMBERS,\n\t\tOTHER_EMAILS,\n\t\tSOCIAL_MEDIA,\n\t\tPREFERRED_LANGUAGE,\n\t\tCONFIDENTIAL = DerivedDIMCol@CONFIDENTIAL,\n\t\t{PHONE NUMBER} = DerivedDIMCol@{PHONE NUMBER},\n\t\tYAHOO = DerivedDIMCol@YAHOO\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectDIMCol\nSelectDIMCol aggregate(groupBy(UNIQUE_PARTICIPANT_ID),\n\teach(match(name!='UNIQUE_PARTICIPANT_ID'), $$ = last($$))) ~> AggDistinct\nAggDistinct derive(SOURCE_HASH_RECORD = sha2(256,EMAIL,\r\nLAST_NAME,\r\nMIDDLE_NAME,\r\nFIRST_NAME,\r\nGENDER,\r\nYEAR_OF_BIRTH,\r\nNATIONALITY,\r\nJOB_TITLE,\r\nADDRESS,\r\nID,\r\nUSERNAME,\r\nHOWLONG,\r\nPRIOR_EXPERIENCE,\r\nSALUTATION,\r\nCITY_NAME,\r\nPOBOX,\r\nPOST_CODE,\r\nSKYPE,\r\nAIM,\r\nYAHOO,\r\nMSN,\r\nSOURCE,\r\nCITY_REGION,\r\nOTHER_INFORMATION,\r\nOTHER_PHONE_NUMBERS,\r\nOTHER_EMAILS,\r\nSOCIAL_MEDIA,\r\nPREFERRED_LANGUAGE,\r\nCONFIDENTIAL,\r\n{PHONE NUMBER})) ~> SourceHASHRecords\nExistingDIM1 aggregate(groupBy(PARTICIPANT_ID),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestRecord\nExistingDIM, LatestRecord join(ExistingDIM@PARTICIPANT_ID == LatestRecord@PARTICIPANT_ID\n\t&& ExistingDIM@VERSION_NO == LatestRecord@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nJoin1 derive(EXISTING_RECORD_HASH = sha2(256,EMAIL,\r\nLAST_NAME,\r\nMIDDLE_NAME,\r\nFIRST_NAME,\r\nGENDER,\r\nYEAR_OF_BIRTH,\r\nNATIONALITY,\r\nJOB_TITLE,\r\nADDRESS,\r\nID,\r\nUSERNAME,\r\nHOWLONG,\r\nPRIOR_EXPERIENCE,\r\nSALUTATION,\r\nCITY_NAME,\r\nPOBOX,\r\nPOST_CODE,\r\nSKYPE,\r\nAIM,\r\nYAHOO,\r\nMSN,\r\nSOURCE,\r\nCITY_REGION,\r\nOTHER_INFORMATION,\r\nOTHER_PHONE_NUMBERS,\r\nOTHER_EMAILS,\r\nSOCIAL_MEDIA,\r\nPREFERRED_LANGUAGE,\r\nCONFIDENTIAL,\r\nPHONE_NUMBER),\n\t\tEXISTING_UNIQUE_PARTICIPANT_ID = case(isNull(EMAIL)==false(),\r\n     EMAIL,\r\n     concat(FIRST_NAME, LAST_NAME,GENDER,toString(YEAR_OF_BIRTH))\r\n     )) ~> ExitingHASHRecords\nExitingHASHRecords select(mapColumn(\n\t\tEXISTING_PARTICIPANT_SR_KEY = PARTICIPANT_SR_KEY,\n\t\tEXISTING_PARTICIPANT_ID = ExistingDIM@PARTICIPANT_ID,\n\t\tEXISTING_VERSION_NO = ExistingDIM@VERSION_NO,\n\t\tEXISTING_RECORD_HASH,\n\t\tEXISTING_UNIQUE_PARTICIPANT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectExiting\nSourceHASHRecords, SelectExiting exists(SOURCE_HASH_RECORD == EXISTING_RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, SelectExiting lookup(UNIQUE_PARTICIPANT_ID == EXISTING_UNIQUE_PARTICIPANT_ID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 split(isNull(EXISTING_PARTICIPANT_ID),\n\tdisjoint: false) ~> ConditionalSplit1@(NewRecords, UpdatedRecords)\nConditionalSplit1@NewRecords keyGenerate(output(NEW_PARTICIPANT_ID as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1, ExistingDimMAX join(1==1,\n\tjoinType:'cross',\n\tbroadcast: 'auto')~> JoinMaxID\nJoinMaxID derive(NEW_PARTICIPANT_ID = MAX_VAL+NEW_PARTICIPANT_ID,\n\t\tVERSION_NO = 1,\n\t\tYEAR_OF_BIRTH = toInteger(YEAR_OF_BIRTH),\n\t\tBATCH_ID = 1,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo alterRow(insertIf(1==1)) ~> AlterRow1\nConditionalSplit1@UpdatedRecords derive(VERSION_NO = EXISTING_VERSION_NO+1,\n\t\tBATCH_ID = 1,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo2\nAlterRow1 sink(input(\n\t\tPARTICIPANT_SR_KEY as integer,\n\t\tPARTICIPANT_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tEMAIL as string,\n\t\tLAST_NAME as string,\n\t\tMIDDLE_NAME as string,\n\t\tFIRST_NAME as string,\n\t\tGENDER as string,\n\t\tYEAR_OF_BIRTH as integer,\n\t\tNATIONALITY as string,\n\t\tJOB_TITLE as string,\n\t\tADDRESS as string,\n\t\tID as string,\n\t\tUSERNAME as string,\n\t\tHOWLONG as string,\n\t\tPRIOR_EXPERIENCE as string,\n\t\tSALUTATION as string,\n\t\tCITY_NAME as string,\n\t\tPOBOX as string,\n\t\tPOST_CODE as string,\n\t\tSKYPE as string,\n\t\tAIM as string,\n\t\tYAHOO as string,\n\t\tMSN as string,\n\t\tCITY_REGION as string,\n\t\tOTHER_INFORMATION as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_EMAILS as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tPREFERRED_LANGUAGE as string,\n\t\tCONFIDENTIAL as string,\n\t\tPHONE_NUMBER as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tVERSION_NO,\n\t\tEMAIL,\n\t\tLAST_NAME,\n\t\tMIDDLE_NAME,\n\t\tFIRST_NAME,\n\t\tGENDER,\n\t\tYEAR_OF_BIRTH,\n\t\tNATIONALITY,\n\t\tJOB_TITLE,\n\t\tADDRESS,\n\t\tID,\n\t\tUSERNAME,\n\t\tHOWLONG,\n\t\tPRIOR_EXPERIENCE,\n\t\tSALUTATION,\n\t\tCITY_NAME,\n\t\tPOBOX,\n\t\tPOST_CODE,\n\t\tSKYPE,\n\t\tAIM,\n\t\tYAHOO,\n\t\tMSN,\n\t\tCITY_REGION,\n\t\tOTHER_INFORMATION,\n\t\tOTHER_PHONE_NUMBERS,\n\t\tOTHER_EMAILS,\n\t\tSOCIAL_MEDIA,\n\t\tPREFERRED_LANGUAGE,\n\t\tCONFIDENTIAL,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> iDIMPARTICIPANT"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_FACT_PROJECT_EVENTS_INDIVIDUAL')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_MART_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "SrcAll"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PROJECT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROJECT"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_CONTEXT_SUB_TYPE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCONTEXTSUBTYPE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_EVENT_TYPE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMEVENTTYPE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_TRAINING_TYPE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMTRAININGTYPE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PLATFORM_TYPE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPLATFORMTYPE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PARTICIPANT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPARTICIPANT"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PARTICIPANT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPARTICIPANT01"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_DATE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMDATE01"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_DATE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMDATE02"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_GENDER",
+								"type": "DatasetReference"
+							},
+							"name": "DIMGENDER"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_DATE",
+								"type": "DatasetReference"
+							},
+							"name": "DATEOFBIRTHYEAR"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_DATE",
+								"type": "DatasetReference"
+							},
+							"name": "DATEOFBIRTH2"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_COUNTRY",
+								"type": "DatasetReference"
+							},
+							"name": "PARTICIPANTHOMECOUNTRY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY1"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY2"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIM_PROFESSIONAL_STATUS",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROFESSIONALSTATUS"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_STAGE_FOLDER",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DIMPROJECT01"
+						},
+						{
+							"name": "DIMCONTEXTSUBTYPE01"
+						},
+						{
+							"name": "DIMEVENTTYPE01"
+						},
+						{
+							"name": "DerivedFACTCol"
+						},
+						{
+							"name": "SelectReqCol"
+						},
+						{
+							"name": "LkpPROJECT"
+						},
+						{
+							"name": "LkpCONTEXT"
+						},
+						{
+							"name": "LkpEVENTTYPE"
+						},
+						{
+							"name": "DIMTRAININGTYPE01"
+						},
+						{
+							"name": "LkpTRAININGTYPE"
+						},
+						{
+							"name": "DIMPLATFORMTYPE01"
+						},
+						{
+							"name": "LkpPLATFORMTYPE"
+						},
+						{
+							"name": "LatestVersionPARTICIPANT"
+						},
+						{
+							"name": "Join1"
+						},
+						{
+							"name": "DIMPARTICIPANTID"
+						},
+						{
+							"name": "LkpPARTICIPANT"
+						},
+						{
+							"name": "DATECOLLECTIONDATE"
+						},
+						{
+							"name": "LkpDATECOLLECTIONDATE"
+						},
+						{
+							"name": "DATESUBMISSON"
+						},
+						{
+							"name": "LkpDATESUBMISSON"
+						},
+						{
+							"name": "DIMPARTICIPANTSelect"
+						},
+						{
+							"name": "DIMGENDER01"
+						},
+						{
+							"name": "LkpGENDER"
+						},
+						{
+							"name": "DATEOFBIRTHYEAR01"
+						},
+						{
+							"name": "LkpDATEOFBIRTH"
+						},
+						{
+							"name": "DATEOFBIRTH201"
+						},
+						{
+							"name": "LkpDATEOFBIRTH2"
+						},
+						{
+							"name": "LkpPARTICIPANTHOMECOUNTRY"
+						},
+						{
+							"name": "PARTICIPANTHOMECOUNTRY01"
+						},
+						{
+							"name": "LatestVersionENTITY"
+						},
+						{
+							"name": "Join2"
+						},
+						{
+							"name": "DIMENTITYSelect"
+						},
+						{
+							"name": "LkpENTITY"
+						},
+						{
+							"name": "DIMPROFESSIONALSTATUSSelect"
+						},
+						{
+							"name": "LkpPROFESSIONALSTATUS"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\t{Type of tool} as string,\n\t\t{Area of change} as string,\n\t\t{Service themes} as string,\n\t\t{Date of data collection} as string,\n\t\tid as string,\n\t\tCourse_name as string,\n\t\tUsername as string,\n\t\tTitle as string,\n\t\tidnumber as string,\n\t\tFunctional_title as string,\n\t\tHowlong as string,\n\t\tPriorexperience as string,\n\t\t{Country code} as string,\n\t\tPobox as string,\n\t\tPostalcode as string,\n\t\tSkype as string,\n\t\tAim as string,\n\t\tYahoo as string,\n\t\tMsn as string,\n\t\tProfile_field_Supervisor as string,\n\t\t{Service theme} as string,\n\t\tCityregion as string,\n\t\tCertification_date as string,\n\t\tCertified as string,\n\t\tCohort as string,\n\t\tUniqueid as string,\n\t\tUser_id as string,\n\t\tEnrol_time as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of training} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\tLocation as string,\n\t\t{Name of the entity} as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tConfidential as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\tAccount as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcAll\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCONTEXT_TYPE_CODE as string,\n\t\tCONTEXT_TYPE_DESC as string,\n\t\tCONTEXT_SUB_TYPE_CODE as string,\n\t\tCONTEXT_SUB_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCONTEXTSUBTYPE\nsource(output(\n\t\tEVENT_TYPE_SR_KEY as integer,\n\t\tEVENT_TYPE_CODE as string,\n\t\tEVENT_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMEVENTTYPE\nsource(output(\n\t\tTRAINING_TYPE_SR_KEY as integer,\n\t\tTRAINING_TYPE_CODE as string,\n\t\tTRAINING_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMTRAININGTYPE\nsource(output(\n\t\tPLATFORM_TYPE_SR_KEY as integer,\n\t\tPLATFORM_TYPE_CODE as string,\n\t\tPLATFORM_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPLATFORMTYPE\nsource(output(\n\t\tPARTICIPANT_SR_KEY as integer,\n\t\tPARTICIPANT_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tEMAIL as string,\n\t\tLAST_NAME as string,\n\t\tMIDDLE_NAME as string,\n\t\tFIRST_NAME as string,\n\t\tGENDER as string,\n\t\tYEAR_OF_BIRTH as integer,\n\t\tNATIONALITY as string,\n\t\tJOB_TITLE as string,\n\t\tADDRESS as string,\n\t\tID as string,\n\t\tUSERNAME as string,\n\t\tHOWLONG as string,\n\t\tPRIOR_EXPERIENCE as string,\n\t\tSALUTATION as string,\n\t\tCITY_NAME as string,\n\t\tPOBOX as string,\n\t\tPOST_CODE as string,\n\t\tSKYPE as string,\n\t\tAIM as string,\n\t\tYAHOO as string,\n\t\tMSN as string,\n\t\tCITY_REGION as string,\n\t\tOTHER_INFORMATION as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_EMAILS as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tPREFERRED_LANGUAGE as string,\n\t\tCONFIDENTIAL as string,\n\t\tPHONE_NUMBER as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPARTICIPANT\nsource(output(\n\t\tPARTICIPANT_SR_KEY as integer,\n\t\tPARTICIPANT_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tEMAIL as string,\n\t\tLAST_NAME as string,\n\t\tMIDDLE_NAME as string,\n\t\tFIRST_NAME as string,\n\t\tGENDER as string,\n\t\tYEAR_OF_BIRTH as integer,\n\t\tNATIONALITY as string,\n\t\tJOB_TITLE as string,\n\t\tADDRESS as string,\n\t\tID as string,\n\t\tUSERNAME as string,\n\t\tHOWLONG as string,\n\t\tPRIOR_EXPERIENCE as string,\n\t\tSALUTATION as string,\n\t\tCITY_NAME as string,\n\t\tPOBOX as string,\n\t\tPOST_CODE as string,\n\t\tSKYPE as string,\n\t\tAIM as string,\n\t\tYAHOO as string,\n\t\tMSN as string,\n\t\tCITY_REGION as string,\n\t\tOTHER_INFORMATION as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_EMAILS as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tPREFERRED_LANGUAGE as string,\n\t\tCONFIDENTIAL as string,\n\t\tPHONE_NUMBER as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPARTICIPANT01\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMDATE01\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMDATE02\nsource(output(\n\t\tGENDER_SR_KEY as integer,\n\t\tGENDER_CODE as string,\n\t\tGENDER_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMGENDER\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DATEOFBIRTHYEAR\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DATEOFBIRTH2\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> PARTICIPANTHOMECOUNTRY\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMENTITY1\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMENTITY2\nsource(output(\n\t\tPROFESSIONAL_STATUS_SR_KEY as integer,\n\t\tPROFESSIONAL_STATUS_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROFESSIONALSTATUS\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMPROJECT01\nDIMCONTEXTSUBTYPE select(mapColumn(\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCONTEXT_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMCONTEXTSUBTYPE01\nDIMEVENTTYPE select(mapColumn(\n\t\tEVENT_TYPE_SR_KEY,\n\t\tEVENT_TYPE_CODE,\n\t\tEVENT_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMEVENTTYPE01\nSelectReqCol derive(ProjectID = case(isNull(ProjectID)==false(),\r\n     ProjectID,\r\n     isNull({Project Number})==false(),\r\n     {Project Number},\r\n     'N/A'),\n\t\t{Type of event} = case(isNull({Type of event})==false(),\r\n     {Type of event},\r\n     isNull({Event type})==false(),\r\n     {Event type},\r\n     instr(FILE_NAME, 'Contact') > 0 && trim({Event type})=='ITC-Corporate',\r\n     'ITC corporate event',\r\n     'N/A'),\n\t\t{Type of platform} = case(isNull({Type of platform})==false(),\r\n     {Type of platform},\r\n     isNull({Type of tool})==false(),\r\n     {Type of tool},\r\n     instr(FILE_NAME, 'Contact') > 0 && isNull(SheTrades)==false(),\r\n     'SheTrades',\r\n     instr(FILE_NAME, 'Contact') > 0 && isNull({SME Trade Academy})==false(),\r\n     'SME Trade Academy',\r\n     'N/A'),\n\t\tPARTICIPANT_ID = case(isNull(Email)==false(),\r\n     Email,\r\n     concat({First name}, {Last name},Gender,{Year of birth})\r\n     ),\n\t\t{Date of data collection New} = case(isNull({Date of data collection})==false(),\r\n     {Date of data collection},\r\n     isNull({Registration Date})==false(),          \r\n{Registration Date},\r\n     ''),\n\t\t{Submission Date} = toDate({Submission Date},'MM/dd/yyyy HH:mm:ss'),\n\t\t{Country of Residence} = case(instr(FILE_NAME, 'WEDF 2018') > 0, \r\n{Country of Residence}, \r\nCountry\r\n),\n\t\t{Date of birth} = case(isNull({Date of birth})==false(),\r\n     {Date of birth},\r\n     isNull({Date of birth2})==false(),\r\n     {Date of birth2},\r\n     ''),\n\t\tENTITY_NAME = case(isNull({Organization/ Company name})==false(),\r\n     {Organization/ Company name},\r\n     isNull({Name of the entity})==false(),\r\n     {Name of the entity},\r\n     isNull(Account)==false(),\r\n     Account,\r\n     isNull({Account Name})==false(),\r\n     {Account},\r\n     '')) ~> DerivedFACTCol\nSrcAll select(mapColumn(\n\t\tProjectID,\n\t\tContext,\n\t\t{Project Number},\n\t\t{Event type},\n\t\t{Type of event},\n\t\t{Type of training},\n\t\t{Type of platform},\n\t\t{Type of tool},\n\t\tSheTrades,\n\t\t{SME Trade Academy},\n\t\tFILE_NAME,\n\t\tEmail,\n\t\t{First name},\n\t\t{Last name},\n\t\tGender,\n\t\t{Year of birth},\n\t\t{Date of data collection},\n\t\t{Registration Date},\n\t\t{Submission Date},\n\t\t{Date of birth},\n\t\t{Date of birth2},\n\t\tCountry,\n\t\t{Country of Residence},\n\t\t{Organization/ Company name},\n\t\t{Name of the entity},\n\t\t{Account Name},\n\t\tAccount,\n\t\t{Professional status}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectReqCol\nDerivedFACTCol, DIMPROJECT01 lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPROJECT\nLkpPROJECT, DIMCONTEXTSUBTYPE01 lookup(upper(trim(Context)) == upper(trim(CONTEXT_TYPE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpCONTEXT\nLkpCONTEXT, DIMEVENTTYPE01 lookup(upper(trim({Type of event})) == upper(trim(EVENT_TYPE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpEVENTTYPE\nDIMTRAININGTYPE select(mapColumn(\n\t\tTRAINING_TYPE_SR_KEY,\n\t\tTRAINING_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMTRAININGTYPE01\nLkpEVENTTYPE, DIMTRAININGTYPE01 lookup(upper(trim({Type of training})) == upper(trim(TRAINING_TYPE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpTRAININGTYPE\nDIMPLATFORMTYPE select(mapColumn(\n\t\tPLATFORM_TYPE_SR_KEY,\n\t\tPLATFORM_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMPLATFORMTYPE01\nLkpTRAININGTYPE, DIMPLATFORMTYPE01 lookup(upper(trim({Type of platform})) == upper(trim(PLATFORM_TYPE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPLATFORMTYPE\nDIMPARTICIPANT01 aggregate(groupBy(PARTICIPANT_ID),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestVersionPARTICIPANT\nDIMPARTICIPANT, LatestVersionPARTICIPANT join(DIMPARTICIPANT@PARTICIPANT_ID == LatestVersionPARTICIPANT@PARTICIPANT_ID\n\t&& DIMPARTICIPANT@VERSION_NO == LatestVersionPARTICIPANT@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nJoin1 derive(PARTICIPANT_ID = case(isNull(EMAIL)==false(),\r\n     EMAIL,\r\n     concat(FIRST_NAME, LAST_NAME,GENDER,toString(YEAR_OF_BIRTH))\r\n     )) ~> DIMPARTICIPANTID\nLkpPLATFORMTYPE, DIMPARTICIPANTSelect lookup(DerivedFACTCol@PARTICIPANT_ID == DIMPARTICIPANTSelect@PARTICIPANT_ID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPARTICIPANT\nDIMDATE01 select(mapColumn(\n\t\tDATE_COLLECTION_DATE_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DATECOLLECTIONDATE\nLkpPARTICIPANT, DATECOLLECTIONDATE lookup(toString(toDate({Date of data collection New},'MM/dd/YYYY HH:mm:ss'), 'MM/dd/YYYY') == toString(DATE_TIME, 'MM/dd/YYYY'),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpDATECOLLECTIONDATE\nDIMDATE02 select(mapColumn(\n\t\tSUBMISSON_DATE_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DATESUBMISSON\nLkpDATECOLLECTIONDATE, DATESUBMISSON lookup({Submission Date} == DATESUBMISSON@DATE_TIME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpDATESUBMISSON\nDIMPARTICIPANTID select(mapColumn(\n\t\tPARTICIPANT_SR_KEY,\n\t\tPARTICIPANT_ID,\n\t\tVERSION_NO = LatestVersionPARTICIPANT@VERSION_NO\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMPARTICIPANTSelect\nDIMGENDER select(mapColumn(\n\t\tGENDER_SR_KEY,\n\t\tGENDER_CODE,\n\t\tGENDER_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMGENDER01\nLkpDATESUBMISSON, DIMGENDER01 lookup(Gender == GENDER_DESC,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpGENDER\nDATEOFBIRTHYEAR select(mapColumn(\n\t\tDATE_OF_BIRTH_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DATEOFBIRTHYEAR01\nLkpGENDER, DATEOFBIRTHYEAR01 lookup(concat(toString({Year of birth}),'01/01/') == toString(DATEOFBIRTHYEAR01@DATE_TIME,'yyyy/MM/dd'),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpDATEOFBIRTH\nDATEOFBIRTH2 select(mapColumn(\n\t\tDATE_OF_BIRTH2_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DATEOFBIRTH201\nLkpDATEOFBIRTH, DATEOFBIRTH201 lookup(toString(toDate({Date of birth},'MM/dd/YYYY HH:mm:ss'), 'MM/dd/YYYY') == toString(DATEOFBIRTH201@DATE_TIME, 'MM/dd/yyyy'),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpDATEOFBIRTH2\nLkpDATEOFBIRTH2, PARTICIPANTHOMECOUNTRY01 lookup({Country of Residence} == COUNTRY_NAME_EN,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPARTICIPANTHOMECOUNTRY\nPARTICIPANTHOMECOUNTRY select(mapColumn(\n\t\tPARTICIPANT_HOME_COUNTRY_SR_KEY = COUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> PARTICIPANTHOMECOUNTRY01\nDIMENTITY2 aggregate(groupBy(ENTITY_ID),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestVersionENTITY\nDIMENTITY1, LatestVersionENTITY join(DIMENTITY1@ENTITY_ID == LatestVersionENTITY@ENTITY_ID\n\t&& DIMENTITY1@VERSION_NO == LatestVersionENTITY@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join2\nJoin2 select(mapColumn(\n\t\tENTITY_SR_KEY,\n\t\tENTITY_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITYSelect\nLkpPARTICIPANTHOMECOUNTRY, DIMENTITYSelect lookup(DerivedFACTCol@ENTITY_NAME == DIMENTITYSelect@ENTITY_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpENTITY\nDIMPROFESSIONALSTATUS select(mapColumn(\n\t\tPROFESSIONAL_STATUS_SR_KEY,\n\t\tPROFESSIONAL_STATUS_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMPROFESSIONALSTATUSSelect\nLkpENTITY, DIMPROFESSIONALSTATUSSelect lookup({Professional status} == PROFESSIONAL_STATUS_DESC,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPROFESSIONALSTATUS\nLkpPROFESSIONALSTATUS sink(input(\n\t\t{ProjectID|Context|FirmID|Date of data collection|Country|interviewkey|interviewid|A01|A02|A03|A04|A06|A07|A09|A10|A11|A12|A13|B01|B03|B17|BA03|BA04|BA07|BA08|BA11|BA12|BA13|BA14|BA15|BB02|BB08|BB09|BC03|BC04|C04|C05|DA01|DB01|DB02|DB03|FILE_NAME|LOAD_TIMESTAMP} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_GENDER')]",
+				"[concat(variables('factoryId'), '/datasets/DIM_PROFESSIONAL_STATUS')]"
+			]
+		}
+	]
+}
