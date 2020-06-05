@@ -1,0 +1,69 @@
+{
+	"name": "MART_DIM_ENTITY_SIZE_GROUP",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ENTITY_SIZE_GROUP_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_SIZE_GROUP_CODE",
+				"type": "varchar"
+			},
+			{
+				"name": "ENTITY_SIZE_GROUP_DESC",
+				"type": "varchar"
+			},
+			{
+				"name": "LOWER_SZIE_LIMIT",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "HIGHER_SIZE_LIMIT",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SOURCE",
+				"type": "varchar"
+			},
+			{
+				"name": "CREATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "UPDATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_CREATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DATE_UPDATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "MART_OWNER",
+			"table": "DIM_ENTITY_SIZE_GROUP"
+		}
+	}
+}
