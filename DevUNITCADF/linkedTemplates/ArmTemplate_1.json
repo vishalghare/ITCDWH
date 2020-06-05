@@ -13,6 +13,444 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_ENTITY')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ENTITY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "VERSION_NO",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "ENTITY_EMAIL_DOMAIN_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "ADDRESS",
+						"type": "varchar"
+					},
+					{
+						"name": "CITY",
+						"type": "varchar"
+					},
+					{
+						"name": "REGION",
+						"type": "varchar"
+					},
+					{
+						"name": "PHONE_NUMBER",
+						"type": "varchar"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "varchar"
+					},
+					{
+						"name": "TWITTER",
+						"type": "varchar"
+					},
+					{
+						"name": "LINKEDIN",
+						"type": "varchar"
+					},
+					{
+						"name": "BSO_OWNERSHIP",
+						"type": "varchar"
+					},
+					{
+						"name": "POST_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "POBOX",
+						"type": "varchar"
+					},
+					{
+						"name": "CITY_REGION",
+						"type": "varchar"
+					},
+					{
+						"name": "CATEGORY",
+						"type": "varchar"
+					},
+					{
+						"name": "CONFIDENTIAL",
+						"type": "varchar"
+					},
+					{
+						"name": "SOCIAL_MEDIA",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_EMAILS",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_PHONE_NUMBERS",
+						"type": "varchar"
+					},
+					{
+						"name": "OTHER_INFORMATION",
+						"type": "varchar"
+					},
+					{
+						"name": "MAILING_ADDRESS_STREET1",
+						"type": "varchar"
+					},
+					{
+						"name": "MAILING_ADDRESS_STREET2",
+						"type": "varchar"
+					},
+					{
+						"name": "MAILING_ADDRESS_CITY",
+						"type": "varchar"
+					},
+					{
+						"name": "MAILING_STATE_PROVICE",
+						"type": "varchar"
+					},
+					{
+						"name": "MAILING_POST_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "MAILING_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "MAILING_FORMAT_UN",
+						"type": "varchar"
+					},
+					{
+						"name": "FIRM_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_ENTITY"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_ENTITY_SIZE_GROUP')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ENTITY_SIZE_GROUP_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_SIZE_GROUP_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ENTITY_SIZE_GROUP_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "LOWER_SZIE_LIMIT",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "HIGHER_SIZE_LIMIT",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_ENTITY_SIZE_GROUP"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_ENTITY_SUB_TYPE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ENTITY_SUB_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ENTITY_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "ENTITY_SUB_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ENTITY_SUB_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_ENTITY_SUB_TYPE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_ENTITY_TYPE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ENTITY_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ENTITY_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_ENTITY_TYPE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_EVENT_TYPE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "EVENT_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EVENT_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "EVENT_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_EVENT_TYPE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_GENDER')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -70,6 +508,178 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_GENDER"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_HS_CODES')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "HS_CODE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ORDER",
+						"type": "varchar"
+					},
+					{
+						"name": "LEVEL",
+						"type": "varchar"
+					},
+					{
+						"name": "CODE1",
+						"type": "varchar"
+					},
+					{
+						"name": "PARENT1",
+						"type": "varchar"
+					},
+					{
+						"name": "CODE2",
+						"type": "varchar"
+					},
+					{
+						"name": "PARENT2",
+						"type": "varchar"
+					},
+					{
+						"name": "DESCRIPTION",
+						"type": "varchar"
+					},
+					{
+						"name": "SELF_EXPLANATORY_TEXTS",
+						"type": "varchar"
+					},
+					{
+						"name": "HS_SECTION",
+						"type": "varchar"
+					},
+					{
+						"name": "HS_CHAPTER",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_HS_CODES"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_INT_STD_INDUSTRY_CODES_ISIC')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "INT_STD_INDUSTRY_CODES_ISIC_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ISIC_SECTION",
+						"type": "varchar"
+					},
+					{
+						"name": "ISIC_DIVISION",
+						"type": "varchar"
+					},
+					{
+						"name": "ISIC_GROUP",
+						"type": "varchar"
+					},
+					{
+						"name": "ISIC_CLASS",
+						"type": "varchar"
+					},
+					{
+						"name": "ISIC_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "ISIC_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_INT_STD_INDUSTRY_CODES_ISIC"
 				}
 			},
 			"dependsOn": []
@@ -375,6 +985,68 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_PROJECT"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_SERVICE_THEME')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SERVICE_THEME_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SERVICE_THERE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "SERVICE_THEME_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_SERVICE_THEME"
 				}
 			},
 			"dependsOn": []
@@ -1159,3225 +1831,6 @@
 						"type": "String"
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/STAGE_CRM')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "CRM.csv",
-						"folderPath": "STAGE",
-						"fileSystem": "source"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "Account Name",
-						"type": "String"
-					},
-					{
-						"name": "English Name",
-						"type": "String"
-					},
-					{
-						"name": "Acronym",
-						"type": "String"
-					},
-					{
-						"name": "Account Type",
-						"type": "String"
-					},
-					{
-						"name": "Account Sub-Type",
-						"type": "String"
-					},
-					{
-						"name": "Office Address: Country",
-						"type": "String"
-					},
-					{
-						"name": "Category",
-						"type": "String"
-					},
-					{
-						"name": "Parent Account",
-						"type": "String"
-					},
-					{
-						"name": "Website",
-						"type": "String"
-					},
-					{
-						"name": "Email",
-						"type": "String"
-					},
-					{
-						"name": "Phone number",
-						"type": "String"
-					},
-					{
-						"name": "Confidential",
-						"type": "String"
-					},
-					{
-						"name": "Size",
-						"type": "String"
-					},
-					{
-						"name": "Activity",
-						"type": "String"
-					},
-					{
-						"name": "Product",
-						"type": "String"
-					},
-					{
-						"name": "Women Managed",
-						"type": "String"
-					},
-					{
-						"name": "Youth Managed",
-						"type": "String"
-					},
-					{
-						"name": "Social media",
-						"type": "String"
-					},
-					{
-						"name": "Other emails",
-						"type": "String"
-					},
-					{
-						"name": "Other phone numbers",
-						"type": "String"
-					},
-					{
-						"name": "Other information",
-						"type": "String"
-					},
-					{
-						"name": "Ownership and management",
-						"type": "String"
-					},
-					{
-						"name": "Trade Forum",
-						"type": "String"
-					},
-					{
-						"name": "Office Address: Street 1",
-						"type": "String"
-					},
-					{
-						"name": "Office Address: Street 2",
-						"type": "String"
-					},
-					{
-						"name": "Office Address: City",
-						"type": "String"
-					},
-					{
-						"name": "Office Address: State/Province",
-						"type": "String"
-					},
-					{
-						"name": "Office Address: ZIP/Postal Code",
-						"type": "String"
-					},
-					{
-						"name": "Mailing address is equal to office address",
-						"type": "String"
-					},
-					{
-						"name": "Mailing Address: Street 1",
-						"type": "String"
-					},
-					{
-						"name": "Mailing Address: Street 2",
-						"type": "String"
-					},
-					{
-						"name": "Mailing Address: City",
-						"type": "String"
-					},
-					{
-						"name": "Mailing Address: State/Province",
-						"type": "String"
-					},
-					{
-						"name": "Mailing Address: ZIP/Postal Code",
-						"type": "String"
-					},
-					{
-						"name": "Mailing Address: Country",
-						"type": "String"
-					},
-					{
-						"name": "UN Mailing Format",
-						"type": "String"
-					},
-					{
-						"name": "Project Number",
-						"type": "String"
-					},
-					{
-						"name": "Salutation",
-						"type": "String"
-					},
-					{
-						"name": "First Name",
-						"type": "String"
-					},
-					{
-						"name": "Last Name",
-						"type": "String"
-					},
-					{
-						"name": "Account",
-						"type": "String"
-					},
-					{
-						"name": "Professional status",
-						"type": "String"
-					},
-					{
-						"name": "Job title",
-						"type": "String"
-					},
-					{
-						"name": "Gender",
-						"type": "String"
-					},
-					{
-						"name": "Year of birth",
-						"type": "String"
-					},
-					{
-						"name": "Phone",
-						"type": "String"
-					},
-					{
-						"name": "Preferred Language",
-						"type": "String"
-					},
-					{
-						"name": "Skype",
-						"type": "String"
-					},
-					{
-						"name": "Use account address",
-						"type": "String"
-					},
-					{
-						"name": "Event title",
-						"type": "String"
-					},
-					{
-						"name": "Event type",
-						"type": "String"
-					},
-					{
-						"name": "Type of tool",
-						"type": "String"
-					},
-					{
-						"name": "Course name",
-						"type": "String"
-					},
-					{
-						"name": "Start date",
-						"type": "String"
-					},
-					{
-						"name": "End date",
-						"type": "String"
-					},
-					{
-						"name": "Event date",
-						"type": "String"
-					},
-					{
-						"name": "SME Trade Academy",
-						"type": "String"
-					},
-					{
-						"name": "SheTrades",
-						"type": "String"
-					},
-					{
-						"name": "FILE_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOAD_TIMESTAMP",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/STAGE_NTF')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "NTF.csv",
-						"folderPath": "STAGE",
-						"fileSystem": "source"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "ProjectID",
-						"type": "String"
-					},
-					{
-						"name": "Context",
-						"type": "String"
-					},
-					{
-						"name": "FirmID",
-						"type": "String"
-					},
-					{
-						"name": "Date of data collection",
-						"type": "String"
-					},
-					{
-						"name": "Country",
-						"type": "String"
-					},
-					{
-						"name": "interviewkey",
-						"type": "String"
-					},
-					{
-						"name": "interviewid",
-						"type": "String"
-					},
-					{
-						"name": "A01",
-						"type": "String"
-					},
-					{
-						"name": "A02",
-						"type": "String"
-					},
-					{
-						"name": "A03",
-						"type": "String"
-					},
-					{
-						"name": "A04",
-						"type": "String"
-					},
-					{
-						"name": "A06",
-						"type": "String"
-					},
-					{
-						"name": "A07",
-						"type": "String"
-					},
-					{
-						"name": "A09",
-						"type": "String"
-					},
-					{
-						"name": "A10",
-						"type": "String"
-					},
-					{
-						"name": "A11",
-						"type": "String"
-					},
-					{
-						"name": "A12",
-						"type": "String"
-					},
-					{
-						"name": "A13",
-						"type": "String"
-					},
-					{
-						"name": "B01",
-						"type": "String"
-					},
-					{
-						"name": "B03",
-						"type": "String"
-					},
-					{
-						"name": "B17",
-						"type": "String"
-					},
-					{
-						"name": "BA03",
-						"type": "String"
-					},
-					{
-						"name": "BA04",
-						"type": "String"
-					},
-					{
-						"name": "BA07",
-						"type": "String"
-					},
-					{
-						"name": "BA08",
-						"type": "String"
-					},
-					{
-						"name": "BA11",
-						"type": "String"
-					},
-					{
-						"name": "BA12",
-						"type": "String"
-					},
-					{
-						"name": "BA13",
-						"type": "String"
-					},
-					{
-						"name": "BA14",
-						"type": "String"
-					},
-					{
-						"name": "BA15",
-						"type": "String"
-					},
-					{
-						"name": "BB02",
-						"type": "String"
-					},
-					{
-						"name": "BB08",
-						"type": "String"
-					},
-					{
-						"name": "BB09",
-						"type": "String"
-					},
-					{
-						"name": "BC03",
-						"type": "String"
-					},
-					{
-						"name": "BC04",
-						"type": "String"
-					},
-					{
-						"name": "C04",
-						"type": "String"
-					},
-					{
-						"name": "C05",
-						"type": "String"
-					},
-					{
-						"name": "DA01",
-						"type": "String"
-					},
-					{
-						"name": "DB01",
-						"type": "String"
-					},
-					{
-						"name": "DB02",
-						"type": "String"
-					},
-					{
-						"name": "DB03",
-						"type": "String"
-					},
-					{
-						"name": "FILE_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOAD_TIMESTAMP",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/STAGE_OLAC')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "STAGE",
-						"fileSystem": "source"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "ProjectID",
-						"type": "String"
-					},
-					{
-						"name": "Context",
-						"type": "String"
-					},
-					{
-						"name": "Type of training",
-						"type": "String"
-					},
-					{
-						"name": "Course_name",
-						"type": "String"
-					},
-					{
-						"name": "Area of change",
-						"type": "String"
-					},
-					{
-						"name": "Service theme 1",
-						"type": "String"
-					},
-					{
-						"name": "Service theme 2",
-						"type": "String"
-					},
-					{
-						"name": "Date of data collection",
-						"type": "String"
-					},
-					{
-						"name": "Location",
-						"type": "String"
-					},
-					{
-						"name": "First name",
-						"type": "String"
-					},
-					{
-						"name": "Last name",
-						"type": "String"
-					},
-					{
-						"name": "Gender",
-						"type": "String"
-					},
-					{
-						"name": "Year of birth",
-						"type": "String"
-					},
-					{
-						"name": "Professional status",
-						"type": "String"
-					},
-					{
-						"name": "Name of the entity",
-						"type": "String"
-					},
-					{
-						"name": "Type of entity",
-						"type": "String"
-					},
-					{
-						"name": "Sub-type of entity",
-						"type": "String"
-					},
-					{
-						"name": "Country",
-						"type": "String"
-					},
-					{
-						"name": "Size",
-						"type": "String"
-					},
-					{
-						"name": "ISIC code division",
-						"type": "String"
-					},
-					{
-						"name": "HS 6 digit code (if available)",
-						"type": "String"
-					},
-					{
-						"name": "FILE_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOAD_TIMESTAMP",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/STAGE_SHE_TRADES')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "SHE_TRADES.csv",
-						"folderPath": "STAGE",
-						"fileSystem": "source"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "ProjectID",
-						"type": "String"
-					},
-					{
-						"name": "Context",
-						"type": "String"
-					},
-					{
-						"name": "Type of platform",
-						"type": "String"
-					},
-					{
-						"name": "SheTrades Project",
-						"type": "String"
-					},
-					{
-						"name": "Date of data collection",
-						"type": "String"
-					},
-					{
-						"name": "First name",
-						"type": "String"
-					},
-					{
-						"name": "Last name",
-						"type": "String"
-					},
-					{
-						"name": "Gender",
-						"type": "String"
-					},
-					{
-						"name": "Year of birth",
-						"type": "String"
-					},
-					{
-						"name": "Country",
-						"type": "String"
-					},
-					{
-						"name": "Email",
-						"type": "String"
-					},
-					{
-						"name": "Job title",
-						"type": "String"
-					},
-					{
-						"name": "Professional status",
-						"type": "String"
-					},
-					{
-						"name": "Organization/ Company name",
-						"type": "String"
-					},
-					{
-						"name": "Type of entity",
-						"type": "String"
-					},
-					{
-						"name": "City",
-						"type": "String"
-					},
-					{
-						"name": "Size",
-						"type": "String"
-					},
-					{
-						"name": "ISIC",
-						"type": "String"
-					},
-					{
-						"name": "Please select the area of your activity",
-						"type": "String"
-					},
-					{
-						"name": "HS",
-						"type": "String"
-					},
-					{
-						"name": "Owner/ top manager gender",
-						"type": "String"
-					},
-					{
-						"name": "Owner/ top manager age",
-						"type": "String"
-					},
-					{
-						"name": "Type of event",
-						"type": "String"
-					},
-					{
-						"name": "Phone number",
-						"type": "String"
-					},
-					{
-						"name": "Registration Date",
-						"type": "String"
-					},
-					{
-						"name": "Submission Date",
-						"type": "String"
-					},
-					{
-						"name": "Middle name",
-						"type": "String"
-					},
-					{
-						"name": "Date of birth",
-						"type": "String"
-					},
-					{
-						"name": "Sub-type of entity",
-						"type": "String"
-					},
-					{
-						"name": "BSO ownership",
-						"type": "String"
-					},
-					{
-						"name": "Office Address",
-						"type": "String"
-					},
-					{
-						"name": "Post Code",
-						"type": "String"
-					},
-					{
-						"name": "Website",
-						"type": "String"
-					},
-					{
-						"name": "Twitter",
-						"type": "String"
-					},
-					{
-						"name": "LinkedIn",
-						"type": "String"
-					},
-					{
-						"name": "FILE_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOAD_TIMESTAMP",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/STAGE_WEDF')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "WEDF.csv",
-						"folderPath": "STAGE",
-						"fileSystem": "source"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "ProjectID",
-						"type": "String"
-					},
-					{
-						"name": "Context",
-						"type": "String"
-					},
-					{
-						"name": "Type of event",
-						"type": "String"
-					},
-					{
-						"name": "Email",
-						"type": "String"
-					},
-					{
-						"name": "Phone number",
-						"type": "String"
-					},
-					{
-						"name": "Registration Date",
-						"type": "String"
-					},
-					{
-						"name": "Submission Date",
-						"type": "String"
-					},
-					{
-						"name": "Last name",
-						"type": "String"
-					},
-					{
-						"name": "Middle name",
-						"type": "String"
-					},
-					{
-						"name": "First name",
-						"type": "String"
-					},
-					{
-						"name": "Gender",
-						"type": "String"
-					},
-					{
-						"name": "Year of birth",
-						"type": "String"
-					},
-					{
-						"name": "Date of birth",
-						"type": "String"
-					},
-					{
-						"name": "Country",
-						"type": "String"
-					},
-					{
-						"name": "Organization/ Company name",
-						"type": "String"
-					},
-					{
-						"name": "Job title",
-						"type": "String"
-					},
-					{
-						"name": "Professional status",
-						"type": "String"
-					},
-					{
-						"name": "Type of entity",
-						"type": "String"
-					},
-					{
-						"name": "Sub-type of entity",
-						"type": "String"
-					},
-					{
-						"name": "Size",
-						"type": "String"
-					},
-					{
-						"name": "BSO ownership",
-						"type": "String"
-					},
-					{
-						"name": "Office Address",
-						"type": "String"
-					},
-					{
-						"name": "City",
-						"type": "String"
-					},
-					{
-						"name": "Post Code",
-						"type": "String"
-					},
-					{
-						"name": "Website",
-						"type": "String"
-					},
-					{
-						"name": "Twitter",
-						"type": "String"
-					},
-					{
-						"name": "LinkedIn",
-						"type": "String"
-					},
-					{
-						"name": "Date of birth2",
-						"type": "String"
-					},
-					{
-						"name": "Country of Residence",
-						"type": "String"
-					},
-					{
-						"name": "Nationality",
-						"type": "String"
-					},
-					{
-						"name": "Address",
-						"type": "String"
-					},
-					{
-						"name": "Cityname",
-						"type": "String"
-					},
-					{
-						"name": "Region",
-						"type": "String"
-					},
-					{
-						"name": "FILE_NAME",
-						"type": "String"
-					},
-					{
-						"name": "LOAD_TIMESTAMP",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PIP_DWH_TO_MART')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "DWH_READ",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": "WEDF 2019 registration data_POC_1905_20200602_082542.csv",
-									"P_PATH": "WEDF"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DWH_STAGE",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": "ALL_COL_FILE.csv"
-								}
-							}
-						]
-					},
-					{
-						"name": "Copy data1_copy1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "DWH_READ",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": "Data_input_from_Dynamics_to_Data_Warehouse_Techm - Account Form_20200602_111523.csv",
-									"P_PATH": "CRM"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DWH_STAGE",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": "ALL_COL_FILE.csv"
-								}
-							}
-						]
-					},
-					{
-						"name": "Copy data1_copy1_copy1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "DWH_READ",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": "SheTrades Global 2019_POC_1905_20200602_082228.csv",
-									"P_PATH": "SHE_TRADES"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DWH_STAGE",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": "ALL_COL_FILE.csv"
-								}
-							}
-						]
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PIP_FILE_LOADING')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get File Using Metadata",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "SRC_FILE_PARAMETER_DATASET",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILE_NAME": {
-										"value": "@pipeline().parameters.P_FILE_NAME_FORMAT",
-										"type": "Expression"
-									},
-									"P_PATH": {
-										"value": "@pipeline().parameters.P_FILE_PATH",
-										"type": "Expression"
-									},
-									"P_FIELD_SEPARATOR": {
-										"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-										"type": "Expression"
-									}
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": false
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "ForEachFiles",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "File Type Filter",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('File Type Filter').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Set Stage Table",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_STAGE_TABLE",
-										"value": {
-											"value": "@{pipeline().parameters.P_STAGE_TABLE}",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set Final Target Table",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_TARGET_TABLE",
-										"value": {
-											"value": "@{pipeline().parameters.P_TARGET_TABLE}",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set Clean Query",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Set Stage Table",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
-											"activity": "Set Final Target Table",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
-											"activity": "Set Failed File Path",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
-											"activity": "Set Loaded File Path",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
-											"activity": "Set Source Name",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_CLEAN_TEMP_QUERY",
-										"value": {
-											"value": "TRUNCATE TABLE DWH.@{variables('V_STAGE_TABLE')}",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set Source Query",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Copy Source File To Stage",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_SOURCE_QUERY",
-										"value": {
-											"value": "SELECT A.*,  'ITC' SOURCE, '@{item().name}' FILE_NAME, GETDATE ()  LOAD_TIMESTAMP FROM DWH.@{variables('V_STAGE_TABLE')} A",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Copy Source File To Stage",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Set Clean Query",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": false,
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"preCopyScript": {
-												"value": "@{variables('V_CLEAN_TEMP_QUERY')}",
-												"type": "Expression"
-											},
-											"disableMetricsCollection": false
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_FILE_PATH",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DWH_SQL_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_TABLE_NAME": {
-													"value": "@{variables('V_STAGE_TABLE')}",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Copy Stage to Target Table",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Set Source Query",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@variables('V_SOURCE_QUERY')",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00"
-										},
-										"sink": {
-											"type": "AzureSqlSink"
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "DWH_SQL_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_TABLE_NAME": "Select NULL"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DWH_SQL_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_TABLE_NAME": {
-													"value": "@{variables('V_TARGET_TABLE')}",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Move Failed Files",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Copy Source File To Stage",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_FILE_PATH",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_FAILED_PATH')",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Move success Files",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Copy Stage to Target Table",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_FILE_PATH",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_LOADED_PATH')",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Set Failed File Path",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_FAILED_PATH",
-										"value": {
-											"value": "@{pipeline().parameters.P_FILE_PATH}/failed",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set Loaded File Path",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_LOADED_PATH",
-										"value": {
-											"value": "@{pipeline().parameters.P_FILE_PATH}/loaded",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Delete After Moved to Failed",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Move Failed Files",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_FILE_PATH",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": "|"
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobStorageReadSettings",
-											"recursive": false
-										}
-									}
-								},
-								{
-									"name": "Delete After Moved to Loaded",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Move success Files",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_FILE_PATH",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": "|"
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobStorageReadSettings",
-											"recursive": false
-										}
-									}
-								},
-								{
-									"name": "Set Source Name",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_SOURCE_NAME",
-										"value": {
-											"value": "@pipeline().parameters.P_SOURCE",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Move Failed Files_copy1",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Copy Stage to Target Table",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_FILE_PATH",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@variables('V_FAILED_PATH')",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Delete After Moved to Failed_copy1",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Move Failed Files_copy1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "SRC_FILE_PARAMETER_DATASET",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@item().name",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_FILE_PATH",
-													"type": "Expression"
-												},
-												"P_FIELD_SEPARATOR": {
-													"value": "@pipeline().parameters.P_FIELD_SEPARATOR",
-													"type": "Expression"
-												}
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobStorageReadSettings",
-											"recursive": false
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "File Type Filter",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Get File Using Metadata",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get File Using Metadata').output.childItems",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().type, 'File')",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"parameters": {
-					"P_FILE_NAME_FORMAT": {
-						"type": "string"
-					},
-					"P_FILE_PATH": {
-						"type": "string"
-					},
-					"P_FIELD_SEPARATOR": {
-						"type": "string"
-					},
-					"P_STAGE_TABLE": {
-						"type": "string"
-					},
-					"P_TARGET_TABLE": {
-						"type": "string"
-					},
-					"P_SOURCE": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"V_SOURCE_QUERY": {
-						"type": "String"
-					},
-					"V_CLEAN_TEMP_QUERY": {
-						"type": "String"
-					},
-					"V_STAGE_TABLE": {
-						"type": "String"
-					},
-					"V_TARGET_TABLE": {
-						"type": "String"
-					},
-					"V_FAILED_PATH": {
-						"type": "String"
-					},
-					"V_LOADED_PATH": {
-						"type": "String"
-					},
-					"V_SOURCE_NAME": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SRC_FILE_PARAMETER_DATASET')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PIP_MART_MASTER_DIM')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "GetPipelineRunInfo",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Start the Pipeline",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00"
-							},
-							"dataset": {
-								"referenceName": "DWH_SQL_PARAMETER_DATASET",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_TABLE_NAME": "NULL"
-								}
-							}
-						}
-					},
-					{
-						"name": "Set PERIOD_START",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "GetPipelineRunInfo",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_RANGE_START",
-							"value": {
-								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set SNAP_DATE",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "GetPipelineRunInfo",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_SNAP_DATE",
-							"value": {
-								"value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set BATCH_NBR",
-						"description": "",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Set SNAP_DATE",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set PERIOD END",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set PERIOD_START",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_BATCH_NBR",
-							"value": {
-								"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set PERIOD END",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "GetPipelineRunInfo",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_RANGE_END",
-							"value": {
-								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Start the Pipeline",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[DWH].[PRC_DWH_START_PIPELINE]",
-							"storedProcedureParameters": {
-								"P_IN_PIPELINE_NAME": {
-									"value": "PIP_MART_MASTER_DIM",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_AGE_GROUP",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[DWH].[PRC_MART_DIM_AGE_GROUP]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_AREA_OF_CHANGE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_AREA_OF_CHANGE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_CONTEXT_SUB_TYPE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_CONTEXT_SUB_TYPE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_COUNTRY",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_COUNTRY]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_ENTITY_SIZE_GROUP",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_ENTITY_SIZE_GROUP]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_ENTITY_SUB_TYPE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_ENTITY_SUB_TYPE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_ENTITY_TYPE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_ENTITY_TYPE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_EVENT_TYPE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_EVENT_TYPE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_GENDER",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_GENDER]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_INT_STD_INDUSTRY_CODES_ISIC",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_INT_STD_INDUSTRY_CODES_ISIC]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_ITC_SECTION",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_ITC_SECTION]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_PLATFORM_TYPE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_PLATFORM_TYPE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_PROFESSIONAL_STATUS",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_PROFESSIONAL_STATUS]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_PROJECT",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_PROJECT]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_PROJECT_STAGE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_PROJECT_STAGE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_SERVICE_THEME",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_SERVICE_THEME]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_RELATION",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_RELATION]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_HS_CODES",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_HS_CODES]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_SURVEY_VARIABLE",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_SURVEY_VARIABLE]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "PRC_MART_DIM_SURVEY_VARIABLE_OPTION",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Set BATCH_NBR",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_SURVEY_VARIABLE_OPTION]",
-							"storedProcedureParameters": {
-								"P_IN_BATCH_NBR": {
-									"value": {
-										"value": "@int(variables('V_BATCH_NBR'))",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"P_IN_PERIOD_END": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_END'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_PERIOD_START": {
-									"value": {
-										"value": "@formatDateTime(variables('V_RANGE_START'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"P_IN_SNAP_DATE": {
-									"value": {
-										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_PIPELINE_NAME": {
-						"type": "string",
-						"defaultValue": "PIP_MART_MASTER_DIM"
-					}
-				},
-				"variables": {
-					"V_RANGE_START": {
-						"type": "String"
-					},
-					"V_RANGE_END": {
-						"type": "String"
-					},
-					"V_SNAP_DATE": {
-						"type": "String"
-					},
-					"V_BATCH_NBR": {
-						"type": "String"
-					}
-				},
-				"annotations": []
 			},
 			"dependsOn": []
 		}

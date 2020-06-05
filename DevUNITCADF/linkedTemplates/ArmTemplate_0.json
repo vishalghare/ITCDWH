@@ -2443,6 +2443,70 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_AREA_OF_CHANGE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AREA_OF_CHANGE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AREA_OF_CHANGE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "AREA_OF_CHANGE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_AREA_OF_CHANGE"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_CONTEXT_SUB_TYPE')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2611,6 +2675,66 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_COURSE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "COURSE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COURSE_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_COURSE"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_DATE')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2704,244 +2828,6 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_DATE"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_ENTITY')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ENTITY_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ENTITY_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "VERSION_NO",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ENTITY_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "ENTITY_EMAIL_DOMAIN_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "ADDRESS",
-						"type": "varchar"
-					},
-					{
-						"name": "CITY",
-						"type": "varchar"
-					},
-					{
-						"name": "REGION",
-						"type": "varchar"
-					},
-					{
-						"name": "PHONE_NUMBER",
-						"type": "varchar"
-					},
-					{
-						"name": "WEBSITE",
-						"type": "varchar"
-					},
-					{
-						"name": "TWITTER",
-						"type": "varchar"
-					},
-					{
-						"name": "LINKEDIN",
-						"type": "varchar"
-					},
-					{
-						"name": "BSO_OWNERSHIP",
-						"type": "varchar"
-					},
-					{
-						"name": "POST_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "POBOX",
-						"type": "varchar"
-					},
-					{
-						"name": "CITY_REGION",
-						"type": "varchar"
-					},
-					{
-						"name": "CATEGORY",
-						"type": "varchar"
-					},
-					{
-						"name": "CONFIDENTIAL",
-						"type": "varchar"
-					},
-					{
-						"name": "SOCIAL_MEDIA",
-						"type": "varchar"
-					},
-					{
-						"name": "OTHER_EMAILS",
-						"type": "varchar"
-					},
-					{
-						"name": "OTHER_PHONE_NUMBERS",
-						"type": "varchar"
-					},
-					{
-						"name": "OTHER_INFORMATION",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_ADDRESS_STREET1",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_ADDRESS_STREET2",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_ADDRESS_CITY",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_STATE_PROVICE",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_POST_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_COUNTRY",
-						"type": "varchar"
-					},
-					{
-						"name": "MAILING_FORMAT_UN",
-						"type": "varchar"
-					},
-					{
-						"name": "FIRM_ID",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_ENTITY"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_EVENT_TYPE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "EVENT_TYPE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "EVENT_TYPE_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "EVENT_TYPE_DESC",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_EVENT_TYPE"
 				}
 			},
 			"dependsOn": [
