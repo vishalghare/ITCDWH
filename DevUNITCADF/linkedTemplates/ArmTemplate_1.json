@@ -13,6 +13,130 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PLATFORM_TYPE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PLATFORM_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PLATFORM_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "PLATFORM_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PLATFORM_TYPE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PROJECT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "PROJECT_TITLE",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PROJECT"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_SURVEY_DETAILS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -258,6 +382,68 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_SURVEY_VARIABLE_OPTION"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_TRAINING_TYPE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TRAINING_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TRAINING_TYPE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "TRAINING_TYPE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_TRAINING_TYPE"
 				}
 			},
 			"dependsOn": []
@@ -1661,192 +1847,6 @@
 						"type": "String"
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_EVENT_TYPE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "EVENT_TYPE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "EVENT_TYPE_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "EVENT_TYPE_DESC",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_EVENT_TYPE"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_TRAINING_TYPE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TRAINING_TYPE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TRAINING_TYPE_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "TRAINING_TYPE_DESC",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_TRAINING_TYPE"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_PLATFORM_TYPE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "PLATFORM_TYPE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "PLATFORM_TYPE_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "PLATFORM_TYPE_DESC",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_PLATFORM_TYPE"
-				}
 			},
 			"dependsOn": []
 		},
