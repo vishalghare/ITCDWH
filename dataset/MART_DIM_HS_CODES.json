@@ -1,0 +1,91 @@
+{
+	"name": "MART_DIM_HS_CODES",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "HS_CODE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ORDER",
+				"type": "varchar"
+			},
+			{
+				"name": "LEVEL",
+				"type": "varchar"
+			},
+			{
+				"name": "CODE1",
+				"type": "varchar"
+			},
+			{
+				"name": "PARENT1",
+				"type": "varchar"
+			},
+			{
+				"name": "CODE2",
+				"type": "varchar"
+			},
+			{
+				"name": "PARENT2",
+				"type": "varchar"
+			},
+			{
+				"name": "DESCRIPTION",
+				"type": "varchar"
+			},
+			{
+				"name": "SELF_EXPLANATORY_TEXTS",
+				"type": "varchar"
+			},
+			{
+				"name": "HS_SECTION",
+				"type": "varchar"
+			},
+			{
+				"name": "HS_CHAPTER",
+				"type": "varchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SOURCE",
+				"type": "varchar"
+			},
+			{
+				"name": "CREATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "UPDATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_CREATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DATE_UPDATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "MART_OWNER",
+			"table": "DIM_HS_CODES"
+		}
+	}
+}
