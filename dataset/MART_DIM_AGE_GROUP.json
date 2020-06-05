@@ -1,0 +1,69 @@
+{
+	"name": "MART_DIM_AGE_GROUP",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "AGE_GROUP_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AGE_GROUP_CODE",
+				"type": "varchar"
+			},
+			{
+				"name": "AGE_GROUP_DESC",
+				"type": "varchar"
+			},
+			{
+				"name": "LOWER_AGE_LIMIT",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "HIGHER_AGE_LIMIT",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SOURCE",
+				"type": "varchar"
+			},
+			{
+				"name": "CREATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "UPDATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_CREATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DATE_UPDATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "MART_OWNER",
+			"table": "DIM_AGE_GROUP"
+		}
+	}
+}
