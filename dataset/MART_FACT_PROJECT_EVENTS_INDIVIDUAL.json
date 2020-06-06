@@ -155,8 +155,7 @@
 			},
 			{
 				"name": "CERTIFIED_FLAG",
-				"type": "int",
-				"precision": 10
+				"type": "varchar"
 			},
 			{
 				"name": "ENROLL_DATE_SR_KEY",
