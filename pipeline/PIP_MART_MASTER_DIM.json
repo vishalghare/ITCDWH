@@ -178,7 +178,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[DWH].[PRC_MART_DIM_AGE_GROUP]",
+					"storedProcedureName": "[MART_OWNER].[PRC_MART_DIM_AGE_GROUP]",
 					"storedProcedureParameters": {
 						"P_IN_BATCH_NBR": {
 							"value": {
