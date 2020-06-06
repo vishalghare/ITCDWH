@@ -1,0 +1,195 @@
+{
+	"name": "MART_FACT_PROJECT_EVENTS_INDIVIDUAL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "PROJECT_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CONTEXT_SUB_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EVENT_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TRAINING_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PLATFORM_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PARTICIPANT_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DATE_COLLECTION_DATE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SUBMISSON_DATE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "GENDER_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DATE_OF_BIRTH_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DATE_OF_BIRTH2_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PARTICIPANT_HOME_COUNTRY_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PROFESSIONAL_STATUS_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_SUB_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_COUNTRY_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SOURCE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_SIZE_GROUP_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "COURSE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AREA_OF_CHANGE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SERVICE_THEME1_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SERVICE_THEME2_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "HS_CODE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "INT_STD_INDUSTRY_CODES_ISIC_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TOP_MANAGER_GENDER_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TOP_MANAGER_AGE_GROUP_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AGE_GROUP_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CERTIFICATION_DATE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CERTIFIED_FLAG",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENROLL_DATE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "YOUTH_MANAGED_FLAG",
+				"type": "varchar"
+			},
+			{
+				"name": "WOMAN_MANAGED_FLAG",
+				"type": "varchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CREATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_CREATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "MART_OWNER",
+			"table": "FACT_PROJECT_EVENTS_INDIVIDUAL"
+		}
+	}
+}
