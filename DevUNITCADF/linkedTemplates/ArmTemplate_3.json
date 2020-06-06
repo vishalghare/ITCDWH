@@ -269,8 +269,8 @@
 									"SrcAll": {},
 									"ExistingDIM": {},
 									"ExistingDIM1": {},
-									"ExistingDimMAX": {},
-									"iDIMPARTICIPANT": {}
+									"iDIMPARTICIPANT": {},
+									"uDIMPARTICIPANT": {}
 								}
 							},
 							"staging": {},
