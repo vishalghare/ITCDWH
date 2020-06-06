@@ -3257,6 +3257,63 @@
 							"referenceName": "AzureSqlDatabase1",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "PRC_MART_DIM_TRAINING_TYPE",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Set BATCH_NBR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[MART_OWNER].[PRC_MART_DIM_TRAINING_TYPE]",
+							"storedProcedureParameters": {
+								"P_IN_BATCH_NBR": {
+									"value": {
+										"value": "@int(variables('V_BATCH_NBR'))",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"P_IN_PERIOD_END": {
+									"value": {
+										"value": "@formatDateTime(variables('V_RANGE_END'))",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"P_IN_PERIOD_START": {
+									"value": {
+										"value": "@formatDateTime(variables('V_RANGE_START'))",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"P_IN_SNAP_DATE": {
+									"value": {
+										"value": "@formatDateTime(variables('V_SNAP_DATE'))",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"parameters": {
