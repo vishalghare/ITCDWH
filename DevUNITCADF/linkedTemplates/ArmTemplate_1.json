@@ -13,6 +13,104 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_DATE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DATE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DATE_TIME",
+						"type": "date"
+					},
+					{
+						"name": "DAY_OF_MONTH",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CALENDER_MONTH_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "CALENDER_MONTH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CALENDER_YEAR",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CALENDER_QUARTER_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CALENDER_QUARTER_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "CALENDER_HALF_YEAR_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CALENDER_HALF_YEAR_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "FISCAL_MONTH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FISCAL_MONTH_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "FISCAL_QUARTER_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FISCAL_QUARTER_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "FISCAL_HALF_YEAR_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FISCAL_HALF_YEAR_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "FISCAL_YEAR",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_DATE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_ENTITY')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1776,58 +1874,6 @@
 					},
 					{
 						"name": "LinkedIn",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SRC_FILE_PARAMETER_DATASET')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_FILE_NAME": {
-						"type": "string"
-					},
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FIELD_SEPARATOR": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().P_FILE_NAME",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						},
-						"container": "source"
-					},
-					"columnDelimiter": {
-						"value": "@dataset().P_FIELD_SEPARATOR",
-						"type": "Expression"
-					},
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "Context",
 						"type": "String"
 					}
 				]

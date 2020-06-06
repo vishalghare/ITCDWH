@@ -2443,6 +2443,80 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_AGE_GROUP')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AGE_GROUP_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AGE_GROUP_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "AGE_GROUP_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "LOWER_AGE_LIMIT",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "HIGHER_AGE_LIMIT",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_AGE_GROUP"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_AREA_OF_CHANGE')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2728,106 +2802,6 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_COURSE"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_DATE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DATE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DATE_TIME",
-						"type": "date"
-					},
-					{
-						"name": "DAY_OF_MONTH",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_MONTH_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "CALENDER_MONTH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_YEAR",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_QUARTER_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_QUARTER_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "CALENDER_HALF_YEAR_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_HALF_YEAR_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_MONTH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "FISCAL_MONTH_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_QUARTER_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "FISCAL_QUARTER_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_HALF_YEAR_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "FISCAL_HALF_YEAR_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_YEAR",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_DATE"
 				}
 			},
 			"dependsOn": [
