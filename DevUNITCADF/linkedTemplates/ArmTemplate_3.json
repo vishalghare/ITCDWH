@@ -13,6 +13,76 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_NTF_STAGE_DWH_LAKE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "STAGE_NTF",
+								"type": "DatasetReference"
+							},
+							"name": "SrcStageNTF"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_NTF",
+								"type": "DatasetReference"
+							},
+							"name": "DWHNTF"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageNTF\nSrcStageNTF derive(NEW_DATALAKE_FILE = 'NTF/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHNTF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_OLAC_STAGE_DWH_LAKE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "STAGE_OLAC",
+								"type": "DatasetReference"
+							},
+							"name": "SrcStageOLAC"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_OLAC",
+								"type": "DatasetReference"
+							},
+							"name": "DWHOLAC"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageOLAC\nSrcStageOLAC derive({Year of birth} = case({Year of birth}=='N/A', \r\n'',\r\niif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth})\r\n),\n\t\tNEW_DATALAKE_FILE = 'OLAC/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHOLAC"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_SHE_TRADES_DIM_ENTITY')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -341,7 +411,8 @@
 									"DIMAGEGROUP": {},
 									"CERTIFICATIONDAET": {},
 									"ENROLLDATE": {},
-									"sink1": {}
+									"DIMSOURCE": {},
+									"FACTPROJECTEVENTSINDIVIDUAL": {}
 								}
 							},
 							"staging": {},
@@ -2486,7 +2557,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_NTF_STAGE_DWH_LAKE')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PIP_OLAC_SRC_DATALAKE')]",
@@ -3121,7 +3194,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_OLAC_STAGE_DWH_LAKE')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PIP_SHE_TRADES_DWH_MART')]",
