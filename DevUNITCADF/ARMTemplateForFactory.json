@@ -52,7 +52,9 @@
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"srcALL": {},
+									"srcALL": {
+										"P_FILE_NAME": "ALL_COL_FILE_NEW.csv"
+									},
 									"ExistingDIM": {},
 									"ExistingDIM1": {},
 									"DIMENTITY": {},
@@ -97,7 +99,9 @@
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"SrcAll": {},
+									"SrcAll": {
+										"P_FILE_NAME": "ALL_COL_FILE_NEW.csv"
+									},
 									"ExistingDIM": {},
 									"ExistingDIM1": {},
 									"iDIMPARTICIPANT": {},
@@ -142,7 +146,9 @@
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"SrcAll": {},
+									"SrcAll": {
+										"P_FILE_NAME": "ALL_COL_FILE_NEW.csv"
+									},
 									"DIMPROJECT": {},
 									"DIMCONTEXTSUBTYPE": {},
 									"DIMEVENTTYPE": {},
@@ -6511,6 +6517,173 @@
 										"variableName": "V_DWH_MART_STAGE_FILE",
 										"value": "ALL_COL_WEDF.csv"
 									}
+								},
+								{
+									"name": "DF_DIM_ENTITY",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "COPY_DWH_TO_MART_STAGE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_DIM_ENTITY",
+											"type": "DataFlowReference",
+											"parameters": {},
+											"datasetParameters": {
+												"srcALL": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_DWH_MART_STAGE_FILE')",
+														"type": "Expression"
+													}
+												},
+												"ExistingDIM": {},
+												"ExistingDIM1": {},
+												"DIMENTITY": {},
+												"DIMENTITY1": {}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "DF_DIM_PARTICIPANT",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "COPY_DWH_TO_MART_STAGE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_DIM_PARTICIPANT",
+											"type": "DataFlowReference",
+											"parameters": {},
+											"datasetParameters": {
+												"SrcAll": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_DWH_MART_STAGE_FILE')",
+														"type": "Expression"
+													}
+												},
+												"ExistingDIM": {},
+												"ExistingDIM1": {},
+												"iDIMPARTICIPANT": {},
+												"uDIMPARTICIPANT": {}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "DF_FACT_PROJECT_EVENTS_INDIVIDUAL",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "DF_DIM_ENTITY",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "DF_DIM_PARTICIPANT",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_FACT_PROJECT_EVENTS_INDIVIDUAL",
+											"type": "DataFlowReference",
+											"parameters": {},
+											"datasetParameters": {
+												"SrcAll": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_DWH_MART_STAGE_FILE')",
+														"type": "Expression"
+													}
+												},
+												"DIMPROJECT": {},
+												"DIMCONTEXTSUBTYPE": {},
+												"DIMEVENTTYPE": {},
+												"DIMTRAININGTYPE": {},
+												"DIMPLATFORMTYPE": {},
+												"DIMPARTICIPANT": {},
+												"DIMPARTICIPANT01": {},
+												"DIMDATE01": {},
+												"DIMDATE02": {},
+												"DIMGENDER": {},
+												"DATEOFBIRTHYEAR": {},
+												"DATEOFBIRTH2": {},
+												"PARTICIPANTHOMECOUNTRY": {},
+												"DIMENTITY1": {},
+												"DIMENTITY2": {},
+												"DIMPROFESSIONALSTATUS": {},
+												"DIMENTITYTYPE": {},
+												"DIMENTITYSUBTYPE": {},
+												"ENTITYCOUNTRY": {},
+												"DIMENTITYSIZEGROUP": {},
+												"DIMCOURSE": {},
+												"DIMAREAOFCHANGE": {},
+												"DIMSERVICETHEME01": {},
+												"DIMSERVICETHEME02": {},
+												"DIMHSCODES": {},
+												"DIMINTSTDINDUSTRYCODESISIC": {},
+												"DIMTOPMANAGERGENDER": {},
+												"TOPMANAGERAGEGROUP": {},
+												"DIMAGEGROUP": {},
+												"CERTIFICATIONDAET": {},
+												"ENROLLDATE": {},
+												"DIMSOURCE": {},
+												"FACTPROJECTEVENTSINDIVIDUAL": {}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
 								}
 							]
 						}
@@ -6551,7 +6724,10 @@
 				"[concat(variables('factoryId'), '/datasets/DWH_SQL_PARAMETER_DATASET')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]",
 				"[concat(variables('factoryId'), '/datasets/DWH_WEDF')]",
-				"[concat(variables('factoryId'), '/dataflows/COPY_DWH_TO_MART_STAGE')]"
+				"[concat(variables('factoryId'), '/dataflows/COPY_DWH_TO_MART_STAGE')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_DIM_ENTITY')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_DIM_PARTICIPANT')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_FACT_PROJECT_EVENTS_INDIVIDUAL')]"
 			]
 		},
 		{
@@ -7568,12 +7744,20 @@
 					"referenceName": "AzureDataLakeStorage1",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"P_FILE_NAME": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "ALL_COL_FILE_NEW.csv",
+						"fileName": {
+							"value": "@dataset().P_FILE_NAME",
+							"type": "Expression"
+						},
 						"folderPath": "STAGE",
 						"fileSystem": "target"
 					},
