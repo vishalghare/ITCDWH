@@ -17,7 +17,12 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "DF_DIM_PARTICIPANT",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"SrcAll": {
+								"P_FILE_NAME": "ALL_COL_FILE_NEW.csv"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
