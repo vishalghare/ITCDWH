@@ -1,0 +1,1051 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "DevUNITCADF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_WEDF_DWH_MART')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetPipelineRunInfo",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Start the Pipeline",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DWH_SQL_PARAMETER_DATASET",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_TABLE_NAME": "NULL"
+								}
+							}
+						}
+					},
+					{
+						"name": "Start the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_START_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set PERIOD_START",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PERIOD_START",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set PERIOD_END",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PERIOD_END",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set SNAP_DATE",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_SNAP_DATE",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set BATCH_NBR",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_BATCH_NBR",
+							"value": {
+								"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Get DATALAKE FILES",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Set PERIOD_START",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set PERIOD_END",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set SNAP_DATE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set BATCH_NBR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DWH_WEDF",
+								"type": "DatasetReference"
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"modifiedDatetimeStart": {
+									"value": "@formatDateTime(variables('V_PERIOD_START'))",
+									"type": "Expression"
+								},
+								"modifiedDatetimeEnd": {
+									"value": "@formatDateTime(variables('V_PERIOD_END'))",
+									"type": "Expression"
+								}
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Filter Dir",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get DATALAKE FILES",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get DATALAKE FILES').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'File')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter Dir",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter Dir').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Set PROCESSING FILE NAME",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_PROCESS_FILE_NAME",
+										"value": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set DWH SRC PATH",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_DWH_SRC_PATH",
+										"value": "WEDF"
+									}
+								},
+								{
+									"name": "COPY_DWH_TO_MART_STAGE",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Set PROCESSING FILE NAME",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set DWH SRC PATH",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set V_DWH_MART_STAGE_FILE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "COPY_DWH_TO_MART_STAGE",
+											"type": "DataFlowReference",
+											"parameters": {
+												"P_DWH_MART_STAGE_FILE": {
+													"value": "'@{variables('V_DWH_MART_STAGE_FILE')}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"SrcDATALAKE": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_PROCESS_FILE_NAME')",
+														"type": "Expression"
+													},
+													"P_PATH": {
+														"value": "@variables('V_DWH_SRC_PATH')",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "Set V_DWH_MART_STAGE_FILE",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_DWH_MART_STAGE_FILE",
+										"value": "ALL_COL_WEDF.csv"
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_PIPELINE_NAME": {
+						"type": "string",
+						"defaultValue": "PIP_WEDF_DWH_MART"
+					}
+				},
+				"variables": {
+					"V_PERIOD_START": {
+						"type": "String"
+					},
+					"V_PERIOD_END": {
+						"type": "String"
+					},
+					"V_SNAP_DATE": {
+						"type": "String"
+					},
+					"V_BATCH_NBR": {
+						"type": "String"
+					},
+					"V_PROCESS_FILE_NAME": {
+						"type": "String"
+					},
+					"V_DWH_SRC_PATH": {
+						"type": "String"
+					},
+					"V_DWH_MART_STAGE_FILE": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/COPY_DWH_TO_MART_STAGE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_NTF_DIM_ENTITY')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "SrcNTF"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDIM"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDIM1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "UpdDIMENTITY"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectColumn"
+						},
+						{
+							"name": "DistinctByAggregate"
+						},
+						{
+							"name": "SourceRecordHash"
+						},
+						{
+							"name": "SelectExistingCol"
+						},
+						{
+							"name": "ExstingRecordHash"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "Lookup1"
+						},
+						{
+							"name": "ConditionalSplit1"
+						},
+						{
+							"name": "RunInfo"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "RunInfo2"
+						},
+						{
+							"name": "AlterRow2"
+						},
+						{
+							"name": "LatestEntityID"
+						},
+						{
+							"name": "Join1"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM1\nSrcNTF select(mapColumn(\n\t\tFIRM_ID = FirmID,\n\t\tENTITY_NAME = A04,\n\t\tADDRESS = A06,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumn\nSelectColumn aggregate(groupBy(ENTITY_NAME),\n\teach(match(name!='ENTITY_NAME'), $$ = last($$))) ~> DistinctByAggregate\nDistinctByAggregate derive(SOURCE_RECORD_HASH = sha2(256,\r\nENTITY_NAME,\r\nADDRESS,\r\nFIRM_ID\r\n)) ~> SourceRecordHash\nJoin1 select(mapColumn(\n\t\tEXIST_ENTITY_ID = ExistingDIM@ENTITY_ID,\n\t\tEXIST_VERSION_NO = ExistingDIM@VERSION_NO,\n\t\tEXIST_ENTITY_NAME = ExistingDIM@ENTITY_NAME,\n\t\tEXIST_ADDRESS = ADDRESS,\n\t\tEXIST_FIRM_ID = FIRM_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectExistingCol\nSelectExistingCol derive(RECORD_HASH = sha2(256,\r\nEXIST_ENTITY_NAME,\r\nEXIST_ADDRESS,\r\nEXIST_FIRM_ID\r\n)) ~> ExstingRecordHash\nSourceRecordHash, ExstingRecordHash exists(SOURCE_RECORD_HASH == RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, ExstingRecordHash lookup(ENTITY_NAME == EXIST_ENTITY_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 split(isNull(EXIST_ENTITY_ID),\n\tdisjoint: false) ~> ConditionalSplit1@(NewRecord, UpdateRecord)\nConditionalSplit1@NewRecord derive(VERSION_NO = 1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo alterRow(insertIf(1==1)) ~> AlterRow1\nConditionalSplit1@UpdateRecord derive(VERSION_NO = EXIST_VERSION_NO +1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo2\nRunInfo2 alterRow(insertIf(1==1)) ~> AlterRow2\nExistingDIM1 aggregate(groupBy(ENTITY_ID,\n\t\tENTITY_NAME),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestEntityID\nExistingDIM, LatestEntityID join(ExistingDIM@ENTITY_ID == LatestEntityID@ENTITY_ID\n\t&& ExistingDIM@ENTITY_NAME == LatestEntityID@ENTITY_NAME\n\t&& ExistingDIM@VERSION_NO == LatestEntityID@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nAlterRow1 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tADDRESS,\n\t\tFIRM_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITY\nAlterRow2 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID = EXIST_ENTITY_ID,\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tADDRESS,\n\t\tFIRM_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UpdDIMENTITY"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/COPY_DWH_TO_MART_STAGE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_READ",
+								"type": "DatasetReference"
+							},
+							"name": "SrcDATALAKE"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_MART_STAGE_WRITE",
+								"type": "DatasetReference"
+							},
+							"name": "trgMARTSTAGE"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tP_DWH_MART_STAGE_FILE as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcDATALAKE\nSrcDATALAKE sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\t{Type of tool} as string,\n\t\t{Area of change} as string,\n\t\t{Service themes} as string,\n\t\t{Date of data collection} as string,\n\t\tid as string,\n\t\tCourse_name as string,\n\t\tUsername as string,\n\t\tTitle as string,\n\t\tidnumber as string,\n\t\tFunctional_title as string,\n\t\tHowlong as string,\n\t\tPriorexperience as string,\n\t\t{Country code} as string,\n\t\tPobox as string,\n\t\tPostalcode as string,\n\t\tSkype as string,\n\t\tAim as string,\n\t\tYahoo as string,\n\t\tMsn as string,\n\t\tProfile_field_Supervisor as string,\n\t\t{Service theme} as string,\n\t\tCityregion as string,\n\t\tCertification_date as string,\n\t\tCertified as string,\n\t\tCohort as string,\n\t\tUniqueid as string,\n\t\tUser_id as string,\n\t\tEnrol_time as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of training} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\tLocation as string,\n\t\t{Name of the entity} as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tConfidential as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\tAccount as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:[($P_DWH_MART_STAGE_FILE)],\n\tpartitionBy('hash', 1)) ~> trgMARTSTAGE"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DWH_MART_STAGE_WRITE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DWH_MART_STAGE_WRITE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "STAGE",
+						"fileSystem": "target"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ProjectID",
+						"type": "String"
+					},
+					{
+						"name": "Context",
+						"type": "String"
+					},
+					{
+						"name": "Type of event",
+						"type": "String"
+					},
+					{
+						"name": "Email",
+						"type": "String"
+					},
+					{
+						"name": "Phone number",
+						"type": "String"
+					},
+					{
+						"name": "Registration Date",
+						"type": "String"
+					},
+					{
+						"name": "Submission Date",
+						"type": "String"
+					},
+					{
+						"name": "Last name",
+						"type": "String"
+					},
+					{
+						"name": "Middle name",
+						"type": "String"
+					},
+					{
+						"name": "First name",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					},
+					{
+						"name": "Year of birth",
+						"type": "String"
+					},
+					{
+						"name": "Date of birth",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					},
+					{
+						"name": "Organization/ Company name",
+						"type": "String"
+					},
+					{
+						"name": "Job title",
+						"type": "String"
+					},
+					{
+						"name": "Professional status",
+						"type": "String"
+					},
+					{
+						"name": "Type of entity",
+						"type": "String"
+					},
+					{
+						"name": "Sub-type of entity",
+						"type": "String"
+					},
+					{
+						"name": "Size",
+						"type": "String"
+					},
+					{
+						"name": "BSO ownership",
+						"type": "String"
+					},
+					{
+						"name": "Office Address",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "Post Code",
+						"type": "String"
+					},
+					{
+						"name": "Website",
+						"type": "String"
+					},
+					{
+						"name": "Twitter",
+						"type": "String"
+					},
+					{
+						"name": "LinkedIn",
+						"type": "String"
+					},
+					{
+						"name": "Date of birth2",
+						"type": "String"
+					},
+					{
+						"name": "Country of Residence",
+						"type": "String"
+					},
+					{
+						"name": "Nationality",
+						"type": "String"
+					},
+					{
+						"name": "Address",
+						"type": "String"
+					},
+					{
+						"name": "Cityname",
+						"type": "String"
+					},
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "Type of tool",
+						"type": "String"
+					},
+					{
+						"name": "Area of change",
+						"type": "String"
+					},
+					{
+						"name": "Service themes",
+						"type": "String"
+					},
+					{
+						"name": "Date of data collection",
+						"type": "String"
+					},
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "Course_name",
+						"type": "String"
+					},
+					{
+						"name": "Username",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "idnumber",
+						"type": "String"
+					},
+					{
+						"name": "Functional_title",
+						"type": "String"
+					},
+					{
+						"name": "Howlong",
+						"type": "String"
+					},
+					{
+						"name": "Priorexperience",
+						"type": "String"
+					},
+					{
+						"name": "Country code",
+						"type": "String"
+					},
+					{
+						"name": "Pobox",
+						"type": "String"
+					},
+					{
+						"name": "Postalcode",
+						"type": "String"
+					},
+					{
+						"name": "Skype",
+						"type": "String"
+					},
+					{
+						"name": "Aim",
+						"type": "String"
+					},
+					{
+						"name": "Yahoo",
+						"type": "String"
+					},
+					{
+						"name": "Msn",
+						"type": "String"
+					},
+					{
+						"name": "Profile_field_Supervisor",
+						"type": "String"
+					},
+					{
+						"name": "Service theme",
+						"type": "String"
+					},
+					{
+						"name": "Cityregion",
+						"type": "String"
+					},
+					{
+						"name": "Certification_date",
+						"type": "String"
+					},
+					{
+						"name": "Certified",
+						"type": "String"
+					},
+					{
+						"name": "Cohort",
+						"type": "String"
+					},
+					{
+						"name": "Uniqueid",
+						"type": "String"
+					},
+					{
+						"name": "User_id",
+						"type": "String"
+					},
+					{
+						"name": "Enrol_time",
+						"type": "String"
+					},
+					{
+						"name": "Type of platform",
+						"type": "String"
+					},
+					{
+						"name": "SheTrades Project",
+						"type": "String"
+					},
+					{
+						"name": "ISIC",
+						"type": "String"
+					},
+					{
+						"name": "Please select the area of your activity",
+						"type": "String"
+					},
+					{
+						"name": "HS",
+						"type": "String"
+					},
+					{
+						"name": "Owner/ top manager gender",
+						"type": "String"
+					},
+					{
+						"name": "Owner/ top manager age",
+						"type": "String"
+					},
+					{
+						"name": "Type of training",
+						"type": "String"
+					},
+					{
+						"name": "Service theme 1",
+						"type": "String"
+					},
+					{
+						"name": "Service theme 2",
+						"type": "String"
+					},
+					{
+						"name": "Location",
+						"type": "String"
+					},
+					{
+						"name": "Name of the entity",
+						"type": "String"
+					},
+					{
+						"name": "ISIC code division",
+						"type": "String"
+					},
+					{
+						"name": "HS 6 digit code (if available)",
+						"type": "String"
+					},
+					{
+						"name": "Account Name",
+						"type": "String"
+					},
+					{
+						"name": "English Name",
+						"type": "String"
+					},
+					{
+						"name": "Acronym",
+						"type": "String"
+					},
+					{
+						"name": "Account Type",
+						"type": "String"
+					},
+					{
+						"name": "Account Sub-Type",
+						"type": "String"
+					},
+					{
+						"name": "Office Address: Country",
+						"type": "String"
+					},
+					{
+						"name": "Category",
+						"type": "String"
+					},
+					{
+						"name": "Parent Account",
+						"type": "String"
+					},
+					{
+						"name": "Confidential",
+						"type": "String"
+					},
+					{
+						"name": "Activity",
+						"type": "String"
+					},
+					{
+						"name": "Product",
+						"type": "String"
+					},
+					{
+						"name": "Women Managed",
+						"type": "String"
+					},
+					{
+						"name": "Youth Managed",
+						"type": "String"
+					},
+					{
+						"name": "Social media",
+						"type": "String"
+					},
+					{
+						"name": "Other emails",
+						"type": "String"
+					},
+					{
+						"name": "Other phone numbers",
+						"type": "String"
+					},
+					{
+						"name": "Other information",
+						"type": "String"
+					},
+					{
+						"name": "Ownership and management",
+						"type": "String"
+					},
+					{
+						"name": "Trade Forum",
+						"type": "String"
+					},
+					{
+						"name": "Office Address: Street 1",
+						"type": "String"
+					},
+					{
+						"name": "Office Address: Street 2",
+						"type": "String"
+					},
+					{
+						"name": "Office Address: City",
+						"type": "String"
+					},
+					{
+						"name": "Office Address: State/Province",
+						"type": "String"
+					},
+					{
+						"name": "Office Address: ZIP/Postal Code",
+						"type": "String"
+					},
+					{
+						"name": "Mailing address is equal to office address",
+						"type": "String"
+					},
+					{
+						"name": "Mailing Address: Street 1",
+						"type": "String"
+					},
+					{
+						"name": "Mailing Address: Street 2",
+						"type": "String"
+					},
+					{
+						"name": "Mailing Address: City",
+						"type": "String"
+					},
+					{
+						"name": "Mailing Address: State/Province",
+						"type": "String"
+					},
+					{
+						"name": "Mailing Address: ZIP/Postal Code",
+						"type": "String"
+					},
+					{
+						"name": "Mailing Address: Country",
+						"type": "String"
+					},
+					{
+						"name": "UN Mailing Format",
+						"type": "String"
+					},
+					{
+						"name": "Project Number",
+						"type": "String"
+					},
+					{
+						"name": "Salutation",
+						"type": "String"
+					},
+					{
+						"name": "Account",
+						"type": "String"
+					},
+					{
+						"name": "Phone",
+						"type": "String"
+					},
+					{
+						"name": "Preferred Language",
+						"type": "String"
+					},
+					{
+						"name": "Use account address",
+						"type": "String"
+					},
+					{
+						"name": "Event title",
+						"type": "String"
+					},
+					{
+						"name": "Event type",
+						"type": "String"
+					},
+					{
+						"name": "Course name",
+						"type": "String"
+					},
+					{
+						"name": "Start date",
+						"type": "String"
+					},
+					{
+						"name": "End date",
+						"type": "String"
+					},
+					{
+						"name": "Event date",
+						"type": "String"
+					},
+					{
+						"name": "SME Trade Academy",
+						"type": "String"
+					},
+					{
+						"name": "SheTrades",
+						"type": "String"
+					},
+					{
+						"name": "FILE_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_TIMESTAMP",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		}
+	]
+}

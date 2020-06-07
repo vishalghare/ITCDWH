@@ -13,104 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_DATE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DATE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DATE_TIME",
-						"type": "date"
-					},
-					{
-						"name": "DAY_OF_MONTH",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_MONTH_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "CALENDER_MONTH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_YEAR",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_QUARTER_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_QUARTER_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "CALENDER_HALF_YEAR_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CALENDER_HALF_YEAR_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_MONTH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "FISCAL_MONTH_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_QUARTER_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "FISCAL_QUARTER_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_HALF_YEAR_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "FISCAL_HALF_YEAR_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "FISCAL_YEAR",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_DATE"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_ENTITY')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1150,6 +1052,60 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_SOURCE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DATA_SOURCE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DATA_SOURCE_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_SOURCE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_SURVEY_DETAILS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1556,6 +1512,203 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_FACT_PROJECT_EVENTS_INDIVIDUAL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CONTEXT_SUB_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EVENT_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TRAINING_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PLATFORM_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PARTICIPANT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DATE_COLLECTION_DATE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SUBMISSON_DATE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "GENDER_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DATE_OF_BIRTH_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DATE_OF_BIRTH2_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PARTICIPANT_HOME_COUNTRY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROFESSIONAL_STATUS_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_SUB_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_COUNTRY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_SIZE_GROUP_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COURSE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AREA_OF_CHANGE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SERVICE_THEME1_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SERVICE_THEME2_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "HS_CODE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "INT_STD_INDUSTRY_CODES_ISIC_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TOP_MANAGER_GENDER_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TOP_MANAGER_AGE_GROUP_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AGE_GROUP_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CERTIFICATION_DATE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CERTIFIED_FLAG",
+						"type": "varchar"
+					},
+					{
+						"name": "ENROLL_DATE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "YOUTH_MANAGED_FLAG",
+						"type": "varchar"
+					},
+					{
+						"name": "WOMAN_MANAGED_FLAG",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "FACT_PROJECT_EVENTS_INDIVIDUAL"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_SRC')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1727,156 +1880,6 @@
 						"type": "Expression"
 					}
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RAW_SRC')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILE_NAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@dataset().P_FILE_NAME",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						},
-						"fileSystem": "source"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "ProjectID",
-						"type": "String"
-					},
-					{
-						"name": "Context",
-						"type": "String"
-					},
-					{
-						"name": "Type of event",
-						"type": "String"
-					},
-					{
-						"name": "Email",
-						"type": "String"
-					},
-					{
-						"name": "Registration Date",
-						"type": "String"
-					},
-					{
-						"name": "Last name",
-						"type": "String"
-					},
-					{
-						"name": "Middle name",
-						"type": "String"
-					},
-					{
-						"name": "First name",
-						"type": "String"
-					},
-					{
-						"name": "Gender",
-						"type": "String"
-					},
-					{
-						"name": "Year of birth",
-						"type": "String"
-					},
-					{
-						"name": "Date of birth2",
-						"type": "String"
-					},
-					{
-						"name": "Country of Residence",
-						"type": "String"
-					},
-					{
-						"name": "Nationality",
-						"type": "String"
-					},
-					{
-						"name": "Organization/ Company name",
-						"type": "String"
-					},
-					{
-						"name": "Professional status",
-						"type": "String"
-					},
-					{
-						"name": "Job title",
-						"type": "String"
-					},
-					{
-						"name": "Type of entity",
-						"type": "String"
-					},
-					{
-						"name": "Sub-type of entity",
-						"type": "String"
-					},
-					{
-						"name": "Address",
-						"type": "String"
-					},
-					{
-						"name": "Cityname",
-						"type": "String"
-					},
-					{
-						"name": "Post Code",
-						"type": "String"
-					},
-					{
-						"name": "Country",
-						"type": "String"
-					},
-					{
-						"name": "Region",
-						"type": "String"
-					},
-					{
-						"name": "Phone number",
-						"type": "String"
-					},
-					{
-						"name": "Website",
-						"type": "String"
-					},
-					{
-						"name": "Twitter",
-						"type": "String"
-					},
-					{
-						"name": "LinkedIn",
-						"type": "String"
-					}
-				]
 			},
 			"dependsOn": []
 		}
