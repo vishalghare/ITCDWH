@@ -1,0 +1,565 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "DevUNITCADF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_OLCA_DWH_MART')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetPipelineRunInfo",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Start the Pipeline",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DWH_SQL_PARAMETER_DATASET",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_TABLE_NAME": "NULL"
+								}
+							}
+						}
+					},
+					{
+						"name": "Start the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_START_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set PERIOD_START",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PERIOD_START",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set PERIOD_END",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PERIOD_END",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set SNAP_DATE",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_SNAP_DATE",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set BATCH_NBR",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_BATCH_NBR",
+							"value": {
+								"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Get DATALAKE FILES",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Set PERIOD_START",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set PERIOD_END",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set SNAP_DATE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set BATCH_NBR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DWH_OLAC",
+								"type": "DatasetReference"
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"modifiedDatetimeStart": {
+									"value": "@formatDateTime(variables('V_PERIOD_START'))",
+									"type": "Expression"
+								},
+								"modifiedDatetimeEnd": {
+									"value": "@formatDateTime(variables('V_PERIOD_END'))",
+									"type": "Expression"
+								}
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Filter Dir",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get DATALAKE FILES",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get DATALAKE FILES').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'File')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter Dir",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter Dir').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Set PROCESSING FILE NAME",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_PROCESS_FILE_NAME",
+										"value": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set DWH SRC PATH",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_DWH_SRC_PATH",
+										"value": "OLAC"
+									}
+								},
+								{
+									"name": "COPY_DWH_TO_MART_STAGE",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Set PROCESSING FILE NAME",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set DWH SRC PATH",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set V_DWH_MART_STAGE_FILE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "COPY_DWH_TO_MART_STAGE",
+											"type": "DataFlowReference",
+											"parameters": {
+												"P_DWH_MART_STAGE_FILE": {
+													"value": "'@{variables('V_DWH_MART_STAGE_FILE')}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"SrcDATALAKE": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_PROCESS_FILE_NAME')",
+														"type": "Expression"
+													},
+													"P_PATH": {
+														"value": "@variables('V_DWH_SRC_PATH')",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "Set V_DWH_MART_STAGE_FILE",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_DWH_MART_STAGE_FILE",
+										"value": "ALL_COL_OLAC.csv"
+									}
+								},
+								{
+									"name": "DF_DIM_ENTITY",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "COPY_DWH_TO_MART_STAGE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_DIM_ENTITY",
+											"type": "DataFlowReference",
+											"datasetParameters": {
+												"srcALL": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_DWH_MART_STAGE_FILE')",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "DF_DIM_PARTICIPANT",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "COPY_DWH_TO_MART_STAGE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_DIM_PARTICIPANT",
+											"type": "DataFlowReference",
+											"datasetParameters": {
+												"SrcAll": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_DWH_MART_STAGE_FILE')",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "DF_FACT_PROJECT_EVENTS_INDIVIDUAL",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "DF_DIM_ENTITY",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "DF_DIM_PARTICIPANT",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_FACT_PROJECT_EVENTS_INDIVIDUAL",
+											"type": "DataFlowReference",
+											"datasetParameters": {
+												"SrcAll": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_DWH_MART_STAGE_FILE')",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "End of the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ForEach1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_END_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_ADF_RUN_ID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_PIPELINE_NAME": {
+						"type": "string",
+						"defaultValue": "PIP_OLAC_DWH_MART"
+					}
+				},
+				"variables": {
+					"V_PERIOD_START": {
+						"type": "String"
+					},
+					"V_PERIOD_END": {
+						"type": "String"
+					},
+					"V_SNAP_DATE": {
+						"type": "String"
+					},
+					"V_BATCH_NBR": {
+						"type": "String"
+					},
+					"V_PROCESS_FILE_NAME": {
+						"type": "String"
+					},
+					"V_DWH_SRC_PATH": {
+						"type": "String"
+					},
+					"V_DWH_MART_STAGE_FILE": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
