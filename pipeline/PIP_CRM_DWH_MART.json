@@ -1,5 +1,5 @@
 {
-	"name": "PIP_WEDF_DWH_MART",
+	"name": "PIP_CRM_DWH_MART",
 	"properties": {
 		"activities": [
 			{
@@ -187,7 +187,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "DWH_WEDF",
+						"referenceName": "DWH_CRM",
 						"type": "DatasetReference"
 					},
 					"fieldList": [
@@ -272,7 +272,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "V_DWH_SRC_PATH",
-								"value": "WEDF"
+								"value": "CRM"
 							}
 						},
 						{
@@ -342,7 +342,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "V_DWH_MART_STAGE_FILE",
-								"value": "ALL_COL_WEDF.csv"
+								"value": "ALL_COL_CRM.csv"
 							}
 						},
 						{
@@ -515,7 +515,7 @@
 		"parameters": {
 			"P_PIPELINE_NAME": {
 				"type": "string",
-				"defaultValue": "PIP_WEDF_DWH_MART"
+				"defaultValue": "PIP_CRM_DWH_MART"
 			}
 		},
 		"variables": {
