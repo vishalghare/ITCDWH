@@ -1,0 +1,28 @@
+{
+	"name": "COPY_DWH_TO_MART_STAGE",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DWH_READ",
+						"type": "DatasetReference"
+					},
+					"name": "SrcDATALAKE"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DWH_MART_STAGE_WRITE",
+						"type": "DatasetReference"
+					},
+					"name": "trgMARTSTAGE"
+				}
+			],
+			"transformations": [],
+			"script": "parameters{\n\tP_DWH_MART_STAGE_FILE as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcDATALAKE\nSrcDATALAKE sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\t{Type of tool} as string,\n\t\t{Area of change} as string,\n\t\t{Service themes} as string,\n\t\t{Date of data collection} as string,\n\t\tid as string,\n\t\tCourse_name as string,\n\t\tUsername as string,\n\t\tTitle as string,\n\t\tidnumber as string,\n\t\tFunctional_title as string,\n\t\tHowlong as string,\n\t\tPriorexperience as string,\n\t\t{Country code} as string,\n\t\tPobox as string,\n\t\tPostalcode as string,\n\t\tSkype as string,\n\t\tAim as string,\n\t\tYahoo as string,\n\t\tMsn as string,\n\t\tProfile_field_Supervisor as string,\n\t\t{Service theme} as string,\n\t\tCityregion as string,\n\t\tCertification_date as string,\n\t\tCertified as string,\n\t\tCohort as string,\n\t\tUniqueid as string,\n\t\tUser_id as string,\n\t\tEnrol_time as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of training} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\tLocation as string,\n\t\t{Name of the entity} as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tConfidential as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\tAccount as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:[($P_DWH_MART_STAGE_FILE)],\n\tpartitionBy('hash', 1)) ~> trgMARTSTAGE"
+		}
+	}
+}

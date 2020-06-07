@@ -82,7 +82,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "V_PERIOD_START",
-					"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START"
+					"value": {
+						"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -99,7 +102,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "V_PERIOD_END",
-					"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END"
+					"value": {
+						"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -116,7 +122,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "V_SNAP_DATE",
-					"value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE"
+					"value": {
+						"value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -133,7 +142,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "V_BATCH_NBR",
-					"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}"
+					"value": {
+						"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -183,6 +195,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"modifiedDatetimeStart": {
 							"value": "@formatDateTime(variables('V_PERIOD_START'))",
 							"type": "Expression"
@@ -219,6 +232,121 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter Dir",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter Dir').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Set PROCESSING FILE NAME",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_PROCESS_FILE_NAME",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set DWH SRC PATH",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_DWH_SRC_PATH",
+								"value": "WEDF"
+							}
+						},
+						{
+							"name": "COPY_DWH_TO_MART_STAGE",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [
+								{
+									"activity": "Set PROCESSING FILE NAME",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set DWH SRC PATH",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set V_DWH_MART_STAGE_FILE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "COPY_DWH_TO_MART_STAGE",
+									"type": "DataFlowReference",
+									"parameters": {
+										"P_DWH_MART_STAGE_FILE": {
+											"value": "'@{variables('V_DWH_MART_STAGE_FILE')}'",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"SrcDATALAKE": {
+											"P_FILE_NAME": {
+												"value": "@variables('V_PROCESS_FILE_NAME')",
+												"type": "Expression"
+											},
+											"P_PATH": {
+												"value": "@variables('V_DWH_SRC_PATH')",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								}
+							}
+						},
+						{
+							"name": "Set V_DWH_MART_STAGE_FILE",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_DWH_MART_STAGE_FILE",
+								"value": "ALL_COL_WEDF.csv"
+							}
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
@@ -238,6 +366,15 @@
 				"type": "String"
 			},
 			"V_BATCH_NBR": {
+				"type": "String"
+			},
+			"V_PROCESS_FILE_NAME": {
+				"type": "String"
+			},
+			"V_DWH_SRC_PATH": {
+				"type": "String"
+			},
+			"V_DWH_MART_STAGE_FILE": {
 				"type": "String"
 			}
 		},
