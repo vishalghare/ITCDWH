@@ -1,0 +1,456 @@
+{
+	"name": "PIP_WEDF_SCR_DATALAKE_NEw",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get WEDF Files",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "Set Raw File PATH",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Loaded File Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Failed File Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "RAW_SRC",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_PATH": {
+								"value": "@variables('V_PATH')",
+								"type": "Expression"
+							},
+							"P_FILE_NAME": "*.*"
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter Dir",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter Dir').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy Loaded Files",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "DF_WEDF_RAW_DATALAKE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "RAW_SRC",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_PATH": {
+											"value": "@variables('V_PATH')",
+											"type": "Expression"
+										},
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "RAW_SRC",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_PATH": {
+											"value": "@variables('V_LOADED_PATH')",
+											"type": "Expression"
+										},
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Delete Loaded Files from Landing",
+							"type": "Delete",
+							"dependsOn": [
+								{
+									"activity": "Copy Loaded Files",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "RAW_SRC",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_PATH": {
+											"value": "@variables('V_PATH')",
+											"type": "Expression"
+										},
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							}
+						},
+						{
+							"name": "Set FILE NAME",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_FILE_NAME",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Copy Failed Files",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "DF_WEDF_RAW_DATALAKE",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "RAW_SRC",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_PATH": {
+											"value": "@variables('V_PATH')",
+											"type": "Expression"
+										},
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "RAW_SRC",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_PATH": {
+											"value": "@variables('V_FAILED_PATH')",
+											"type": "Expression"
+										},
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Delete Failed Files from Landing",
+							"type": "Delete",
+							"dependsOn": [
+								{
+									"activity": "Copy Failed Files",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "RAW_SRC",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_PATH": {
+											"value": "@variables('V_PATH')",
+											"type": "Expression"
+										},
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							}
+						},
+						{
+							"name": "DF_WEDF_RAW_DATALAKE",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [
+								{
+									"activity": "Set FILE NAME",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "DF_WEDF_RAW_DATALAKE",
+									"type": "DataFlowReference",
+									"parameters": {
+										"P_DWH_FILE_NAME": {
+											"value": "'@{variables('V_FILE_NAME')}'",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"SrcStageWEDF": {
+											"P_PATH": {
+												"value": "@variables('V_PATH')",
+												"type": "Expression"
+											},
+											"P_FILE_NAME": {
+												"value": "@variables('V_FILE_NAME')",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Filter Dir",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get WEDF Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get WEDF Files').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().type, 'File')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Failed File Path",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_FILE_NAME",
+					"value": {
+						"value": "WEDF/FAILED",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Loaded File Path",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_LOADED_PATH",
+					"value": {
+						"value": "WEDF/LOADED",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Raw File PATH",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_PATH",
+					"value": {
+						"value": "WEDF",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"V_FILE_NAME": {
+				"type": "String"
+			},
+			"V_FAILED_PATH": {
+				"type": "String"
+			},
+			"V_LOADED_PATH": {
+				"type": "String"
+			},
+			"V_PATH": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
