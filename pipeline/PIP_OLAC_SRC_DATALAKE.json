@@ -38,8 +38,8 @@
 						"referenceName": "RAW_SRC",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_FILE_NAME": "*.csv",
-							"P_PATH": "OLAC"
+							"P_PATH": "OLAC",
+							"P_FILE_NAME": "*.csv"
 						}
 					},
 					"fieldList": [
@@ -204,12 +204,12 @@
 									"referenceName": "RAW_SRC",
 									"type": "DatasetReference",
 									"parameters": {
-										"P_FILE_NAME": {
-											"value": "@variables('V_FILE_NAME')",
-											"type": "Expression"
-										},
 										"P_PATH": {
 											"value": "@variables('V_PATH')",
+											"type": "Expression"
+										},
+										"P_FILE_NAME": {
+											"value": "@variables('V_FILE_NAME')",
 											"type": "Expression"
 										}
 									}
