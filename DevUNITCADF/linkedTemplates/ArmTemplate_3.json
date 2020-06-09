@@ -2058,11 +2058,11 @@
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true,
 									"modifiedDatetimeStart": {
-										"value": "formatDateTime(@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START)",
+										"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
 										"type": "Expression"
 									},
 									"modifiedDatetimeEnd": {
-										"value": "formatDateTime(@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END)",
+										"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
 										"type": "Expression"
 									},
 									"wildcardFolderPath": {

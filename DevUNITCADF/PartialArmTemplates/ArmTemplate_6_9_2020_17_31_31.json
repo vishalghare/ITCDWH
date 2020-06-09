@@ -1,0 +1,922 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "DevUNITCADF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_NTF_DWH_MART')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Delete Old Stage Data",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "NTF.csv"
+								}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": false
+							}
+						}
+					},
+					{
+						"name": "Set PATH",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PATH",
+							"value": "NTF"
+						}
+					},
+					{
+						"name": "Copy NTF File to Satge",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set PATH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Delete Old Stage Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set BATCH_NBR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"modifiedDatetimeStart": {
+										"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
+										"type": "Expression"
+									},
+									"modifiedDatetimeEnd": {
+										"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
+										"type": "Expression"
+									},
+									"wildcardFolderPath": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									},
+									"wildcardFileName": "*.csv",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "MergeFiles"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ProjectID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ProjectID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Context",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Context",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FirmID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FirmID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Date of data collection",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Date of data collection",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Country",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Country",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "interviewkey",
+											"type": "String"
+										},
+										"sink": {
+											"name": "interviewkey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "interviewid",
+											"type": "String"
+										},
+										"sink": {
+											"name": "interviewid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A06",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A06",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A07",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A07",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A09",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A09",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A10",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A10",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A11",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A11",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A12",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A12",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "A13",
+											"type": "String"
+										},
+										"sink": {
+											"name": "A13",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "B17",
+											"type": "String"
+										},
+										"sink": {
+											"name": "B17",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA07",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA07",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA08",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA08",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA11",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA11",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA12",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA12",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA13",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA13",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA14",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA14",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BA15",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BA15",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB08",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB08",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BB09",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BB09",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BC03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BC03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "BC04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BC04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "C04",
+											"type": "String"
+										},
+										"sink": {
+											"name": "C04",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "C05",
+											"type": "String"
+										},
+										"sink": {
+											"name": "C05",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DA01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DA01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB01",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB01",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB02",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB02",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DB03",
+											"type": "String"
+										},
+										"sink": {
+											"name": "DB03",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FILE_NAME",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FILE_NAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "LOAD_TIMESTAMP",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LOAD_TIMESTAMP",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DWH_READ",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "*.*",
+									"P_PATH": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DWH_STAGE",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILE_NAME": "NTF.csv"
+								}
+							}
+						]
+					},
+					{
+						"name": "DF_NFT_UNPIVOT",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NFT_UNPIVOT",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"SrcSTGNTR": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_DIM_SURVEY_DETAILS",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_DIM_SURVEY_DETAILS",
+								"type": "DataFlowReference",
+								"parameters": {
+									"P_BATCH_NBR": {
+										"value": "'@{variables('V_BATCH_NBR')}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_NTF_DIM_ENTITY",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy NTF File to Satge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_NTF_DIM_ENTITY",
+								"type": "DataFlowReference",
+								"parameters": {
+									"P_BATCH_NBR": {
+										"value": "'@{variables('V_BATCH_NBR')}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"SrcNTF": {
+										"P_FILE_NAME": "NTF.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "DF_FACT_ENTITY_SURVEY",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "DF_NFT_UNPIVOT",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DF_DIM_SURVEY_DETAILS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DF_NTF_DIM_ENTITY",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_FACT_ENTITY_SURVEY",
+								"type": "DataFlowReference",
+								"parameters": {
+									"P_BATCH_NBR": {
+										"value": "'@{variables('V_BATCH_NBR')}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"SrcNtfUNPOVITE": {
+										"P_FILE_NAME": "NTF_UNPOVITE.csv"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							}
+						}
+					},
+					{
+						"name": "GetPipelineRunInfo",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Start the Pipeline",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DWH_SQL_PARAMETER_DATASET",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_TABLE_NAME": "NULL"
+								}
+							}
+						}
+					},
+					{
+						"name": "Start the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_START_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set BATCH_NBR",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_BATCH_NBR",
+							"value": {
+								"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "End of the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "DF_FACT_ENTITY_SURVEY",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_END_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_ADF_RUN_ID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_PIPELINE_NAME": {
+						"type": "string",
+						"defaultValue": "PIP_NTF_DWH_MART"
+					}
+				},
+				"variables": {
+					"V_FILE_NAME": {
+						"type": "String"
+					},
+					"V_PATH": {
+						"type": "String"
+					},
+					"V_BATCH_NBR": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
