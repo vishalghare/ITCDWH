@@ -1830,7 +1830,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"folderPath": "SHE_TRADE",
+						"folderPath": "SHE_TRADES",
 						"fileSystem": "target"
 					},
 					"columnDelimiter": "|",
