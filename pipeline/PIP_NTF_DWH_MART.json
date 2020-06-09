@@ -90,8 +90,14 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
-							"modifiedDatetimeStart": "2020-05-30T00:00:00.000Z",
-							"modifiedDatetimeEnd": "2020-06-05T23:00:00.000Z",
+							"modifiedDatetimeStart": {
+								"value": "formatDateTime(@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START)",
+								"type": "Expression"
+							},
+							"modifiedDatetimeEnd": {
+								"value": "formatDateTime(@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END)",
+								"type": "Expression"
+							},
 							"wildcardFolderPath": {
 								"value": "@variables('V_PATH')",
 								"type": "Expression"
@@ -829,6 +835,49 @@
 						"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
 						"type": "Expression"
 					}
+				}
+			},
+			{
+				"name": "End of the Pipeline",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "DF_FACT_ENTITY_SURVEY",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[DWH].[PRC_DWH_END_PIPELINE]",
+					"storedProcedureParameters": {
+						"P_IN_PIPELINE_ADF_RUN_ID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"P_IN_PIPELINE_NAME": {
+							"value": {
+								"value": "@pipeline().parameters.P_PIPELINE_NAME",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
