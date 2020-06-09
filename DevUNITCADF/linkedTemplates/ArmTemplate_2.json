@@ -871,6 +871,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "OLAC.csv",
 						"folderPath": "STAGE",
 						"fileSystem": "source"
 					},

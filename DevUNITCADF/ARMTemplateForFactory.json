@@ -5562,8 +5562,8 @@
 								"referenceName": "RAW_SRC",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILE_NAME": "*.csv",
-									"P_PATH": "OLAC"
+									"P_PATH": "OLAC",
+									"P_FILE_NAME": "*.csv"
 								}
 							},
 							"fieldList": [
@@ -5728,12 +5728,12 @@
 											"referenceName": "RAW_SRC",
 											"type": "DatasetReference",
 											"parameters": {
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												},
 												"P_PATH": {
 													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
 													"type": "Expression"
 												}
 											}
@@ -15255,6 +15255,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "OLAC.csv",
 						"folderPath": "STAGE",
 						"fileSystem": "source"
 					},
@@ -16957,7 +16958,7 @@
 							"name": "DerivedColumn1"
 						}
 					],
-					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageOLAC\nSrcStageOLAC derive({Year of birth} = case({Year of birth}=='N/A', \r\n'',\r\niif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth})\r\n),\n\t\tNEW_DATALAKE_FILE = 'OLAC/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHOLAC"
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageOLAC\nSrcStageOLAC derive({Year of birth} = case({Year of birth}=='N/A', \r\n'',\r\niif(toInteger({Year of birth}) < year(currentUTC()), '', {Year of birth})\r\n),\n\t\tNEW_DATALAKE_FILE = 'OLAC/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of training} as string,\n\t\tCourse_name as string,\n\t\t{Area of change} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\t{Date of data collection} as string,\n\t\tLocation as string,\n\t\t{First name} as string,\n\t\t{Last name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Professional status} as string,\n\t\t{Name of the entity} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tCountry as string,\n\t\tSize as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE',\n\tmapColumn(\n\t\tProjectID,\n\t\tContext,\n\t\t{Type of training},\n\t\tCourse_name,\n\t\t{Area of change},\n\t\t{Service theme 1},\n\t\t{Service theme 2},\n\t\t{Date of data collection},\n\t\tLocation,\n\t\t{First name},\n\t\t{Last name},\n\t\tGender,\n\t\t{Year of birth},\n\t\t{Professional status},\n\t\t{Name of the entity},\n\t\t{Type of entity},\n\t\t{Sub-type of entity},\n\t\tCountry,\n\t\tSize,\n\t\t{ISIC code division},\n\t\t{HS 6 digit code (if available)},\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t)) ~> DWHOLAC"
 				}
 			},
 			"dependsOn": [
