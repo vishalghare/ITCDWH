@@ -18,6 +18,12 @@
 					"dataflow": {
 						"referenceName": "DF_DIM_ENTITY",
 						"type": "DataFlowReference",
+						"parameters": {
+							"P_BATCH_NBR": {
+								"value": "'@{1}'",
+								"type": "Expression"
+							}
+						},
 						"datasetParameters": {
 							"srcALL": {
 								"P_FILE_NAME": "ALL_COL_FILE_NEW.csv"

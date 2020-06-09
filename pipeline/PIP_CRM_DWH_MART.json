@@ -368,6 +368,12 @@
 								"dataflow": {
 									"referenceName": "DF_DIM_ENTITY",
 									"type": "DataFlowReference",
+									"parameters": {
+										"P_BATCH_NBR": {
+											"value": "'@{variables('V_BATCH_NBR')}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"srcALL": {
 											"P_FILE_NAME": {
@@ -406,6 +412,12 @@
 								"dataflow": {
 									"referenceName": "DF_DIM_PARTICIPANT",
 									"type": "DataFlowReference",
+									"parameters": {
+										"P_BATCH_NBR": {
+											"value": "'@{variables('V_BATCH_NBR')}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"SrcAll": {
 											"P_FILE_NAME": {
@@ -450,6 +462,12 @@
 								"dataflow": {
 									"referenceName": "DF_FACT_PROJECT_EVENTS_INDIVIDUAL",
 									"type": "DataFlowReference",
+									"parameters": {
+										"P_BATCH_NBR": {
+											"value": "'@{variables('V_BATCH_NBR')}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"SrcAll": {
 											"P_FILE_NAME": {
