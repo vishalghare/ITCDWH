@@ -1573,6 +1573,11 @@
 						"precision": 10
 					},
 					{
+						"name": "ENTITY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
 						"name": "BATCH_ID",
 						"type": "int",
 						"precision": 10

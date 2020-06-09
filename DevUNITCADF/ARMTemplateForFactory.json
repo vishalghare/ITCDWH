@@ -3924,7 +3924,14 @@
 					{
 						"name": "Delete Old Stage Data",
 						"type": "Delete",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "7.00:00:00",
 							"retry": 0,
@@ -3951,7 +3958,14 @@
 					{
 						"name": "Set PATH",
 						"type": "SetVariable",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"userProperties": [],
 						"typeProperties": {
 							"variableName": "V_PATH",
@@ -3973,6 +3987,12 @@
 								"dependencyConditions": [
 									"Succeeded"
 								]
+							},
+							{
+								"activity": "Set BATCH_NBR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
 							}
 						],
 						"policy": {
@@ -3989,8 +4009,14 @@
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true,
-									"modifiedDatetimeStart": "2020-05-30T00:00:00.000Z",
-									"modifiedDatetimeEnd": "2020-06-05T23:00:00.000Z",
+									"modifiedDatetimeStart": {
+										"value": "formatDateTime(@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START)",
+										"type": "Expression"
+									},
+									"modifiedDatetimeEnd": {
+										"value": "formatDateTime(@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END)",
+										"type": "Expression"
+									},
 									"wildcardFolderPath": {
 										"value": "@variables('V_PATH')",
 										"type": "Expression"
@@ -4535,7 +4561,12 @@
 							"dataflow": {
 								"referenceName": "DF_DIM_SURVEY_DETAILS",
 								"type": "DataFlowReference",
-								"parameters": {},
+								"parameters": {
+									"P_BATCH_NBR": {
+										"value": "'@{variables('V_BATCH_NBR')}'",
+										"type": "Expression"
+									}
+								},
 								"datasetParameters": {
 									"SrcNTF": {
 										"P_FILE_NAME": "NTF.csv"
@@ -4574,7 +4605,12 @@
 							"dataflow": {
 								"referenceName": "DF_NTF_DIM_ENTITY",
 								"type": "DataFlowReference",
-								"parameters": {},
+								"parameters": {
+									"P_BATCH_NBR": {
+										"value": "'@{variables('V_BATCH_NBR')}'",
+										"type": "Expression"
+									}
+								},
 								"datasetParameters": {
 									"SrcNTF": {
 										"P_FILE_NAME": "NTF.csv"
@@ -4627,7 +4663,12 @@
 							"dataflow": {
 								"referenceName": "DF_FACT_ENTITY_SURVEY",
 								"type": "DataFlowReference",
-								"parameters": {},
+								"parameters": {
+									"P_BATCH_NBR": {
+										"value": "'@{variables('V_BATCH_NBR')}'",
+										"type": "Expression"
+									}
+								},
 								"datasetParameters": {
 									"SrcNtfUNPOVITE": {
 										"P_FILE_NAME": "NTF_UNPOVITE.csv"
@@ -4639,6 +4680,8 @@
 									"DIMSURVEYDATE": {},
 									"DIMSURVEYVARIABLE": {},
 									"DIMSURVEYVARIABLEOPTION": {},
+									"DIMENTITY01": {},
+									"DIMENTITY02": {},
 									"FACTENTITYSURVEY": {}
 								}
 							},
@@ -4648,13 +4691,151 @@
 								"computeType": "General"
 							}
 						}
+					},
+					{
+						"name": "GetPipelineRunInfo",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Start the Pipeline",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DWH_SQL_PARAMETER_DATASET",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_TABLE_NAME": "NULL"
+								}
+							}
+						}
+					},
+					{
+						"name": "Start the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_START_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set BATCH_NBR",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_BATCH_NBR",
+							"value": {
+								"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "End of the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "DF_FACT_ENTITY_SURVEY",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_END_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_ADF_RUN_ID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
+				"parameters": {
+					"P_PIPELINE_NAME": {
+						"type": "string",
+						"defaultValue": "PIP_NTF_DWH_MART"
+					}
+				},
 				"variables": {
 					"V_FILE_NAME": {
 						"type": "String"
 					},
 					"V_PATH": {
+						"type": "String"
+					},
+					"V_BATCH_NBR": {
 						"type": "String"
 					}
 				},
@@ -4666,7 +4847,9 @@
 				"[concat(variables('factoryId'), '/dataflows/DF_NFT_UNPIVOT')]",
 				"[concat(variables('factoryId'), '/dataflows/DF_DIM_SURVEY_DETAILS')]",
 				"[concat(variables('factoryId'), '/dataflows/DF_NTF_DIM_ENTITY')]",
-				"[concat(variables('factoryId'), '/dataflows/DF_FACT_ENTITY_SURVEY')]"
+				"[concat(variables('factoryId'), '/dataflows/DF_FACT_ENTITY_SURVEY')]",
+				"[concat(variables('factoryId'), '/datasets/DWH_SQL_PARAMETER_DATASET')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		},
 		{
@@ -9082,6 +9265,470 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/PIP_WEDF_SCR_DATALAKE_NEW')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get WEDF Files",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Set Raw File PATH",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Loaded File Path",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Failed File Path",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "RAW_SRC",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_PATH": {
+										"value": "@variables('V_PATH')",
+										"type": "Expression"
+									},
+									"P_FILE_NAME": "*.*"
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter Dir",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter Dir').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Copy Loaded Files",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "DF_WEDF_RAW_DATALAKE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_LOADED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Loaded Files from Landing",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Loaded Files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "Set FILE NAME",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_FILE_NAME",
+										"value": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Copy Failed Files",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "DF_WEDF_RAW_DATALAKE",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_FAILED_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Delete Failed Files from Landing",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Copy Failed Files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "RAW_SRC",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@variables('V_PATH')",
+													"type": "Expression"
+												},
+												"P_FILE_NAME": {
+													"value": "@variables('V_FILE_NAME')",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true
+										}
+									}
+								},
+								{
+									"name": "DF_WEDF_RAW_DATALAKE",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Set FILE NAME",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_WEDF_RAW_DATALAKE",
+											"type": "DataFlowReference",
+											"parameters": {
+												"P_DWH_FILE_NAME": {
+													"value": "'@{variables('V_FILE_NAME')}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"SrcStageWEDF": {
+													"P_PATH": {
+														"value": "@variables('V_PATH')",
+														"type": "Expression"
+													},
+													"P_FILE_NAME": {
+														"value": "@variables('V_FILE_NAME')",
+														"type": "Expression"
+													}
+												},
+												"DWHWEDF": {}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Filter Dir",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get WEDF Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get WEDF Files').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'File-1') ",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Failed File Path",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_FILE_NAME",
+							"value": {
+								"value": "WEDF/FAILED",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Loaded File Path",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_LOADED_PATH",
+							"value": {
+								"value": "WEDF/LOADED",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Raw File PATH",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PATH",
+							"value": {
+								"value": "WEDF",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"variables": {
+					"V_FILE_NAME": {
+						"type": "String"
+					},
+					"V_FAILED_PATH": {
+						"type": "String"
+					},
+					"V_LOADED_PATH": {
+						"type": "String"
+					},
+					"V_PATH": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/RAW_SRC')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_WEDF_RAW_DATALAKE')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DIM_PROFESSIONAL_STATUS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -13422,6 +14069,11 @@
 						"precision": 10
 					},
 					{
+						"name": "ENTITY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
 						"name": "BATCH_ID",
 						"type": "int",
 						"precision": 10
@@ -15361,7 +16013,7 @@
 							"name": "DISTINCT"
 						}
 					],
-					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nSrcNTF select(mapColumn(\n\t\tINTERVIEW_KEY = interviewkey,\n\t\tINTERVIEW_ID = interviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nDISTINCT derive(SOURCE_RECORD_HASH = sha2(256,\r\nINTERVIEWEE_NAME,\r\nINTERVIERWER_NAME,\r\nINTERVIEEE_TELEPHONE,\r\nINTERVIEWEE_POSITION,\r\nINTERVIEWEE_EMAIL,\r\nSUPERVISOR_NAME,\r\nTIME_INTERVIEW_STARTED,\r\nTIME_INTERVIEW_ENDED,\r\nINTERVIEW_DURATION,\r\nINTERVIEWEE_NAME,\r\nINTERVIEW_ID)) ~> SourceRecordHash\nSourceRecordHash, ExistingDIM exists(SOURCE_RECORD_HASH == RECORD_HASH_VALUE,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentTimestamp(),\n\t\tDATE_UPDATED = currentTimestamp()) ~> RunInfor\nRunInfor alterRow(insertIf(1==1)) ~> AlterRow1\nSelectColumns aggregate(groupBy(INTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tFILE_NAME),\n\tCOUNT = count()) ~> DISTINCT\nAlterRow1 sink(input(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tRECORD_HASH_VALUE = SOURCE_RECORD_HASH,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS"
+					"script": "parameters{\n\tP_BATCH_NBR as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nSrcNTF select(mapColumn(\n\t\tINTERVIEW_KEY = interviewkey,\n\t\tINTERVIEW_ID = interviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nDISTINCT derive(SOURCE_RECORD_HASH = sha2(256,\r\nINTERVIEWEE_NAME,\r\nINTERVIERWER_NAME,\r\nINTERVIEEE_TELEPHONE,\r\nINTERVIEWEE_POSITION,\r\nINTERVIEWEE_EMAIL,\r\nSUPERVISOR_NAME,\r\nTIME_INTERVIEW_STARTED,\r\nTIME_INTERVIEW_ENDED,\r\nINTERVIEW_DURATION,\r\nINTERVIEWEE_NAME,\r\nINTERVIEW_ID)) ~> SourceRecordHash\nSourceRecordHash, ExistingDIM exists(SOURCE_RECORD_HASH == RECORD_HASH_VALUE,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists derive(BATCH_ID = toInteger($P_BATCH_NBR),\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentTimestamp(),\n\t\tDATE_UPDATED = currentTimestamp()) ~> RunInfor\nRunInfor alterRow(insertIf(1==1)) ~> AlterRow1\nSelectColumns aggregate(groupBy(INTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tFILE_NAME),\n\tCOUNT = count()) ~> DISTINCT\nAlterRow1 sink(input(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tRECORD_HASH_VALUE = SOURCE_RECORD_HASH,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS"
 				}
 			},
 			"dependsOn": [
@@ -15432,6 +16084,20 @@
 								"type": "DatasetReference"
 							},
 							"name": "DIMSURVEYVARIABLEOPTION"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY01"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY02"
 						}
 					],
 					"sinks": [
@@ -15491,9 +16157,24 @@
 						},
 						{
 							"name": "DerivedColumn1"
+						},
+						{
+							"name": "LkpENTITY"
+						},
+						{
+							"name": "Join1"
+						},
+						{
+							"name": "LatestVersionENTITY"
+						},
+						{
+							"name": "DIMENTITY01Select"
+						},
+						{
+							"name": "Select2"
 						}
 					],
-					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as timestamp,\n\t\tVariables as string,\n\t\tAnswer_KEY as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNtfUNPOVITE\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCONTEXT_TYPE_CODE as string,\n\t\tCONTEXT_TYPE_DESC as string,\n\t\tCONTEXT_SUB_TYPE_CODE as string,\n\t\tCONTEXT_SUB_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCONTEXTSUBTYPE\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYDETAILS\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYDATE\nsource(output(\n\t\tSURVEY_VARIABLE_SR_KEY as integer,\n\t\tVARIABLE_NAME as string,\n\t\tSURVEY_QUESTIONIRE_VERSION_NO as string,\n\t\tQUENTION_TITLE as string,\n\t\tVARIABLE_DESC as string,\n\t\tRESPONSE_TYPE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYVARIABLE\nsource(output(\n\t\tSURVEY_VARIABLE_OPTION_SR_KEY as integer,\n\t\tVARIABLE_NAME as string,\n\t\tSURVEY_QUESTIONIRE_VERSION_NO as string,\n\t\tQUENTION_TITLE as string,\n\t\tOPTIONS_CODE as string,\n\t\tOPTIONS_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYVARIABLEOPTION\nSelect1, DIMPROJECT1 lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPROJECT\nLkpPROJECT, DIMCONTEXTSUBTYPE1 lookup(upper(trim(Context)) == upper(trim(CONTEXT_TYPE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpCONTEXT\nLkpCONTEXT, DIMCOUNTRY1 lookup(upper(trim(Country)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpCOUNTRY\nLkpCOUNTRY, DIMSURVEYDETAILS1 lookup(iifNull(Select1@INTERVIEWEE_NAME, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEWEE_NAME,'')\n\t&& iifNull(Select1@INTERVIERWER_NAME, '') == iifNull(DIMSURVEYDETAILS1@INTERVIERWER_NAME,'')\n\t&& iifNull(Select1@INTERVIEEE_TELEPHONE, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEEE_TELEPHONE,'')\n\t&& iifNull(Select1@INTERVIEWEE_POSITION, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEWEE_POSITION,'')\n\t&& iifNull(Select1@INTERVIEWEE_EMAIL, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEWEE_EMAIL,'')\n\t&& iifNull(Select1@SUPERVISOR_NAME, '') == iifNull(DIMSURVEYDETAILS1@SUPERVISOR_NAME,'')\n\t&& iifNull(Select1@TIME_INTERVIEW_STARTED, '') == iifNull(DIMSURVEYDETAILS1@TIME_INTERVIEW_STARTED)\n\t&& iifNull(Select1@TIME_INTERVIEW_ENDED, '') == iifNull(DIMSURVEYDETAILS1@TIME_INTERVIEW_ENDED,'')\n\t&& iifNull(Select1@INTERVIEW_DURATION, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEW_DURATION,'')\n\t&& iifNull(interviewkey,'') == iifNull(INTERVIEW_KEY,'')\n\t&& iifNull(interviewid,'') == iifNull(INTERVIEW_ID,''),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYDETAILS\nSrcNtfUNPOVITE select(mapColumn(\n\t\tProjectID,\n\t\tContext,\n\t\tFirmID,\n\t\t{Date of data collection},\n\t\tCountry,\n\t\tinterviewkey,\n\t\tinterviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tA04,\n\t\tA06,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP,\n\t\tVariables,\n\t\tAnswer_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nLkpSURVEYDETAILS, DIMSURVEYDATE1 lookup(toDate({Date of data collection}, 'MM/DD/YYYY') == DATE_TIME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYDATE\nLkpSURVEYDATE, DIMSURVEYVARIABLE1 lookup(Variables == VARIABLE_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYVARIABLE\nLkpSURVEYVARIABLE, DIMSURVEYVARIABLEOPTION1 lookup(Variables == DIMSURVEYVARIABLEOPTION1@VARIABLE_NAME\n\t&& Answer_KEY == OPTIONS_CODE,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYVARIABLEOPTION\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMPROJECT1\nDIMCONTEXTSUBTYPE select(mapColumn(\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCONTEXT_TYPE_DESC,\n\t\tCONTEXT_SUB_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMCONTEXTSUBTYPE1\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMCOUNTRY1\nDIMSURVEYDETAILS select(mapColumn(\n\t\tSURVEY_DETAILS_SR_KEY,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS1\nDIMSURVEYDATE select(mapColumn(\n\t\tSURVEY_DATE_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDATE1\nDIMSURVEYVARIABLE select(mapColumn(\n\t\tSURVEY_VARIABLE_SR_KEY,\n\t\tVARIABLE_NAME,\n\t\tSURVEY_INTERVIEWEE_RESPONSE = RESPONSE_TYPE\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYVARIABLE1\nDIMSURVEYVARIABLEOPTION select(mapColumn(\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY = SURVEY_VARIABLE_OPTION_SR_KEY,\n\t\tVARIABLE_NAME,\n\t\tOPTIONS_CODE\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYVARIABLEOPTION1\nLkpSURVEYVARIABLEOPTION derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tPROJECT_SR_KEY as integer,\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tSURVEY_DATE_SR_KEY as integer,\n\t\tSURVEY_VARIABLE_SR_KEY as integer,\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY as integer,\n\t\tSURVEY_INTERVIEWEE_RESPONSE as integer,\n\t\tCHANGE_VALUE as integer,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tSURVEY_DETAILS_SR_KEY,\n\t\tSURVEY_DATE_SR_KEY,\n\t\tSURVEY_VARIABLE_SR_KEY,\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY,\n\t\tSURVEY_INTERVIEWEE_RESPONSE,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FACTENTITYSURVEY"
+					"script": "parameters{\n\tP_BATCH_NBR as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as timestamp,\n\t\tVariables as string,\n\t\tAnswer_KEY as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNtfUNPOVITE\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCONTEXT_TYPE_CODE as string,\n\t\tCONTEXT_TYPE_DESC as string,\n\t\tCONTEXT_SUB_TYPE_CODE as string,\n\t\tCONTEXT_SUB_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCONTEXTSUBTYPE\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nsource(output(\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tRECORD_HASH_VALUE as string,\n\t\tINTERVIEWEE_NAME as string,\n\t\tINTERVIERWER_NAME as string,\n\t\tINTERVIEEE_TELEPHONE as string,\n\t\tINTERVIEWEE_POSITION as string,\n\t\tINTERVIEWEE_EMAIL as string,\n\t\tSUPERVISOR_NAME as string,\n\t\tTIME_INTERVIEW_STARTED as string,\n\t\tTIME_INTERVIEW_ENDED as string,\n\t\tINTERVIEW_DURATION as string,\n\t\tINTERVIEW_KEY as string,\n\t\tINTERVIEW_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYDETAILS\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYDATE\nsource(output(\n\t\tSURVEY_VARIABLE_SR_KEY as integer,\n\t\tVARIABLE_NAME as string,\n\t\tSURVEY_QUESTIONIRE_VERSION_NO as string,\n\t\tQUENTION_TITLE as string,\n\t\tVARIABLE_DESC as string,\n\t\tRESPONSE_TYPE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYVARIABLE\nsource(output(\n\t\tSURVEY_VARIABLE_OPTION_SR_KEY as integer,\n\t\tVARIABLE_NAME as string,\n\t\tSURVEY_QUESTIONIRE_VERSION_NO as string,\n\t\tQUENTION_TITLE as string,\n\t\tOPTIONS_CODE as string,\n\t\tOPTIONS_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMSURVEYVARIABLEOPTION\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMENTITY01\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMENTITY02\nSelect1, DIMPROJECT1 lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpPROJECT\nLkpPROJECT, DIMCONTEXTSUBTYPE1 lookup(upper(trim(Context)) == upper(trim(CONTEXT_TYPE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpCONTEXT\nLkpCONTEXT, DIMCOUNTRY1 lookup(upper(trim(Country)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpCOUNTRY\nLkpCOUNTRY, DIMSURVEYDETAILS1 lookup(iifNull(Select1@INTERVIEWEE_NAME, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEWEE_NAME,'')\n\t&& iifNull(Select1@INTERVIERWER_NAME, '') == iifNull(DIMSURVEYDETAILS1@INTERVIERWER_NAME,'')\n\t&& iifNull(Select1@INTERVIEEE_TELEPHONE, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEEE_TELEPHONE,'')\n\t&& iifNull(Select1@INTERVIEWEE_POSITION, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEWEE_POSITION,'')\n\t&& iifNull(Select1@INTERVIEWEE_EMAIL, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEWEE_EMAIL,'')\n\t&& iifNull(Select1@SUPERVISOR_NAME, '') == iifNull(DIMSURVEYDETAILS1@SUPERVISOR_NAME,'')\n\t&& iifNull(Select1@TIME_INTERVIEW_STARTED, '') == iifNull(DIMSURVEYDETAILS1@TIME_INTERVIEW_STARTED)\n\t&& iifNull(Select1@TIME_INTERVIEW_ENDED, '') == iifNull(DIMSURVEYDETAILS1@TIME_INTERVIEW_ENDED,'')\n\t&& iifNull(Select1@INTERVIEW_DURATION, '') == iifNull(DIMSURVEYDETAILS1@INTERVIEW_DURATION,'')\n\t&& iifNull(interviewkey,'') == iifNull(INTERVIEW_KEY,'')\n\t&& iifNull(interviewid,'') == iifNull(INTERVIEW_ID,''),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYDETAILS\nSrcNtfUNPOVITE select(mapColumn(\n\t\tProjectID,\n\t\tContext,\n\t\tFirmID,\n\t\t{Date of data collection},\n\t\tCountry,\n\t\tinterviewkey,\n\t\tinterviewid,\n\t\tINTERVIERWER_NAME = A01,\n\t\tINTERVIEEE_TELEPHONE = A02,\n\t\tTIME_INTERVIEW_STARTED = A03,\n\t\tENTITY_NAME = A04,\n\t\tA06,\n\t\tSUPERVISOR_NAME = A07,\n\t\tINTERVIEWEE_NAME = A09,\n\t\tTIME_INTERVIEW_ENDED = A10,\n\t\tINTERVIEW_DURATION = A11,\n\t\tINTERVIEWEE_EMAIL = A12,\n\t\tINTERVIEWEE_POSITION = A13,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP,\n\t\tVariables,\n\t\tAnswer_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nLkpSURVEYDETAILS, DIMSURVEYDATE1 lookup(toDate({Date of data collection}, 'MM/DD/YYYY') == DATE_TIME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYDATE\nLkpSURVEYDATE, DIMSURVEYVARIABLE1 lookup(Variables == VARIABLE_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYVARIABLE\nLkpSURVEYVARIABLE, DIMSURVEYVARIABLEOPTION1 lookup(Variables == DIMSURVEYVARIABLEOPTION1@VARIABLE_NAME\n\t&& Answer_KEY == OPTIONS_CODE,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpSURVEYVARIABLEOPTION\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMPROJECT1\nDIMCONTEXTSUBTYPE select(mapColumn(\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCONTEXT_TYPE_DESC,\n\t\tCONTEXT_SUB_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMCONTEXTSUBTYPE1\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMCOUNTRY1\nDIMSURVEYDETAILS select(mapColumn(\n\t\tSURVEY_DETAILS_SR_KEY,\n\t\tINTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDETAILS1\nDIMSURVEYDATE select(mapColumn(\n\t\tSURVEY_DATE_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYDATE1\nDIMSURVEYVARIABLE select(mapColumn(\n\t\tSURVEY_VARIABLE_SR_KEY,\n\t\tVARIABLE_NAME,\n\t\tSURVEY_INTERVIEWEE_RESPONSE = RESPONSE_TYPE\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYVARIABLE1\nDIMSURVEYVARIABLEOPTION select(mapColumn(\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY = SURVEY_VARIABLE_OPTION_SR_KEY,\n\t\tVARIABLE_NAME,\n\t\tOPTIONS_CODE\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSURVEYVARIABLEOPTION1\nSelect2 derive(BATCH_ID = toInteger($P_BATCH_NBR),\n\t\tCHANGE_VALUE = '',\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> DerivedColumn1\nLkpSURVEYVARIABLEOPTION, DIMENTITY01Select lookup(Select1@ENTITY_NAME == DIMENTITY01Select@ENTITY_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LkpENTITY\nDIMENTITY01, LatestVersionENTITY join(DIMENTITY01@ENTITY_ID == LatestVersionENTITY@ENTITY_ID\n\t&& DIMENTITY01@VERSION_NO == LatestVersionENTITY@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nDIMENTITY02 aggregate(groupBy(ENTITY_ID),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestVersionENTITY\nJoin1 select(mapColumn(\n\t\tENTITY_SR_KEY,\n\t\tENTITY_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITY01Select\nLkpENTITY select(mapColumn(\n\t\tProjectID,\n\t\tContext,\n\t\tFirmID,\n\t\t{Date of data collection},\n\t\tCountry,\n\t\tinterviewkey,\n\t\tinterviewid,\n\t\tINTERVIERWER_NAME = Select1@INTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE = Select1@INTERVIEEE_TELEPHONE,\n\t\tTIME_INTERVIEW_STARTED = Select1@TIME_INTERVIEW_STARTED,\n\t\tA04 = Select1@ENTITY_NAME,\n\t\tA06,\n\t\tSUPERVISOR_NAME = Select1@SUPERVISOR_NAME,\n\t\tINTERVIEWEE_NAME = Select1@INTERVIEWEE_NAME,\n\t\tTIME_INTERVIEW_ENDED = Select1@TIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION = Select1@INTERVIEW_DURATION,\n\t\tINTERVIEWEE_EMAIL = Select1@INTERVIEWEE_EMAIL,\n\t\tINTERVIEWEE_POSITION = Select1@INTERVIEWEE_POSITION,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP,\n\t\tVariables,\n\t\tAnswer_KEY,\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID,\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCONTEXT_TYPE_DESC,\n\t\tCONTEXT_SUB_TYPE_DESC,\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN,\n\t\tSURVEY_DETAILS_SR_KEY,\n\t\tINTERVIEWEE_NAME = DIMSURVEYDETAILS1@INTERVIEWEE_NAME,\n\t\tINTERVIERWER_NAME = DIMSURVEYDETAILS1@INTERVIERWER_NAME,\n\t\tINTERVIEEE_TELEPHONE = DIMSURVEYDETAILS1@INTERVIEEE_TELEPHONE,\n\t\tINTERVIEWEE_POSITION = DIMSURVEYDETAILS1@INTERVIEWEE_POSITION,\n\t\tINTERVIEWEE_EMAIL = DIMSURVEYDETAILS1@INTERVIEWEE_EMAIL,\n\t\tSUPERVISOR_NAME = DIMSURVEYDETAILS1@SUPERVISOR_NAME,\n\t\tTIME_INTERVIEW_STARTED = DIMSURVEYDETAILS1@TIME_INTERVIEW_STARTED,\n\t\tTIME_INTERVIEW_ENDED = DIMSURVEYDETAILS1@TIME_INTERVIEW_ENDED,\n\t\tINTERVIEW_DURATION = DIMSURVEYDETAILS1@INTERVIEW_DURATION,\n\t\tINTERVIEW_KEY,\n\t\tINTERVIEW_ID,\n\t\tSURVEY_DATE_SR_KEY,\n\t\tDATE_TIME,\n\t\tSURVEY_VARIABLE_SR_KEY,\n\t\tVARIABLE_NAME = DIMSURVEYVARIABLE1@VARIABLE_NAME,\n\t\tSURVEY_INTERVIEWEE_RESPONSE,\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY,\n\t\tVARIABLE_NAME = DIMSURVEYVARIABLEOPTION1@VARIABLE_NAME,\n\t\tOPTIONS_CODE,\n\t\tENTITY_SR_KEY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nDerivedColumn1 sink(input(\n\t\tPROJECT_SR_KEY as integer,\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tSURVEY_DETAILS_SR_KEY as integer,\n\t\tSURVEY_DATE_SR_KEY as integer,\n\t\tSURVEY_VARIABLE_SR_KEY as integer,\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY as integer,\n\t\tSURVEY_INTERVIEWEE_RESPONSE as integer,\n\t\tCHANGE_VALUE as integer,\n\t\tENTITY_SR_KEY as integer,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tSURVEY_DETAILS_SR_KEY,\n\t\tSURVEY_DATE_SR_KEY,\n\t\tSURVEY_VARIABLE_SR_KEY,\n\t\tSURVEY_VARIABLE_SELECTED_OPTION_SR_KEY,\n\t\tSURVEY_INTERVIEWEE_RESPONSE,\n\t\tENTITY_SR_KEY,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FACTENTITYSURVEY"
 				}
 			},
 			"dependsOn": [
@@ -15505,6 +16186,7 @@
 				"[concat(variables('factoryId'), '/datasets/MART_DIM_DATE')]",
 				"[concat(variables('factoryId'), '/datasets/MART_DIM_SURVEY_VARIABLE')]",
 				"[concat(variables('factoryId'), '/datasets/MART_DIM_SURVEY_VARIABLE_OPTION')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_ENTITY')]",
 				"[concat(variables('factoryId'), '/datasets/MART_FACT_ENTITY_SURVEY')]"
 			]
 		},
@@ -16124,7 +16806,7 @@
 							"name": "Join1"
 						}
 					],
-					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM1\nSrcNTF select(mapColumn(\n\t\tFIRM_ID = FirmID,\n\t\tENTITY_NAME = A04,\n\t\tADDRESS = A06,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumn\nSelectColumn aggregate(groupBy(ENTITY_NAME),\n\teach(match(name!='ENTITY_NAME'), $$ = last($$))) ~> DistinctByAggregate\nDistinctByAggregate derive(SOURCE_RECORD_HASH = sha2(256,\r\nENTITY_NAME,\r\nADDRESS,\r\nFIRM_ID\r\n)) ~> SourceRecordHash\nJoin1 select(mapColumn(\n\t\tEXIST_ENTITY_ID = ExistingDIM@ENTITY_ID,\n\t\tEXIST_VERSION_NO = ExistingDIM@VERSION_NO,\n\t\tEXIST_ENTITY_NAME = ExistingDIM@ENTITY_NAME,\n\t\tEXIST_ADDRESS = ADDRESS,\n\t\tEXIST_FIRM_ID = FIRM_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectExistingCol\nSelectExistingCol derive(RECORD_HASH = sha2(256,\r\nEXIST_ENTITY_NAME,\r\nEXIST_ADDRESS,\r\nEXIST_FIRM_ID\r\n)) ~> ExstingRecordHash\nSourceRecordHash, ExstingRecordHash exists(SOURCE_RECORD_HASH == RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, ExstingRecordHash lookup(ENTITY_NAME == EXIST_ENTITY_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 split(isNull(EXIST_ENTITY_ID),\n\tdisjoint: false) ~> ConditionalSplit1@(NewRecord, UpdateRecord)\nConditionalSplit1@NewRecord derive(VERSION_NO = 1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo alterRow(insertIf(1==1)) ~> AlterRow1\nConditionalSplit1@UpdateRecord derive(VERSION_NO = EXIST_VERSION_NO +1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo2\nRunInfo2 alterRow(insertIf(1==1)) ~> AlterRow2\nExistingDIM1 aggregate(groupBy(ENTITY_ID,\n\t\tENTITY_NAME),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestEntityID\nExistingDIM, LatestEntityID join(ExistingDIM@ENTITY_ID == LatestEntityID@ENTITY_ID\n\t&& ExistingDIM@ENTITY_NAME == LatestEntityID@ENTITY_NAME\n\t&& ExistingDIM@VERSION_NO == LatestEntityID@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nAlterRow1 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tADDRESS,\n\t\tFIRM_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITY\nAlterRow2 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID = EXIST_ENTITY_ID,\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tADDRESS,\n\t\tFIRM_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UpdDIMENTITY"
+					"script": "parameters{\n\tP_BATCH_NBR as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\tFirmID as string,\n\t\t{Date of data collection} as string,\n\t\tCountry as string,\n\t\tinterviewkey as string,\n\t\tinterviewid as string,\n\t\tA01 as string,\n\t\tA02 as string,\n\t\tA03 as string,\n\t\tA04 as string,\n\t\tA06 as string,\n\t\tA07 as string,\n\t\tA09 as string,\n\t\tA10 as string,\n\t\tA11 as string,\n\t\tA12 as string,\n\t\tA13 as string,\n\t\tB01 as string,\n\t\tB03 as string,\n\t\tB17 as string,\n\t\tBA03 as string,\n\t\tBA04 as string,\n\t\tBA07 as string,\n\t\tBA08 as string,\n\t\tBA11 as string,\n\t\tBA12 as string,\n\t\tBA13 as string,\n\t\tBA14 as string,\n\t\tBA15 as string,\n\t\tBB02 as string,\n\t\tBB08 as string,\n\t\tBB09 as string,\n\t\tBC03 as string,\n\t\tBC04 as string,\n\t\tC04 as string,\n\t\tC05 as string,\n\t\tDA01 as string,\n\t\tDB01 as string,\n\t\tDB02 as string,\n\t\tDB03 as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcNTF\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDIM1\nSrcNTF select(mapColumn(\n\t\tFIRM_ID = FirmID,\n\t\tENTITY_NAME = A04,\n\t\tADDRESS = A06,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumn\nSelectColumn aggregate(groupBy(ENTITY_NAME),\n\teach(match(name!='ENTITY_NAME'), $$ = last($$))) ~> DistinctByAggregate\nDistinctByAggregate derive(SOURCE_RECORD_HASH = sha2(256,\r\nENTITY_NAME,\r\nADDRESS,\r\nFIRM_ID\r\n)) ~> SourceRecordHash\nJoin1 select(mapColumn(\n\t\tEXIST_ENTITY_ID = ExistingDIM@ENTITY_ID,\n\t\tEXIST_VERSION_NO = ExistingDIM@VERSION_NO,\n\t\tEXIST_ENTITY_NAME = ExistingDIM@ENTITY_NAME,\n\t\tEXIST_ADDRESS = ADDRESS,\n\t\tEXIST_FIRM_ID = FIRM_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectExistingCol\nSelectExistingCol derive(RECORD_HASH = sha2(256,\r\nEXIST_ENTITY_NAME,\r\nEXIST_ADDRESS,\r\nEXIST_FIRM_ID\r\n)) ~> ExstingRecordHash\nSourceRecordHash, ExstingRecordHash exists(SOURCE_RECORD_HASH == RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, ExstingRecordHash lookup(ENTITY_NAME == EXIST_ENTITY_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 split(isNull(EXIST_ENTITY_ID),\n\tdisjoint: false) ~> ConditionalSplit1@(NewRecord, UpdateRecord)\nConditionalSplit1@NewRecord derive(VERSION_NO = 1,\n\t\tBATCH_ID = toInteger($P_BATCH_NBR),\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo alterRow(insertIf(1==1)) ~> AlterRow1\nConditionalSplit1@UpdateRecord derive(VERSION_NO = EXIST_VERSION_NO +1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo2\nRunInfo2 alterRow(insertIf(1==1)) ~> AlterRow2\nExistingDIM1 aggregate(groupBy(ENTITY_ID,\n\t\tENTITY_NAME),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestEntityID\nExistingDIM, LatestEntityID join(ExistingDIM@ENTITY_ID == LatestEntityID@ENTITY_ID\n\t&& ExistingDIM@ENTITY_NAME == LatestEntityID@ENTITY_NAME\n\t&& ExistingDIM@VERSION_NO == LatestEntityID@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nAlterRow1 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tADDRESS,\n\t\tFIRM_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMENTITY\nAlterRow2 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID = EXIST_ENTITY_ID,\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tADDRESS,\n\t\tFIRM_ID,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UpdDIMENTITY"
 				}
 			},
 			"dependsOn": [
@@ -16367,6 +17049,44 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DF_WEDF_RAW_DATALAKE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "RAW_SRC",
+								"type": "DatasetReference"
+							},
+							"name": "SrcStageWEDF"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_WEDF",
+								"type": "DatasetReference"
+							},
+							"name": "DWHWEDF"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tfileList: true) ~> SrcStageWEDF\nSrcStageWEDF derive(Address = replace(Address, '\\\\n',' '),\n\t\t{Office Address} = replace({Office Address}, '\\\\n',' '),\n\t\tFILE_NAME = $P_DWH_FILE_NAME,\n\t\tLOAD_TIMESTAMP = toString(currentTimestamp(), 'MM/dd/YYYY HH:mm:SS'),\n\t\tNEW_DATALAKE_FILE = 'WEDF/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> DWHWEDF"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/RAW_SRC')]",
+				"[concat(variables('factoryId'), '/datasets/DWH_WEDF')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DF_WEDF_STAGE_DWH_LAKE')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -16401,508 +17121,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/STAGE_WEDF')]",
-				"[concat(variables('factoryId'), '/datasets/DWH_WEDF')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PIP_WEDF_SCR_DATALAKE_NEW')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get WEDF Files",
-						"type": "GetMetadata",
-						"dependsOn": [
-							{
-								"activity": "Set Raw File PATH",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set Loaded File Path",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set Failed File Path",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "RAW_SRC",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_PATH": {
-										"value": "@variables('V_PATH')",
-										"type": "Expression"
-									},
-									"P_FILE_NAME": "*.*"
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobFSReadSettings",
-								"recursive": true
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Filter Dir",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Filter Dir').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "Copy Loaded Files",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "DF_WEDF_RAW_DATALAKE",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobFSReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												},
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@variables('V_LOADED_PATH')",
-													"type": "Expression"
-												},
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Delete Loaded Files from Landing",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Copy Loaded Files",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												},
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												}
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobFSReadSettings",
-											"recursive": true
-										}
-									}
-								},
-								{
-									"name": "Set FILE NAME",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_FILE_NAME",
-										"value": {
-											"value": "@item().name",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Copy Failed Files",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "DF_WEDF_RAW_DATALAKE",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobFSReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												},
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@variables('V_FAILED_PATH')",
-													"type": "Expression"
-												},
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Delete Failed Files from Landing",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "Copy Failed Files",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "RAW_SRC",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@variables('V_PATH')",
-													"type": "Expression"
-												},
-												"P_FILE_NAME": {
-													"value": "@variables('V_FILE_NAME')",
-													"type": "Expression"
-												}
-											}
-										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobFSReadSettings",
-											"recursive": true
-										}
-									}
-								},
-								{
-									"name": "DF_WEDF_RAW_DATALAKE",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "Set FILE NAME",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DF_WEDF_RAW_DATALAKE",
-											"type": "DataFlowReference",
-											"parameters": {
-												"P_DWH_FILE_NAME": {
-													"value": "'@{variables('V_FILE_NAME')}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"SrcStageWEDF": {
-													"P_PATH": {
-														"value": "@variables('V_PATH')",
-														"type": "Expression"
-													},
-													"P_FILE_NAME": {
-														"value": "@variables('V_FILE_NAME')",
-														"type": "Expression"
-													}
-												},
-												"DWHWEDF": {}
-											}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Filter Dir",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Get WEDF Files",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get WEDF Files').output.childItems",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().type, 'File')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set Failed File Path",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_FILE_NAME",
-							"value": {
-								"value": "WEDF/FAILED",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set Loaded File Path",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_LOADED_PATH",
-							"value": {
-								"value": "WEDF/LOADED",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set Raw File PATH",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_PATH",
-							"value": {
-								"value": "WEDF",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"variables": {
-					"V_FILE_NAME": {
-						"type": "String"
-					},
-					"V_FAILED_PATH": {
-						"type": "String"
-					},
-					"V_LOADED_PATH": {
-						"type": "String"
-					},
-					"V_PATH": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/RAW_SRC')]",
-				"[concat(variables('factoryId'), '/dataflows/DF_WEDF_RAW_DATALAKE')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DF_WEDF_RAW_DATALAKE')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "RAW_SRC",
-								"type": "DatasetReference"
-							},
-							"name": "SrcStageWEDF"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DWH_WEDF",
-								"type": "DatasetReference"
-							},
-							"name": "DWHWEDF"
-						}
-					],
-					"transformations": [
-						{
-							"name": "DerivedColumn1"
-						}
-					],
-					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SrcStageWEDF\nSrcStageWEDF derive(Address = replace(Address, '\\\\n',' '),\n\t\t{Office Address} = replace({Office Address}, '\\\\n',' '),\n\t\tFILE_NAME = $P_DWH_FILE_NAME,\n\t\tLOAD_TIMESTAMP = currentTimestamp(),\n\t\tNEW_DATALAKE_FILE = 'WEDF/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHWEDF"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/RAW_SRC')]",
 				"[concat(variables('factoryId'), '/datasets/DWH_WEDF')]"
 			]
 		}
