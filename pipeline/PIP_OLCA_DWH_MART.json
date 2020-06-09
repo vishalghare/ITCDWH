@@ -533,7 +533,7 @@
 		"parameters": {
 			"P_PIPELINE_NAME": {
 				"type": "string",
-				"defaultValue": "PIP_OLAC_DWH_MART"
+				"defaultValue": "PIP_OLCA_DWH_MART"
 			}
 		},
 		"variables": {
