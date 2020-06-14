@@ -142,6 +142,10 @@
 						"type": "varchar"
 					},
 					{
+						"name": "EMAIL",
+						"type": "varchar"
+					},
+					{
 						"name": "ENTITY_EMAIL_DOMAIN_NAME",
 						"type": "varchar"
 					},
