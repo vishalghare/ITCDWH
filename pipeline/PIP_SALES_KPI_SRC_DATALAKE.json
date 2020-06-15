@@ -1,0 +1,625 @@
+{
+    "name": "PIP_SALES_KPI_SRC_DATALAKE",
+    "properties": {
+        "activities": [
+            {
+                "name": "Get SALES_KPI Files",
+                "type": "GetMetadata",
+                "dependsOn": [
+                    {
+                        "activity": "Set Failed File Path",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Set Loaded File Path",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Set Raw File PATH",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "RAW_SRC",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "P_PATH": "SALES_KPI",
+                            "P_FILE_NAME": "*.csv"
+                        }
+                    },
+                    "fieldList": [
+                        "childItems"
+                    ],
+                    "storeSettings": {
+                        "type": "AzureBlobFSReadSettings",
+                        "recursive": true
+                    },
+                    "formatSettings": {
+                        "type": "DelimitedTextReadSettings"
+                    }
+                }
+            },
+            {
+                "name": "Filter Dir",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get SALES_KPI Files",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get SALES_KPI Files').output.childitems",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@equals(item().type, 'File')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Set Failed File Path",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "V_FAILED_PATH",
+                    "value": "SALES_KPI/FAILED"
+                }
+            },
+            {
+                "name": "Set Loaded File Path",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "V_LOADED_PATH",
+                    "value": "SALES_KPI/LOADED"
+                }
+            },
+            {
+                "name": "Set Raw File PATH",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "V_PATH",
+                    "value": "SALES_KPI"
+                }
+            },
+            {
+                "name": "ForEach1",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Filter Dir",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Filter Dir').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "Set FILE NAME",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "V_FILE_NAME",
+                                "value": {
+                                    "value": "@item().name",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Copy SALES_KPI RAW To STAGE",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set FILE NAME",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "additionalColumns": [
+                                        {
+                                            "name": "FILE_NAME",
+                                            "value": {
+                                                "value": "@variables('V_FILE_NAME')",
+                                                "type": "Expression"
+                                            }
+                                        },
+                                        {
+                                            "name": "LOAD_TIMESTAMP",
+                                            "value": {
+                                                "value": "@utcnow()",
+                                                "type": "Expression"
+                                            }
+                                        }
+                                    ],
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": {
+                                            "value": "@variables('V_FILE_NAME')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "STAGE_SALES_KPI",
+                                    "type": "DatasetReference"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Copy Failed Files",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "DF_SALES_STAGE_DWH",
+                                    "dependencyConditions": [
+                                        "Failed"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": {
+                                            "value": "@variables('V_FILE_NAME')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_FAILED_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": "@variables('V_FILE_NAME')"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Delete Failed Files from Landing",
+                            "type": "Delete",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy Failed Files",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataset": {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": {
+                                            "value": "@variables('V_FILE_NAME')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                "enableLogging": false,
+                                "storeSettings": {
+                                    "type": "AzureBlobFSReadSettings",
+                                    "recursive": true
+                                }
+                            }
+                        },
+                        {
+                            "name": "Copy Failed Files_copy1",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy SALES_KPI RAW To STAGE",
+                                    "dependencyConditions": [
+                                        "Failed"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": {
+                                            "value": "@variables('V_FILE_NAME')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_FAILED_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": "@variables('V_FILE_NAME')"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Delete Failed Files from Landing_copy1",
+                            "type": "Delete",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy Failed Files_copy1",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataset": {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": {
+                                            "value": "@variables('V_FILE_NAME')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                "enableLogging": false,
+                                "storeSettings": {
+                                    "type": "AzureBlobFSReadSettings",
+                                    "recursive": true
+                                }
+                            }
+                        },
+                        {
+                            "name": "Delete Loaded Files from Landing",
+                            "type": "Delete",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy Loaded Files",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataset": {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": {
+                                            "value": "@variables('V_FILE_NAME')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                "enableLogging": false,
+                                "storeSettings": {
+                                    "type": "AzureBlobFSReadSettings",
+                                    "recursive": true
+                                }
+                            }
+                        },
+                        {
+                            "name": "Copy Loaded Files",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "DF_SALES_STAGE_DWH",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": {
+                                            "value": "@variables('V_FILE_NAME')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "RAW_SRC",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "P_PATH": {
+                                            "value": "@variables('V_LOADED_PATH')",
+                                            "type": "Expression"
+                                        },
+                                        "P_FILE_NAME": "@variables('V_FILE_NAME')"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "DF_SALES_STAGE_DWH",
+                            "type": "ExecuteDataFlow",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy SALES_KPI RAW To STAGE",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataflow": {
+                                    "referenceName": "DF_SALES_STAGE_DWH",
+                                    "type": "DataFlowReference",
+                                    "parameters": {
+                                        "P_DWH_FILE_NAME": {
+                                            "value": "'@{variables('V_FILE_NAME')}'",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                "compute": {
+                                    "coreCount": 8,
+                                    "computeType": "General"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "variables": {
+            "V_FILE_NAME": {
+                "type": "String"
+            },
+            "V_DWH_FILE_NAME": {
+                "type": "String"
+            },
+            "V_FAILED_PATH": {
+                "type": "String"
+            },
+            "V_LOADED_PATH": {
+                "type": "String"
+            },
+            "V_PATH": {
+                "type": "String"
+            }
+        },
+        "annotations": []
+    }
+}
