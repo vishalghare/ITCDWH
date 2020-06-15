@@ -1,0 +1,2031 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "DevUNITCADF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_SALES_KPI_DWH_MART')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetPipelineRunInfo",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Start the Pipeline",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT R.PERIOD_START,R.PERIOD_END,R.SNAP_DATE,R.BATCH_NBR,PIPELINE_NAME  FROM DWH.PIPELINE_INFO P, DWH.PIPELINE_RUNS R  WHERE P.PIPELINE_ID = R.PIPELINE_ID AND R.PIPELINE_RUN_STATUS = '1' AND P.PIPELINE_NAME = '@{pipeline().parameters.P_PIPELINE_NAME}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DWH_SQL_PARAMETER_DATASET",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_TABLE_NAME": "NULL"
+								}
+							}
+						}
+					},
+					{
+						"name": "Start the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_START_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set PERIOD_START",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PERIOD_START",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_START",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set PERIOD_END",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_PERIOD_END",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.PERIOD_END",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set SNAP_DATE",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_SNAP_DATE",
+							"value": {
+								"value": "@activity('GetPipelineRunInfo').output.firstRow.SNAP_DATE",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set BATCH_NBR",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetPipelineRunInfo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_BATCH_NBR",
+							"value": {
+								"value": "@{activity('GetPipelineRunInfo').output.firstRow.BATCH_NBR}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Get DATALAKE FILES",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Set PERIOD_START",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set PERIOD_END",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set SNAP_DATE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set BATCH_NBR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DWH_SALES_KPI",
+								"type": "DatasetReference"
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"modifiedDatetimeStart": {
+									"value": "@formatDateTime(variables('V_PERIOD_START'))",
+									"type": "Expression"
+								},
+								"modifiedDatetimeEnd": {
+									"value": "@formatDateTime(variables('V_PERIOD_END'))",
+									"type": "Expression"
+								}
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Filter Dir",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get DATALAKE FILES",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get DATALAKE FILES').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'File')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter Dir",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter Dir').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Set PROCESSING FILE NAME",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_PROCESS_FILE_NAME",
+										"value": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set DWH SRC PATH",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_DWH_SRC_PATH",
+										"value": "SALES_KPI"
+									}
+								},
+								{
+									"name": "COPY_DWH_TO_MART_STAGE",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Set PROCESSING FILE NAME",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set DWH SRC PATH",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set V_DWH_MART_STAGE_FILE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "COPY_DWH_TO_MART_STAGE",
+											"type": "DataFlowReference",
+											"parameters": {
+												"P_DWH_MART_STAGE_FILE": {
+													"value": "'@{variables('V_DWH_MART_STAGE_FILE')}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"SrcDATALAKE": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_PROCESS_FILE_NAME')",
+														"type": "Expression"
+													},
+													"P_PATH": {
+														"value": "@variables('V_DWH_SRC_PATH')",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "Set V_DWH_MART_STAGE_FILE",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_DWH_MART_STAGE_FILE",
+										"value": "ALL_COL_SALES_KPI.csv"
+									}
+								},
+								{
+									"name": "DF_DIM_ENTITY",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "COPY_DWH_TO_MART_STAGE",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_DIM_ENTITY",
+											"type": "DataFlowReference",
+											"parameters": {
+												"P_BATCH_NBR": {
+													"value": "'@{variables('V_BATCH_NBR')}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"srcALL": {
+													"P_FILE_NAME": {
+														"value": "@variables('V_DWH_MART_STAGE_FILE')",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								},
+								{
+									"name": "DF_SALES_FACT_ENTITY_BUSINESS_TRANSACTIONS",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "DF_DIM_ENTITY",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "DF_SALES_FACT_ENTITY_BUSINESS_TRANSACTIONS",
+											"type": "DataFlowReference",
+											"parameters": {
+												"P_BATCH_NBR": {
+													"value": "'@{variables('V_BATCH_NBR')}'",
+													"type": "Expression"
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "End of the Pipeline",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ForEach1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DWH].[PRC_DWH_END_PIPELINE]",
+							"storedProcedureParameters": {
+								"P_IN_PIPELINE_ADF_RUN_ID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_IN_PIPELINE_NAME": {
+									"value": {
+										"value": "@pipeline().parameters.P_PIPELINE_NAME",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_PIPELINE_NAME": {
+						"type": "string",
+						"defaultValue": "PIP_SHE_TRADES_DWH_MART"
+					}
+				},
+				"variables": {
+					"V_PERIOD_START": {
+						"type": "String"
+					},
+					"V_PERIOD_END": {
+						"type": "String"
+					},
+					"V_SNAP_DATE": {
+						"type": "String"
+					},
+					"V_BATCH_NBR": {
+						"type": "String"
+					},
+					"V_PROCESS_FILE_NAME": {
+						"type": "String"
+					},
+					"V_DWH_SRC_PATH": {
+						"type": "String"
+					},
+					"V_DWH_MART_STAGE_FILE": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DWH_SALES_KPI')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_SALES_FACT_ENTITY_BUSINESS_TRANSACTIONS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DWH_SALES_KPI')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "target"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Project ID",
+						"type": "String"
+					},
+					{
+						"name": "ContextCode",
+						"type": "String"
+					},
+					{
+						"name": "EventCode",
+						"type": "String"
+					},
+					{
+						"name": "A04",
+						"type": "String"
+					},
+					{
+						"name": "Date",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					},
+					{
+						"name": "A12",
+						"type": "String"
+					},
+					{
+						"name": "SalesUSD",
+						"type": "String"
+					},
+					{
+						"name": "FILE_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LOAD_TIMESTAMP",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_COUNTRY')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "COUNTRY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COUNTRY_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "COUNTRY_NAME_EN",
+						"type": "varchar"
+					},
+					{
+						"name": "COUNTRY_NAME_ES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COUNTRY_NAME_FR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ISO2_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ISO3_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "LEAST_DEVELPED_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "LAND_LCKD_DEVELOPING_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "SMALL_ISLAND_DEVELOPING_STATES",
+						"type": "varchar"
+					},
+					{
+						"name": "DEVELOPED_DEVELOPING_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_COUNTRY"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_FUNDER')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FUNDER_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ACCOUNT_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "ACCOUNT_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ACRONYM",
+						"type": "varchar"
+					},
+					{
+						"name": "ACCOUNT_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_FUNDER"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_ITC_SECTION')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ITC_SECTION_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ITC_SECTION_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ITC_SECTION_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "ITC_SECTION_DESC_LONG",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_ITC_SECTION"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PROJECT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "PROJECT_TITLE",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PROJECT"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PROJECT_STAGE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_STAGE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_STAGE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "PROJECT_STAGE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PROJECT_STAGE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_RELATION')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "RELATION_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RELATION_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_RELATION"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_FACT_PROJECT_COUNTRY')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COUNTRY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "FACT_PROJECT_COUNTRY"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_FACT_PROJECT_FUNDER_PARTNER')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FUNDER_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COUNTRY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RELATION_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "FACT_PROJECT_FUNDER_PARTNER"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_FACT_PROJECT_STAGE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ITC_SECTION_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_STAGE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "FACT_PROJECT_STAGE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MASTER_ProjectFunderPartners')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ProjectFunderPartners.csv",
+						"folderPath": "masters",
+						"fileSystem": "source"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ProjectID",
+						"type": "String"
+					},
+					{
+						"name": "AccountId",
+						"type": "String"
+					},
+					{
+						"name": "AccountName",
+						"type": "String"
+					},
+					{
+						"name": "Acronym",
+						"type": "String"
+					},
+					{
+						"name": "AccountCountry",
+						"type": "String"
+					},
+					{
+						"name": "Relation",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MASTER_Project_countries')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Project_countries.csv",
+						"folderPath": "masters",
+						"fileSystem": "source"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ProjectID",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					},
+					{
+						"name": "CountryCode",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MASTER_ProjectsList')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ProjectsList.csv",
+						"folderPath": "masters",
+						"fileSystem": "source"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ProjectID",
+						"type": "String"
+					},
+					{
+						"name": "Project Title",
+						"type": "String"
+					},
+					{
+						"name": "Section",
+						"type": "String"
+					},
+					{
+						"name": "Stage",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_DIM_SOURCE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_MART_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "FetchingSourceNames"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_SOURCE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMSOURCE"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectFileName"
+						},
+						{
+							"name": "DistinctSource"
+						},
+						{
+							"name": "RunIfo"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\t{Type of tool} as string,\n\t\t{Area of change} as string,\n\t\t{Service themes} as string,\n\t\t{Date of data collection} as string,\n\t\tid as string,\n\t\tCourse_name as string,\n\t\tUsername as string,\n\t\tTitle as string,\n\t\tidnumber as string,\n\t\tFunctional_title as string,\n\t\tHowlong as string,\n\t\tPriorexperience as string,\n\t\t{Country code} as string,\n\t\tPobox as string,\n\t\tPostalcode as string,\n\t\tSkype as string,\n\t\tAim as string,\n\t\tYahoo as string,\n\t\tMsn as string,\n\t\tProfile_field_Supervisor as string,\n\t\t{Service theme} as string,\n\t\tCityregion as string,\n\t\tCertification_date as string,\n\t\tCertified as string,\n\t\tCohort as string,\n\t\tUniqueid as string,\n\t\tUser_id as string,\n\t\tEnrol_time as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of training} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\tLocation as string,\n\t\t{Name of the entity} as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tConfidential as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\tAccount as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> FetchingSourceNames\nFetchingSourceNames select(mapColumn(\n\t\tDATA_SOURCE_NAME = FILE_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectFileName\nSelectFileName aggregate(groupBy(DATA_SOURCE_NAME),\n\teach(match(name!='DATA_SOURCE_NAME'), $$ = last($$))) ~> DistinctSource\nDistinctSource derive(BATCH_ID = 1,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunIfo\nRunIfo sink(input(\n\t\tDATA_SOURCE_SR_KEY as integer,\n\t\tDATA_SOURCE_NAME as string,\n\t\tBATCH_ID as integer,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tDATA_SOURCE_NAME,\n\t\tBATCH_ID,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DIMSOURCE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_FACT_PROJECT_COUNTRY')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "MASTER_Project_countries",
+								"type": "DatasetReference"
+							},
+							"name": "ProjectCountries"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PROJECT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROJECT"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_COUNTRY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCOUNTRY"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_FACT_PROJECT_COUNTRY",
+								"type": "DatasetReference"
+							},
+							"name": "FactprojectCountry"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectProjectID"
+						},
+						{
+							"name": "SelectCountry"
+						},
+						{
+							"name": "LookupProjectID"
+						},
+						{
+							"name": "LookupCountry"
+						},
+						{
+							"name": "RunInfo"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tCountry as string,\n\t\tCountryCode as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> ProjectCountries\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProjectID\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCountry\nProjectCountries, SelectProjectID lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProjectID\nLookupProjectID, SelectCountry lookup(upper(trim(Country)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCountry\nLookupCountry derive(BATCH_ID = 1,\n\t\tSOURCE = 'Project_countries.csv',\n\t\tCREATED_BY = 'Project_countries.csv',\n\t\tUPDATED_BY = 'Project_countries.csv',\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(input(\n\t\tPROJECT_SR_KEY as integer,\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tBATCH_ID as integer,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactprojectCountry"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/MASTER_Project_countries')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_PROJECT')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_COUNTRY')]",
+				"[concat(variables('factoryId'), '/datasets/MART_FACT_PROJECT_COUNTRY')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_FACT_PROJECT_FUNDER_PARTNER')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "MASTER_ProjectFunderPartners",
+								"type": "DatasetReference"
+							},
+							"name": "ProjectPartnerFunders"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PROJECT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROJECT"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_FUNDER",
+								"type": "DatasetReference"
+							},
+							"name": "DIMFUNDER"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_COUNTRY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCOUNTRY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_RELATION",
+								"type": "DatasetReference"
+							},
+							"name": "DIMRELATION"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_FACT_PROJECT_FUNDER_PARTNER",
+								"type": "DatasetReference"
+							},
+							"name": "FactProjectFunderPartner"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectProjectID"
+						},
+						{
+							"name": "SelectAccountName"
+						},
+						{
+							"name": "SelectCountry"
+						},
+						{
+							"name": "SelectRelation"
+						},
+						{
+							"name": "LookupProjectID"
+						},
+						{
+							"name": "LookupAccounName"
+						},
+						{
+							"name": "LookupCountry"
+						},
+						{
+							"name": "LookupRelation"
+						},
+						{
+							"name": "RunInfo"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tAccountId as string,\n\t\tAccountName as string,\n\t\tAcronym as string,\n\t\tAccountCountry as string,\n\t\tRelation as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> ProjectPartnerFunders\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tFUNDER_SR_KEY as integer,\n\t\tACCOUNT_ID as string,\n\t\tACCOUNT_NAME as string,\n\t\tACRONYM as string,\n\t\tACCOUNT_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMFUNDER\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nsource(output(\n\t\tRELATION_SR_KEY as integer,\n\t\tRELATION_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMRELATION\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProjectID\nDIMFUNDER select(mapColumn(\n\t\tFUNDER_SR_KEY,\n\t\tACCOUNT_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAccountName\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCountry\nDIMRELATION select(mapColumn(\n\t\tRELATION_SR_KEY,\n\t\tRELATION_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectRelation\nProjectPartnerFunders, SelectProjectID lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProjectID\nLookupProjectID, SelectAccountName lookup(upper(trim(AccountName)) == upper(trim(ACCOUNT_NAME)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAccounName\nLookupAccounName, SelectCountry lookup(upper(trim(AccountCountry)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCountry\nLookupCountry, SelectRelation lookup(upper(trim(Relation)) == upper(trim(RELATION_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupRelation\nLookupRelation derive({BATCH_ID } = 1,\n\t\tSOURCE = 'ProjectFunderPartners.csv',\n\t\tCREATED_BY = 'ProjectFunderPartners.csv',\n\t\tUPDATED_BY = 'ProjectFunderPartners.csv',\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(input(\n\t\tFUNDER_SR_KEY as integer,\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tRELATION_SR_KEY as integer,\n\t\tPROJECT_SR_KEY as integer,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tFUNDER_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tRELATION_SR_KEY,\n\t\tPROJECT_SR_KEY,\n\t\tBATCH_ID = {BATCH_ID },\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactProjectFunderPartner"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/MASTER_ProjectFunderPartners')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_PROJECT')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_FUNDER')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_COUNTRY')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_RELATION')]",
+				"[concat(variables('factoryId'), '/datasets/MART_FACT_PROJECT_FUNDER_PARTNER')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_FACT_PROJECT_STAGE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "MASTER_ProjectsList",
+								"type": "DatasetReference"
+							},
+							"name": "projectlist"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PROJECT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROJECT"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PROJECT_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROJECTSTAGE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ITC_SECTION",
+								"type": "DatasetReference"
+							},
+							"name": "DIMITCSECTION"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_FACT_PROJECT_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "FactProjectStage"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectStage"
+						},
+						{
+							"name": "SelectProject"
+						},
+						{
+							"name": "LookupProject"
+						},
+						{
+							"name": "LookupStage"
+						},
+						{
+							"name": "SelectSection"
+						},
+						{
+							"name": "LookupSection"
+						},
+						{
+							"name": "RunInfo"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\t{Project Title} as string,\n\t\tSection as string,\n\t\tStage as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> projectlist\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tPROJECT_STAGE_SR_KEY as integer,\n\t\tPROJECT_STAGE_CODE as string,\n\t\tPROJECT_STAGE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECTSTAGE\nsource(output(\n\t\tITC_SECTION_SR_KEY as integer,\n\t\tITC_SECTION_CODE as string,\n\t\tITC_SECTION_DESC as string,\n\t\tITC_SECTION_DESC_LONG as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMITCSECTION\nDIMPROJECTSTAGE select(mapColumn(\n\t\tPROJECT_STAGE_SR_KEY,\n\t\tPROJECT_STAGE_CODE,\n\t\tPROJECT_STAGE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectStage\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID,\n\t\tPROJECT_TITLE,\n\t\tCREATED_BY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProject\nprojectlist, SelectProject lookup(upper(trim({Project Title})) == upper(trim(PROJECT_TITLE)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProject\nLookupProject, SelectStage lookup(upper(trim(Stage)) == upper(trim(PROJECT_STAGE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupStage\nDIMITCSECTION select(mapColumn(\n\t\tITC_SECTION_SR_KEY,\n\t\tITC_SECTION_CODE,\n\t\tITC_SECTION_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSection\nLookupStage, SelectSection lookup(upper(trim(Section)) == upper(trim(ITC_SECTION_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupSection\nLookupSection derive(BATCH_ID = 1,\n\t\tSOURCE = 'ProjectsList.csv',\n\t\tCREATED_BY = 'ProjectsList.csv',\n\t\tUPDATED_BY = 'ProjectsList.csv',\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(input(\n\t\tITC_SECTION_SR_KEY as integer,\n\t\tPROJECT_STAGE_SR_KEY as integer,\n\t\tPROJECT_SR_KEY as integer,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tITC_SECTION_SR_KEY,\n\t\tPROJECT_STAGE_SR_KEY,\n\t\tPROJECT_SR_KEY,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactProjectStage"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/MASTER_ProjectsList')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_PROJECT')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_PROJECT_STAGE')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_ITC_SECTION')]",
+				"[concat(variables('factoryId'), '/datasets/MART_FACT_PROJECT_STAGE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SALES_DIM_ENTITY')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "SALES_DWHToMART"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_SALES_KPI",
+								"type": "DatasetReference"
+							},
+							"name": "SRCSALES"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDim"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "ExistingDimMaxID"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "UpdateDIMENTITY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "InsertDIMENTITY"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DistinctEntities"
+						},
+						{
+							"name": "SourceRecordHash"
+						},
+						{
+							"name": "Join1"
+						},
+						{
+							"name": "LatestEntityID"
+						},
+						{
+							"name": "ExistingRecordHash"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "Lookup1"
+						},
+						{
+							"name": "ConditionalSplit1"
+						},
+						{
+							"name": "Join2"
+						},
+						{
+							"name": "SurrogateKey1"
+						},
+						{
+							"name": "RunInfo"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "RunInfo1"
+						},
+						{
+							"name": "AlterRow2"
+						},
+						{
+							"name": "Selectcolumns"
+						},
+						{
+							"name": "SelectExistingCols"
+						}
+					],
+					"script": "source(output(\n\t\t{Project ID} as string,\n\t\tContextCode as string,\n\t\tEventCode as string,\n\t\tA04 as string,\n\t\tDate as string,\n\t\tCountry as string,\n\t\tA12 as string,\n\t\tSalesUSD as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SRCSALES\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> ExistingDim\nsource(output(\n\t\tMAX_VAL as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'Select IsNULL(Max(ENTITY_ID),0) MAX_VAL\\nFROM MART_OWNER.DIM_ENTITY',\n\tformat: 'query') ~> ExistingDimMaxID\nSelectcolumns aggregate(groupBy(ENTITY_NAME),\n\teach(match(name!='ENTITY_NAME'), $$ = last($$))) ~> DistinctEntities\nDistinctEntities derive(SOURCE_RECORD_HASH = sha2(256,\r\nENTITY_NAME,\r\nENTITY_EMAIL_DOMAIN_NAME\r\n)) ~> SourceRecordHash\nExistingDim, LatestEntityID join(ExistingDim@ENTITY_ID == LatestEntityID@ENTITY_ID\n\t&& ExistingDim@ENTITY_NAME == LatestEntityID@ENTITY_NAME\n\t&& ExistingDim@VERSION_NO == LatestEntityID@VERSION_NO,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nExistingDim aggregate(groupBy(ENTITY_ID,\n\t\tENTITY_NAME),\n\tVERSION_NO = max(VERSION_NO)) ~> LatestEntityID\nSelectExistingCols derive(RECORD_HASH = sha2(256, EXIST_ENTITY_NAME,EXIST_ENTITY_EMAIL_DOMAIN_NAME)) ~> ExistingRecordHash\nSourceRecordHash, ExistingRecordHash exists(SOURCE_RECORD_HASH == RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, ExistingRecordHash lookup(ENTITY_NAME == EXIST_ENTITY_NAME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 split(isNull(EXIST_ENTITY_ID),\n\tdisjoint: false) ~> ConditionalSplit1@(NewRecord, UpdateRecord)\nConditionalSplit1@NewRecord, ExistingDimMaxID join(1==1,\n\tjoinType:'cross',\n\tbroadcast: 'auto')~> Join2\nJoin2 keyGenerate(output(Dim_Surrogate_Key as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey1 derive(ENTITY_ID = MAX_VAL+Dim_Surrogate_Key,\n\t\tVERSION_NO = 1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo alterRow(insertIf(1==1)) ~> AlterRow1\nConditionalSplit1@UpdateRecord derive(VERSION_NO = EXIST_VERSION_NO+1,\n\t\tBATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo1\nRunInfo1 alterRow(insertIf(1==1)) ~> AlterRow2\nSRCSALES select(mapColumn(\n\t\tENTITY_NAME = A04,\n\t\tENTITY_EMAIL_DOMAIN_NAME = A12,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Selectcolumns\nJoin1 select(mapColumn(\n\t\tEXIST_VERSION_NO = ExistingDim@VERSION_NO,\n\t\tEXIST_ENTITY_NAME = ExistingDim@ENTITY_NAME,\n\t\tEXIST_ENTITY_EMAIL_DOMAIN_NAME = ENTITY_EMAIL_DOMAIN_NAME,\n\t\tEXIST_ENTITY_ID = ExistingDim@ENTITY_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectExistingCols\nAlterRow2 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tEMAIL as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID = EXIST_ENTITY_ID,\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tENTITY_EMAIL_DOMAIN_NAME,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UpdateDIMENTITY\nAlterRow1 sink(input(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tEMAIL as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tENTITY_ID,\n\t\tVERSION_NO,\n\t\tENTITY_NAME,\n\t\tENTITY_EMAIL_DOMAIN_NAME,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> InsertDIMENTITY"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DWH_SALES_KPI')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SALES_FACT_ENTITY_BUSINESS_TRANSACTIONS')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "SALES_DWHToMART"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_SALES_KPI",
+								"type": "DatasetReference"
+							},
+							"name": "SRCSALES"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_CONTEXT_SUB_TYPE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCONTEXTSUBTYPE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_COUNTRY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCOUNTRY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_ENTITY",
+								"type": "DatasetReference"
+							},
+							"name": "DIMENTITY"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_EVENT_TYPE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMEVENTTYPE"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_PROJECT",
+								"type": "DatasetReference"
+							},
+							"name": "DIMPROJECT"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_DATE",
+								"type": "DatasetReference"
+							},
+							"name": "DIMDATE"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_FACT_ENTITY_BUSINESS_TRANSACTIONS",
+								"type": "DatasetReference"
+							},
+							"name": "FACTENTITYBUSINESSTRANSACTIONS"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectContextCode"
+						},
+						{
+							"name": "LookupContext"
+						},
+						{
+							"name": "SelectCountry"
+						},
+						{
+							"name": "LookupCountry"
+						},
+						{
+							"name": "SelectEntity"
+						},
+						{
+							"name": "LookupEntityName"
+						},
+						{
+							"name": "SelectEventCode"
+						},
+						{
+							"name": "LookupEventCode"
+						},
+						{
+							"name": "SelectProjectID"
+						},
+						{
+							"name": "LookupProjectID"
+						},
+						{
+							"name": "SelectTransactionDate"
+						},
+						{
+							"name": "LookupTransactionDate"
+						},
+						{
+							"name": "Renaming"
+						},
+						{
+							"name": "RunInfo"
+						}
+					],
+					"script": "parameters{\n\tP_BATCH_NBR as string\n}\nsource(output(\n\t\t{Project ID} as string,\n\t\tContextCode as string,\n\t\tEventCode as string,\n\t\tA04 as string,\n\t\tDate as string,\n\t\tCountry as string,\n\t\tA12 as string,\n\t\tSalesUSD as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> SRCSALES\nsource(output(\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tCONTEXT_TYPE_CODE as string,\n\t\tCONTEXT_TYPE_DESC as string,\n\t\tCONTEXT_SUB_TYPE_CODE as string,\n\t\tCONTEXT_SUB_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCONTEXTSUBTYPE\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nsource(output(\n\t\tENTITY_SR_KEY as integer,\n\t\tENTITY_ID as integer,\n\t\tVERSION_NO as integer,\n\t\tENTITY_NAME as string,\n\t\tENTITY_EMAIL_DOMAIN_NAME as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tREGION as string,\n\t\tPHONE_NUMBER as string,\n\t\tWEBSITE as string,\n\t\tTWITTER as string,\n\t\tLINKEDIN as string,\n\t\tBSO_OWNERSHIP as string,\n\t\tPOST_CODE as string,\n\t\tPOBOX as string,\n\t\tCITY_REGION as string,\n\t\tCATEGORY as string,\n\t\tCONFIDENTIAL as string,\n\t\tSOCIAL_MEDIA as string,\n\t\tOTHER_EMAILS as string,\n\t\tOTHER_PHONE_NUMBERS as string,\n\t\tOTHER_INFORMATION as string,\n\t\tMAILING_ADDRESS_STREET1 as string,\n\t\tMAILING_ADDRESS_STREET2 as string,\n\t\tMAILING_ADDRESS_CITY as string,\n\t\tMAILING_STATE_PROVICE as string,\n\t\tMAILING_POST_CODE as string,\n\t\tMAILING_COUNTRY as string,\n\t\tMAILING_FORMAT_UN as string,\n\t\tFIRM_ID as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMENTITY\nsource(output(\n\t\tEVENT_TYPE_SR_KEY as integer,\n\t\tEVENT_TYPE_CODE as string,\n\t\tEVENT_TYPE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMEVENTTYPE\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tDATE_SR_KEY as integer,\n\t\tDATE_TIME as date,\n\t\tDAY_OF_MONTH as integer,\n\t\tCALENDER_MONTH_NAME as string,\n\t\tCALENDER_MONTH_ID as integer,\n\t\tCALENDER_YEAR as integer,\n\t\tCALENDER_QUARTER_ID as integer,\n\t\tCALENDER_QUARTER_NAME as string,\n\t\tCALENDER_HALF_YEAR_ID as integer,\n\t\tCALENDER_HALF_YEAR_NAME as string,\n\t\tFISCAL_MONTH_ID as integer,\n\t\tFISCAL_MONTH_NAME as string,\n\t\tFISCAL_QUARTER_ID as integer,\n\t\tFISCAL_QUARTER_NAME as string,\n\t\tFISCAL_HALF_YEAR_ID as integer,\n\t\tFISCAL_HALF_YEAR_NAME as string,\n\t\tFISCAL_YEAR as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMDATE\nDIMCONTEXTSUBTYPE select(mapColumn(\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tCONTEXT_TYPE_CODE,\n\t\tCONTEXT_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectContextCode\nRenaming, SelectContextCode lookup(trim(ContextCode) == trim(CONTEXT_TYPE_CODE),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupContext\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCountry\nLookupContext, SelectCountry lookup(upper(trim(Country)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCountry\nDIMENTITY select(mapColumn(\n\t\tENTITY_SR_KEY,\n\t\tENTITY_ID,\n\t\tENTITY_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectEntity\nLookupCountry, SelectEntity lookup(upper(trim(A04)) == upper(trim(ENTITY_NAME)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupEntityName\nDIMEVENTTYPE select(mapColumn(\n\t\tEVENT_TYPE_SR_KEY,\n\t\tEVENT_TYPE_CODE,\n\t\tEVENT_TYPE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectEventCode\nLookupEntityName, SelectEventCode lookup(trim(EventCode) == trim(EVENT_TYPE_CODE),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupEventCode\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProjectID\nLookupEventCode, SelectProjectID lookup(upper(trim({Project ID})) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProjectID\nDIMDATE select(mapColumn(\n\t\tTRANSACTION_DATE_SR_KEY = DATE_SR_KEY,\n\t\tDATE_TIME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectTransactionDate\nLookupProjectID, SelectTransactionDate lookup(toTimestamp(Date,'MM/dd/yyyy') == DATE_TIME,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupTransactionDate\nSRCSALES select(mapColumn(\n\t\t{Project ID},\n\t\tContextCode,\n\t\tEventCode,\n\t\tA04,\n\t\tDate,\n\t\tCountry,\n\t\tA12,\n\t\tSALES_IN_USD = SalesUSD,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Renaming\nLookupTransactionDate derive(BATCH_ID = toInteger($P_BATCH_NBR),\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(input(\n\t\tPROJECT_SR_KEY as integer,\n\t\tCONTEXT_SUB_TYPE_SR_KEY as integer,\n\t\tEVENT_TYPE_SR_KEY as integer,\n\t\tENTITY_SR_KEY as integer,\n\t\tTRANSACTION_DATE_SR_KEY as integer,\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tSALES_IN_USD as integer,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tCONTEXT_SUB_TYPE_SR_KEY,\n\t\tEVENT_TYPE_SR_KEY,\n\t\tENTITY_SR_KEY,\n\t\tTRANSACTION_DATE_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tSALES_IN_USD,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FACTENTITYBUSINESSTRANSACTIONS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DWH_SALES_KPI')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_COUNTRY')]",
+				"[concat(variables('factoryId'), '/datasets/MART_DIM_PROJECT')]",
+				"[concat(variables('factoryId'), '/datasets/MART_FACT_ENTITY_BUSINESS_TRANSACTIONS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SALES_STAGE_DWH')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "StageToCurated"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "STAGE_SALES_KPI",
+								"type": "DatasetReference"
+							},
+							"name": "sourcestageSALESKPI"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DWH_SALES_KPI",
+								"type": "DatasetReference"
+							},
+							"name": "DWHSALESKPI"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\t{Salutation|First Name|Last Name|Account|Professional status|Job title|Gender|Year of birth|Email|Phone|Confidential|Preferred Language|Social media|Other emails|Other phone numbers|Skype|Other Information|Use account address|Office Address: Street 1|Office Address: Street 2|Office Address: City|Office Address: State/Province|Office Address: ZIP/Postal Code|Office Address: Country|Mailing address is equal to office address|Mailing Address: Street 1|Mailing Address: Street 2|Mailing Address: City|Mailing Address: State/Province|Mailing Address: ZIP/Postal Code|Mailing Address: Country|Trade Forum|Project Number|Event title|Event type|Type of tool|Course name|Start date|End date|Event date|SME Trade Academy|SheTrades|FILE_NAME|LOAD_TIMESTAMP} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> sourcestageSALESKPI\nsourcestageSALESKPI derive(NEW_DATALAKE_FILE = 'SALES_KPI/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\t{Project ID} as string,\n\t\tContextCode as string,\n\t\tEventCode as string,\n\t\tA04 as string,\n\t\tDate as string,\n\t\tCountry as string,\n\t\tA12 as string,\n\t\tSalesUSD as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHSALESKPI"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DWH_SALES_KPI')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_SME_DIM_COURSE')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "SME_DWHToMART"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DWH_MART_STAGE",
+								"type": "DatasetReference"
+							},
+							"name": "allsmefiles"
+						},
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_COURSE",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MART_DIM_COURSE",
+								"type": "DatasetReference"
+							},
+							"name": "dimcourse"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Selectingcoursename"
+						},
+						{
+							"name": "Aggregate1"
+						},
+						{
+							"name": "DerivedColumn1"
+						},
+						{
+							"name": "Selectcoursename"
+						},
+						{
+							"name": "ExistingRecordHash"
+						},
+						{
+							"name": "Sourcerecordhash"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "AlterRow1"
+						}
+					],
+					"script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of event} as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\t{Registration Date} as string,\n\t\t{Submission Date} as string,\n\t\t{Last name} as string,\n\t\t{Middle name} as string,\n\t\t{First name} as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Date of birth} as string,\n\t\tCountry as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Job title} as string,\n\t\t{Professional status} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\tSize as string,\n\t\t{BSO ownership} as string,\n\t\t{Office Address} as string,\n\t\tCity as string,\n\t\t{Post Code} as string,\n\t\tWebsite as string,\n\t\tTwitter as string,\n\t\tLinkedIn as string,\n\t\t{Date of birth2} as string,\n\t\t{Country of Residence} as string,\n\t\tNationality as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tRegion as string,\n\t\t{Type of tool} as string,\n\t\t{Area of change} as string,\n\t\t{Service themes} as string,\n\t\t{Date of data collection} as string,\n\t\tid as string,\n\t\tCourse_name as string,\n\t\tUsername as string,\n\t\tTitle as string,\n\t\tidnumber as string,\n\t\tFunctional_title as string,\n\t\tHowlong as string,\n\t\tPriorexperience as string,\n\t\t{Country code} as string,\n\t\tPobox as string,\n\t\tPostalcode as string,\n\t\tSkype as string,\n\t\tAim as string,\n\t\tYahoo as string,\n\t\tMsn as string,\n\t\tProfile_field_Supervisor as string,\n\t\t{Service theme} as string,\n\t\tCityregion as string,\n\t\tCertification_date as string,\n\t\tCertified as string,\n\t\tCohort as string,\n\t\tUniqueid as string,\n\t\tUser_id as string,\n\t\tEnrol_time as string,\n\t\t{Type of platform} as string,\n\t\t{SheTrades Project} as string,\n\t\tISIC as string,\n\t\t{Please select the area of your activity} as string,\n\t\tHS as string,\n\t\t{Owner/ top manager gender} as string,\n\t\t{Owner/ top manager age} as string,\n\t\t{Type of training} as string,\n\t\t{Service theme 1} as string,\n\t\t{Service theme 2} as string,\n\t\tLocation as string,\n\t\t{Name of the entity} as string,\n\t\t{ISIC code division} as string,\n\t\t{HS 6 digit code (if available)} as string,\n\t\t{Account Name} as string,\n\t\t{English Name} as string,\n\t\tAcronym as string,\n\t\t{Account Type} as string,\n\t\t{Account Sub-Type} as string,\n\t\t{Office Address: Country} as string,\n\t\tCategory as string,\n\t\t{Parent Account} as string,\n\t\tConfidential as string,\n\t\tActivity as string,\n\t\tProduct as string,\n\t\t{Women Managed} as string,\n\t\t{Youth Managed} as string,\n\t\t{Social media} as string,\n\t\t{Other emails} as string,\n\t\t{Other phone numbers} as string,\n\t\t{Other information} as string,\n\t\t{Ownership and management} as string,\n\t\t{Trade Forum} as string,\n\t\t{Office Address: Street 1} as string,\n\t\t{Office Address: Street 2} as string,\n\t\t{Office Address: City} as string,\n\t\t{Office Address: State/Province} as string,\n\t\t{Office Address: ZIP/Postal Code} as string,\n\t\t{Mailing address is equal to office address} as string,\n\t\t{Mailing Address: Street 1} as string,\n\t\t{Mailing Address: Street 2} as string,\n\t\t{Mailing Address: City} as string,\n\t\t{Mailing Address: State/Province} as string,\n\t\t{Mailing Address: ZIP/Postal Code} as string,\n\t\t{Mailing Address: Country} as string,\n\t\t{UN Mailing Format} as string,\n\t\t{Project Number} as string,\n\t\tSalutation as string,\n\t\tAccount as string,\n\t\tPhone as string,\n\t\t{Preferred Language} as string,\n\t\t{Use account address} as string,\n\t\t{Event title} as string,\n\t\t{Event type} as string,\n\t\t{Course name} as string,\n\t\t{Start date} as string,\n\t\t{End date} as string,\n\t\t{Event date} as string,\n\t\t{SME Trade Academy} as string,\n\t\tSheTrades as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> allsmefiles\nsource(output(\n\t\tCOURSE_SR_KEY as integer,\n\t\tCOURSE_NAME as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nallsmefiles select(mapColumn(\n\t\tCOURSE_NAME = Course_name,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Selectingcoursename\nSelectingcoursename aggregate(groupBy(COURSE_NAME),\n\teach(match(name!='COURSE_NAME'), $$ = last($$))) ~> Aggregate1\nExists1 derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> DerivedColumn1\nsource1 select(mapColumn(\n\t\tEXIST_COURSE_NAME = COURSE_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Selectcoursename\nSelectcoursename derive(EXIST_RECORD_HASH = sha2(256, EXIST_COURSE_NAME)) ~> ExistingRecordHash\nAggregate1 derive(Source_Record_Hash = sha2(256, COURSE_NAME)) ~> Sourcerecordhash\nSourcerecordhash, ExistingRecordHash exists(Source_Record_Hash == EXIST_RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nDerivedColumn1 alterRow(insertIf(1==1)) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tCOURSE_SR_KEY as integer,\n\t\tCOURSE_NAME as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tCOURSE_NAME,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> dimcourse"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_FACT_ENTITY_BUSINESS_TRANSACTIONS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CONTEXT_SUB_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EVENT_TYPE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTITY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TRANSACTION_DATE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COUNTRY_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SALES_IN_USD",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "FACT_ENTITY_BUSINESS_TRANSACTIONS"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

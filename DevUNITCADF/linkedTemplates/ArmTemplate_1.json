@@ -611,6 +611,76 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_FUNDER')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FUNDER_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ACCOUNT_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "ACCOUNT_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ACRONYM",
+						"type": "varchar"
+					},
+					{
+						"name": "ACCOUNT_COUNTRY",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_FUNDER"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_GENDER')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -840,6 +910,72 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_INT_STD_INDUSTRY_CODES_ISIC"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_ITC_SECTION')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ITC_SECTION_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ITC_SECTION_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "ITC_SECTION_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "ITC_SECTION_DESC_LONG",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_ITC_SECTION"
 				}
 			},
 			"dependsOn": []
@@ -1150,6 +1286,126 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_PROJECT_STAGE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PROJECT_STAGE_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PROJECT_STAGE_CODE",
+						"type": "varchar"
+					},
+					{
+						"name": "PROJECT_STAGE_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_PROJECT_STAGE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MART_DIM_RELATION')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "RELATION_SR_KEY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RELATION_DESC",
+						"type": "varchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SOURCE",
+						"type": "varchar"
+					},
+					{
+						"name": "CREATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "UPDATED_BY",
+						"type": "varchar"
+					},
+					{
+						"name": "DATE_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DATE_UPDATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "MART_OWNER",
+					"table": "DIM_RELATION"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MART_DIM_SERVICE_THEME')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1363,315 +1619,6 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_SURVEY_DETAILS"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_SURVEY_VARIABLE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "SURVEY_VARIABLE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "VARIABLE_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "SURVEY_QUESTIONIRE_VERSION_NO",
-						"type": "varchar"
-					},
-					{
-						"name": "QUENTION_TITLE",
-						"type": "varchar"
-					},
-					{
-						"name": "VARIABLE_DESC",
-						"type": "varchar"
-					},
-					{
-						"name": "RESPONSE_TYPE",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_SURVEY_VARIABLE"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_SURVEY_VARIABLE_OPTION')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "SURVEY_VARIABLE_OPTION_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "VARIABLE_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "SURVEY_QUESTIONIRE_VERSION_NO",
-						"type": "varchar"
-					},
-					{
-						"name": "QUENTION_TITLE",
-						"type": "varchar"
-					},
-					{
-						"name": "OPTIONS_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "OPTIONS_DESC",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_SURVEY_VARIABLE_OPTION"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_TRAINING_TYPE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TRAINING_TYPE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TRAINING_TYPE_CODE",
-						"type": "varchar"
-					},
-					{
-						"name": "TRAINING_TYPE_DESC",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_TRAINING_TYPE"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_FACT_ENTITY_SURVEY')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "PROJECT_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CONTEXT_SUB_TYPE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "COUNTRY_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SURVEY_DETAILS_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SURVEY_DATE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SURVEY_VARIABLE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SURVEY_VARIABLE_SELECTED_OPTION_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SURVEY_INTERVIEWEE_RESPONSE",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CHANGE_VALUE",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ENTITY_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "FACT_ENTITY_SURVEY"
 				}
 			},
 			"dependsOn": []
