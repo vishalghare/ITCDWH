@@ -1817,6 +1817,38 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DWH_SALES_KPI')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "target"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Account Name|English Name|Acronym|Account Type|Account Sub-Type|Office Address: Country|Category|Parent Account|Website|Email|Phone number|Confidential|Size|Activity|Product|Women Managed|Youth Managed|Social media|Other emails|Other phone numbers|Other information|Ownership and management|Trade Forum|Office Address: Street 1|Office Address: Street 2|Office Address: City|Office Address: State/Province|Office Address: ZIP/Postal Code|Mailing address is equal to office address|Mailing Address: Street 1|Mailing Address: Street 2|Mailing Address: City|Mailing Address: State/Province|Mailing Address: ZIP/Postal Code|Mailing Address: Country|UN Mailing Format|Project Number|Salutation|First Name|Last Name|Account|Professional status|Job title|Gender|Year of birth|Phone|Preferred Language|Skype|Use account address|Event title|Event type|Type of tool|Course name|Start date|End date|Event date|SME Trade Academy|SheTrades|FILE_NAME|LOAD_TIMESTAMP",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DWH_SHE_TRADES')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2749,66 +2781,6 @@
 				"typeProperties": {
 					"schema": "MART_OWNER",
 					"table": "DIM_COUNTRY"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MART_DIM_COURSE')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "COURSE_SR_KEY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "COURSE_NAME",
-						"type": "varchar"
-					},
-					{
-						"name": "BATCH_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "SOURCE",
-						"type": "varchar"
-					},
-					{
-						"name": "CREATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "UPDATED_BY",
-						"type": "varchar"
-					},
-					{
-						"name": "DATE_CREATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DATE_UPDATED",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "MART_OWNER",
-					"table": "DIM_COURSE"
 				}
 			},
 			"dependsOn": [
