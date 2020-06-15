@@ -411,7 +411,13 @@
 							"typeProperties": {
 								"dataflow": {
 									"referenceName": "DF_SALES_FACT_ENTITY_BUSINESS_TRANSACTIONS",
-									"type": "DataFlowReference"
+									"type": "DataFlowReference",
+									"parameters": {
+										"P_BATCH_NBR": {
+											"value": "'@{variables('V_BATCH_NBR')}'",
+											"type": "Expression"
+										}
+									}
 								},
 								"compute": {
 									"coreCount": 8,

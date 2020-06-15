@@ -1,28 +1,41 @@
 {
-    "name": "MASTER_ProjectsList",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "AzureDataLakeStorage1",
-            "type": "LinkedServiceReference"
-        },
-        "annotations": [],
-        "type": "DelimitedText",
-        "typeProperties": {
-            "location": {
-                "type": "AzureBlobFSLocation",
-                "folderPath": "masters",
-                "fileSystem": "source"
-            },
-            "columnDelimiter": "|",
-            "escapeChar": "\\",
-            "firstRowAsHeader": true,
-            "quoteChar": "\""
-        },
-        "schema": [
-            {
-                "name": "Variable Name|Question Title|Possible Options Code|Description",
-                "type": "String"
-            }
-        ]
-    }
+	"name": "MASTER_ProjectsList",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "ProjectsList.csv",
+				"folderPath": "masters",
+				"fileSystem": "source"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ProjectID",
+				"type": "String"
+			},
+			{
+				"name": "Project Title",
+				"type": "String"
+			},
+			{
+				"name": "Section",
+				"type": "String"
+			},
+			{
+				"name": "Stage",
+				"type": "String"
+			}
+		]
+	}
 }

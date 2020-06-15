@@ -1,5 +1,5 @@
 {
-	"name": "MART_FACT_PROJECT_COUNTRY",
+	"name": "MART_FACT_ENTITY_BUSINESS_TRANSACTIONS",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureSqlDatabase1",
@@ -14,7 +14,32 @@
 				"precision": 10
 			},
 			{
+				"name": "CONTEXT_SUB_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EVENT_TYPE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ENTITY_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TRANSACTION_DATE_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
 				"name": "COUNTRY_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SALES_IN_USD",
 				"type": "int",
 				"precision": 10
 			},
@@ -22,6 +47,10 @@
 				"name": "BATCH_ID",
 				"type": "int",
 				"precision": 10
+			},
+			{
+				"name": "SOURCE",
+				"type": "varchar"
 			},
 			{
 				"name": "CREATED_BY",
@@ -46,7 +75,7 @@
 		],
 		"typeProperties": {
 			"schema": "MART_OWNER",
-			"table": "FACT_PROJECT_COUNTRY"
+			"table": "FACT_ENTITY_BUSINESS_TRANSACTIONS"
 		}
 	}
 }

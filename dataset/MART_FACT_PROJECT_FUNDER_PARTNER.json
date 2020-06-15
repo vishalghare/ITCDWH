@@ -1,16 +1,66 @@
 {
-    "name": "MART_FACT_PROJECT_FUNDER_PARTNER",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "AzureSqlDatabase1",
-            "type": "LinkedServiceReference"
-        },
-        "annotations": [],
-        "type": "AzureSqlTable",
-        "schema": [],
-        "typeProperties": {
-            "schema": "MART_OWNER",
-            "table": ""
-        }
-    }
+	"name": "MART_FACT_PROJECT_FUNDER_PARTNER",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FUNDER_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "COUNTRY_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "RELATION_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PROJECT_SR_KEY",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SOURCE",
+				"type": "varchar"
+			},
+			{
+				"name": "CREATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "UPDATED_BY",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_CREATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DATE_UPDATED",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "MART_OWNER",
+			"table": "FACT_PROJECT_FUNDER_PARTNER"
+		}
+	}
 }
