@@ -1,5 +1,5 @@
 {
-    "name": "MART_DIM_PROJECT",
+    "name": "MART_DIM_PROJECT_STAGE",
     "properties": {
         "linkedServiceName": {
             "referenceName": "AzureSqlDatabase1",
@@ -9,16 +9,16 @@
         "type": "AzureSqlTable",
         "schema": [
             {
-                "name": "PROJECT_SR_KEY",
+                "name": "PROJECT_STAGE_SR_KEY",
                 "type": "int",
                 "precision": 10
             },
             {
-                "name": "PROJECT_ID",
+                "name": "PROJECT_STAGE_CODE",
                 "type": "varchar"
             },
             {
-                "name": "PROJECT_TITLE",
+                "name": "PROJECT_STAGE_DESC",
                 "type": "varchar"
             },
             {
@@ -53,7 +53,7 @@
         ],
         "typeProperties": {
             "schema": "MART_OWNER",
-            "table": "DIM_PROJECT"
+            "table": "DIM_PROJECT_STAGE"
         }
     }
 }

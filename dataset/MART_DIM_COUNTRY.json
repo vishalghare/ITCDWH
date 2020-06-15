@@ -1,91 +1,91 @@
 {
-	"name": "MART_DIM_COUNTRY",
-	"properties": {
-		"linkedServiceName": {
-			"referenceName": "AzureSqlDatabase1",
-			"type": "LinkedServiceReference"
-		},
-		"annotations": [],
-		"type": "AzureSqlTable",
-		"schema": [
-			{
-				"name": "COUNTRY_SR_KEY",
-				"type": "int",
-				"precision": 10
-			},
-			{
-				"name": "COUNTRY_CODE",
-				"type": "varchar"
-			},
-			{
-				"name": "COUNTRY_NAME_EN",
-				"type": "varchar"
-			},
-			{
-				"name": "COUNTRY_NAME_ES",
-				"type": "nvarchar"
-			},
-			{
-				"name": "COUNTRY_NAME_FR",
-				"type": "nvarchar"
-			},
-			{
-				"name": "ISO2_CODE",
-				"type": "varchar"
-			},
-			{
-				"name": "ISO3_CODE",
-				"type": "varchar"
-			},
-			{
-				"name": "LEAST_DEVELPED_COUNTRY",
-				"type": "varchar"
-			},
-			{
-				"name": "LAND_LCKD_DEVELOPING_COUNTRY",
-				"type": "varchar"
-			},
-			{
-				"name": "SMALL_ISLAND_DEVELOPING_STATES",
-				"type": "varchar"
-			},
-			{
-				"name": "DEVELOPED_DEVELOPING_COUNTRY",
-				"type": "varchar"
-			},
-			{
-				"name": "BATCH_ID",
-				"type": "int",
-				"precision": 10
-			},
-			{
-				"name": "SOURCE",
-				"type": "varchar"
-			},
-			{
-				"name": "CREATED_BY",
-				"type": "varchar"
-			},
-			{
-				"name": "UPDATED_BY",
-				"type": "varchar"
-			},
-			{
-				"name": "DATE_CREATED",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
-			},
-			{
-				"name": "DATE_UPDATED",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
-			}
-		],
-		"typeProperties": {
-			"schema": "MART_OWNER",
-			"table": "DIM_COUNTRY"
-		}
-	}
+    "name": "MART_DIM_COUNTRY",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "AzureSqlDatabase1",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "AzureSqlTable",
+        "schema": [
+            {
+                "name": "COUNTRY_SR_KEY",
+                "type": "int",
+                "precision": 10
+            },
+            {
+                "name": "COUNTRY_CODE",
+                "type": "varchar"
+            },
+            {
+                "name": "COUNTRY_NAME_EN",
+                "type": "varchar"
+            },
+            {
+                "name": "COUNTRY_NAME_ES",
+                "type": "nvarchar"
+            },
+            {
+                "name": "COUNTRY_NAME_FR",
+                "type": "nvarchar"
+            },
+            {
+                "name": "ISO2_CODE",
+                "type": "varchar"
+            },
+            {
+                "name": "ISO3_CODE",
+                "type": "varchar"
+            },
+            {
+                "name": "LEAST_DEVELPED_COUNTRY",
+                "type": "varchar"
+            },
+            {
+                "name": "LAND_LCKD_DEVELOPING_COUNTRY",
+                "type": "varchar"
+            },
+            {
+                "name": "SMALL_ISLAND_DEVELOPING_STATES",
+                "type": "varchar"
+            },
+            {
+                "name": "DEVELOPED_DEVELOPING_COUNTRY",
+                "type": "varchar"
+            },
+            {
+                "name": "BATCH_ID",
+                "type": "int",
+                "precision": 10
+            },
+            {
+                "name": "SOURCE",
+                "type": "varchar"
+            },
+            {
+                "name": "CREATED_BY",
+                "type": "varchar"
+            },
+            {
+                "name": "UPDATED_BY",
+                "type": "varchar"
+            },
+            {
+                "name": "DATE_CREATED",
+                "type": "datetime",
+                "precision": 23,
+                "scale": 3
+            },
+            {
+                "name": "DATE_UPDATED",
+                "type": "datetime",
+                "precision": 23,
+                "scale": 3
+            }
+        ],
+        "typeProperties": {
+            "schema": "MART_OWNER",
+            "table": "DIM_COUNTRY"
+        }
+    }
 }

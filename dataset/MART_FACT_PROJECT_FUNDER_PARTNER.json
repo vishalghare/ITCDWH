@@ -1,0 +1,16 @@
+{
+    "name": "MART_FACT_PROJECT_FUNDER_PARTNER",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "AzureSqlDatabase1",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "AzureSqlTable",
+        "schema": [],
+        "typeProperties": {
+            "schema": "MART_OWNER",
+            "table": ""
+        }
+    }
+}

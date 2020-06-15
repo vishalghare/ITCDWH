@@ -1,5 +1,5 @@
 {
-    "name": "MART_DIM_PROJECT",
+    "name": "MART_DIM_FUNDER",
     "properties": {
         "linkedServiceName": {
             "referenceName": "AzureSqlDatabase1",
@@ -9,16 +9,24 @@
         "type": "AzureSqlTable",
         "schema": [
             {
-                "name": "PROJECT_SR_KEY",
+                "name": "FUNDER_SR_KEY",
                 "type": "int",
                 "precision": 10
             },
             {
-                "name": "PROJECT_ID",
+                "name": "ACCOUNT_ID",
                 "type": "varchar"
             },
             {
-                "name": "PROJECT_TITLE",
+                "name": "ACCOUNT_NAME",
+                "type": "nvarchar"
+            },
+            {
+                "name": "ACRONYM",
+                "type": "varchar"
+            },
+            {
+                "name": "ACCOUNT_COUNTRY",
                 "type": "varchar"
             },
             {
@@ -53,7 +61,7 @@
         ],
         "typeProperties": {
             "schema": "MART_OWNER",
-            "table": "DIM_PROJECT"
+            "table": "DIM_FUNDER"
         }
     }
 }
