@@ -1,84 +1,84 @@
 {
-    "name": "DF_FACT_PROJECT_FUNDER_PARTNER",
-    "properties": {
-        "type": "MappingDataFlow",
-        "typeProperties": {
-            "sources": [
-                {
-                    "dataset": {
-                        "referenceName": "MASTER_ProjectFunderPartners",
-                        "type": "DatasetReference"
-                    },
-                    "name": "ProjectPartnerFunders"
-                },
-                {
-                    "dataset": {
-                        "referenceName": "MART_DIM_PROJECT",
-                        "type": "DatasetReference"
-                    },
-                    "name": "DIMPROJECT"
-                },
-                {
-                    "dataset": {
-                        "referenceName": "MART_DIM_FUNDER",
-                        "type": "DatasetReference"
-                    },
-                    "name": "DIMFUNDER"
-                },
-                {
-                    "dataset": {
-                        "referenceName": "MART_DIM_COUNTRY",
-                        "type": "DatasetReference"
-                    },
-                    "name": "DIMCOUNTRY"
-                },
-                {
-                    "dataset": {
-                        "referenceName": "MART_DIM_RELATION",
-                        "type": "DatasetReference"
-                    },
-                    "name": "DIMRELATION"
-                }
-            ],
-            "sinks": [
-                {
-                    "dataset": {
-                        "referenceName": "MART_FACT_PROJECT_FUNDER_PARTNER",
-                        "type": "DatasetReference"
-                    },
-                    "name": "FactProjectFunderPartner"
-                }
-            ],
-            "transformations": [
-                {
-                    "name": "SelectProjectID"
-                },
-                {
-                    "name": "SelectAccountName"
-                },
-                {
-                    "name": "SelectCountry"
-                },
-                {
-                    "name": "SelectRelation"
-                },
-                {
-                    "name": "LookupProjectID"
-                },
-                {
-                    "name": "LookupAccounName"
-                },
-                {
-                    "name": "LookupCountry"
-                },
-                {
-                    "name": "LookupRelation"
-                },
-                {
-                    "name": "RunInfo"
-                }
-            ],
-            "script": "source(output(\n\t\t{Variable Name|Question Title|Possible Options Code|Description} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> ProjectPartnerFunders\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tFUNDER_SR_KEY as integer,\n\t\tACCOUNT_ID as string,\n\t\tACCOUNT_NAME as string,\n\t\tACRONYM as string,\n\t\tACCOUNT_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMFUNDER\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nsource(output(\n\t\tRELATION_SR_KEY as integer,\n\t\tRELATION_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMRELATION\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProjectID\nDIMFUNDER select(mapColumn(\n\t\tFUNDER_SR_KEY,\n\t\tACCOUNT_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAccountName\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCountry\nDIMRELATION select(mapColumn(\n\t\tRELATION_SR_KEY,\n\t\tRELATION_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectRelation\nProjectPartnerFunders, SelectProjectID lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProjectID\nLookupProjectID, SelectAccountName lookup(upper(trim(AccountName)) == upper(trim(ACCOUNT_NAME)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAccounName\nLookupAccounName, SelectCountry lookup(upper(trim(AccountCountry)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCountry\nLookupCountry, SelectRelation lookup(upper(trim(Relation)) == upper(trim(RELATION_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupRelation\nLookupRelation derive({BATCH_ID } = 1,\n\t\tSOURCE = 'ProjectFunderPartners.csv',\n\t\tCREATED_BY = 'ProjectFunderPartners.csv',\n\t\tUPDATED_BY = 'ProjectFunderPartners.csv',\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tFUNDER_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tRELATION_SR_KEY,\n\t\tPROJECT_SR_KEY,\n\t\tBATCH_ID = {BATCH_ID },\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactProjectFunderPartner"
-        }
-    }
+	"name": "DF_FACT_PROJECT_FUNDER_PARTNER",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "MASTER_ProjectFunderPartners",
+						"type": "DatasetReference"
+					},
+					"name": "ProjectPartnerFunders"
+				},
+				{
+					"dataset": {
+						"referenceName": "MART_DIM_PROJECT",
+						"type": "DatasetReference"
+					},
+					"name": "DIMPROJECT"
+				},
+				{
+					"dataset": {
+						"referenceName": "MART_DIM_FUNDER",
+						"type": "DatasetReference"
+					},
+					"name": "DIMFUNDER"
+				},
+				{
+					"dataset": {
+						"referenceName": "MART_DIM_COUNTRY",
+						"type": "DatasetReference"
+					},
+					"name": "DIMCOUNTRY"
+				},
+				{
+					"dataset": {
+						"referenceName": "MART_DIM_RELATION",
+						"type": "DatasetReference"
+					},
+					"name": "DIMRELATION"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "MART_FACT_PROJECT_FUNDER_PARTNER",
+						"type": "DatasetReference"
+					},
+					"name": "FactProjectFunderPartner"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectProjectID"
+				},
+				{
+					"name": "SelectAccountName"
+				},
+				{
+					"name": "SelectCountry"
+				},
+				{
+					"name": "SelectRelation"
+				},
+				{
+					"name": "LookupProjectID"
+				},
+				{
+					"name": "LookupAccounName"
+				},
+				{
+					"name": "LookupCountry"
+				},
+				{
+					"name": "LookupRelation"
+				},
+				{
+					"name": "RunInfo"
+				}
+			],
+			"script": "source(output(\n\t\tProjectID as string,\n\t\tAccountId as string,\n\t\tAccountName as string,\n\t\tAcronym as string,\n\t\tAccountCountry as string,\n\t\tRelation as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> ProjectPartnerFunders\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tFUNDER_SR_KEY as integer,\n\t\tACCOUNT_ID as string,\n\t\tACCOUNT_NAME as string,\n\t\tACRONYM as string,\n\t\tACCOUNT_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMFUNDER\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nsource(output(\n\t\tRELATION_SR_KEY as integer,\n\t\tRELATION_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMRELATION\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProjectID\nDIMFUNDER select(mapColumn(\n\t\tFUNDER_SR_KEY,\n\t\tACCOUNT_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAccountName\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCountry\nDIMRELATION select(mapColumn(\n\t\tRELATION_SR_KEY,\n\t\tRELATION_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectRelation\nProjectPartnerFunders, SelectProjectID lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProjectID\nLookupProjectID, SelectAccountName lookup(upper(trim(AccountName)) == upper(trim(ACCOUNT_NAME)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAccounName\nLookupAccounName, SelectCountry lookup(upper(trim(AccountCountry)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCountry\nLookupCountry, SelectRelation lookup(upper(trim(Relation)) == upper(trim(RELATION_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupRelation\nLookupRelation derive({BATCH_ID } = 1,\n\t\tSOURCE = 'ProjectFunderPartners.csv',\n\t\tCREATED_BY = 'ProjectFunderPartners.csv',\n\t\tUPDATED_BY = 'ProjectFunderPartners.csv',\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tFUNDER_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tRELATION_SR_KEY,\n\t\tPROJECT_SR_KEY,\n\t\tBATCH_ID = {BATCH_ID },\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactProjectFunderPartner"
+		}
+	}
 }

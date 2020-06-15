@@ -1,35 +1,35 @@
 {
-    "name": "DF_SALES_STAGE_DWH",
-    "properties": {
-        "folder": {
-            "name": "StageToCurated"
-        },
-        "type": "MappingDataFlow",
-        "typeProperties": {
-            "sources": [
-                {
-                    "dataset": {
-                        "referenceName": "STAGE_SALES_KPI",
-                        "type": "DatasetReference"
-                    },
-                    "name": "sourcestageSALESKPI"
-                }
-            ],
-            "sinks": [
-                {
-                    "dataset": {
-                        "referenceName": "DWH_SALES_KPI",
-                        "type": "DatasetReference"
-                    },
-                    "name": "DWHSALESKPI"
-                }
-            ],
-            "transformations": [
-                {
-                    "name": "DerivedColumn1"
-                }
-            ],
-            "script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\t{Salutation|First Name|Last Name|Account|Professional status|Job title|Gender|Year of birth|Email|Phone|Confidential|Preferred Language|Social media|Other emails|Other phone numbers|Skype|Other Information|Use account address|Office Address: Street 1|Office Address: Street 2|Office Address: City|Office Address: State/Province|Office Address: ZIP/Postal Code|Office Address: Country|Mailing address is equal to office address|Mailing Address: Street 1|Mailing Address: Street 2|Mailing Address: City|Mailing Address: State/Province|Mailing Address: ZIP/Postal Code|Mailing Address: Country|Trade Forum|Project Number|Event title|Event type|Type of tool|Course name|Start date|End date|Event date|SME Trade Academy|SheTrades|FILE_NAME|LOAD_TIMESTAMP} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> sourcestageSALESKPI\nsourcestageSALESKPI derive(NEW_DATALAKE_FILE = 'SALES_KPI/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\t{Account Name|English Name|Acronym|Account Type|Account Sub-Type|Office Address: Country|Category|Parent Account|Website|Email|Phone number|Confidential|Size|Activity|Product|Women Managed|Youth Managed|Social media|Other emails|Other phone numbers|Other information|Ownership and management|Trade Forum|Office Address: Street 1|Office Address: Street 2|Office Address: City|Office Address: State/Province|Office Address: ZIP/Postal Code|Mailing address is equal to office address|Mailing Address: Street 1|Mailing Address: Street 2|Mailing Address: City|Mailing Address: State/Province|Mailing Address: ZIP/Postal Code|Mailing Address: Country|UN Mailing Format|Project Number|Salutation|First Name|Last Name|Account|Professional status|Job title|Gender|Year of birth|Phone|Preferred Language|Skype|Use account address|Event title|Event type|Type of tool|Course name|Start date|End date|Event date|SME Trade Academy|SheTrades|FILE_NAME|LOAD_TIMESTAMP} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHSALESKPI"
-        }
-    }
+	"name": "DF_SALES_STAGE_DWH",
+	"properties": {
+		"folder": {
+			"name": "StageToCurated"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "STAGE_SALES_KPI",
+						"type": "DatasetReference"
+					},
+					"name": "sourcestageSALESKPI"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DWH_SALES_KPI",
+						"type": "DatasetReference"
+					},
+					"name": "DWHSALESKPI"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "parameters{\n\tP_DWH_FILE_NAME as string\n}\nsource(output(\n\t\t{Salutation|First Name|Last Name|Account|Professional status|Job title|Gender|Year of birth|Email|Phone|Confidential|Preferred Language|Social media|Other emails|Other phone numbers|Skype|Other Information|Use account address|Office Address: Street 1|Office Address: Street 2|Office Address: City|Office Address: State/Province|Office Address: ZIP/Postal Code|Office Address: Country|Mailing address is equal to office address|Mailing Address: Street 1|Mailing Address: Street 2|Mailing Address: City|Mailing Address: State/Province|Mailing Address: ZIP/Postal Code|Mailing Address: Country|Trade Forum|Project Number|Event title|Event type|Type of tool|Course name|Start date|End date|Event date|SME Trade Academy|SheTrades|FILE_NAME|LOAD_TIMESTAMP} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> sourcestageSALESKPI\nsourcestageSALESKPI derive(NEW_DATALAKE_FILE = 'SALES_KPI/'+replace($P_DWH_FILE_NAME, '.csv', '_'+toString(currentTimestamp(),'YYYYMMdd_HHmmss')+'.csv')) ~> DerivedColumn1\nDerivedColumn1 sink(input(\n\t\t{Project ID} as string,\n\t\tContextCode as string,\n\t\tEventCode as string,\n\t\tA04 as string,\n\t\tDate as string,\n\t\tCountry as string,\n\t\tA12 as string,\n\t\tSalesUSD as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\trowUrlColumn:'NEW_DATALAKE_FILE') ~> DWHSALESKPI"
+		}
+	}
 }

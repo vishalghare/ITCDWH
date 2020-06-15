@@ -1,28 +1,37 @@
 {
-    "name": "MASTER_Project_countries",
-    "properties": {
-        "linkedServiceName": {
-            "referenceName": "AzureDataLakeStorage1",
-            "type": "LinkedServiceReference"
-        },
-        "annotations": [],
-        "type": "DelimitedText",
-        "typeProperties": {
-            "location": {
-                "type": "AzureBlobFSLocation",
-                "folderPath": "masters",
-                "fileSystem": "source"
-            },
-            "columnDelimiter": "|",
-            "escapeChar": "\\",
-            "firstRowAsHeader": true,
-            "quoteChar": "\""
-        },
-        "schema": [
-            {
-                "name": "Variable Name|Question Title|Possible Options Code|Description",
-                "type": "String"
-            }
-        ]
-    }
+	"name": "MASTER_Project_countries",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Project_countries.csv",
+				"folderPath": "masters",
+				"fileSystem": "source"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ProjectID",
+				"type": "String"
+			},
+			{
+				"name": "Country",
+				"type": "String"
+			},
+			{
+				"name": "CountryCode",
+				"type": "String"
+			}
+		]
+	}
 }
