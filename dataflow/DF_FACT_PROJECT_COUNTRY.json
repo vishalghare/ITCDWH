@@ -1,0 +1,58 @@
+{
+    "name": "DF_FACT_PROJECT_COUNTRY",
+    "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "dataset": {
+                        "referenceName": "MASTER_Project_countries",
+                        "type": "DatasetReference"
+                    },
+                    "name": "ProjectCountries"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "MART_DIM_PROJECT",
+                        "type": "DatasetReference"
+                    },
+                    "name": "DIMPROJECT"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "MART_DIM_COUNTRY",
+                        "type": "DatasetReference"
+                    },
+                    "name": "DIMCOUNTRY"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "MART_FACT_PROJECT_COUNTRY",
+                        "type": "DatasetReference"
+                    },
+                    "name": "FactprojectCountry"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "SelectProjectID"
+                },
+                {
+                    "name": "SelectCountry"
+                },
+                {
+                    "name": "LookupProjectID"
+                },
+                {
+                    "name": "LookupCountry"
+                },
+                {
+                    "name": "RunInfo"
+                }
+            ],
+            "script": "source(output(\n\t\t{Variable Name|Question Title|Possible Options Code|Description} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> ProjectCountries\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tCOUNTRY_SR_KEY as integer,\n\t\tCOUNTRY_CODE as string,\n\t\tCOUNTRY_NAME_EN as string,\n\t\tCOUNTRY_NAME_ES as string,\n\t\tCOUNTRY_NAME_FR as string,\n\t\tISO2_CODE as string,\n\t\tISO3_CODE as string,\n\t\tLEAST_DEVELPED_COUNTRY as string,\n\t\tLAND_LCKD_DEVELOPING_COUNTRY as string,\n\t\tSMALL_ISLAND_DEVELOPING_STATES as string,\n\t\tDEVELOPED_DEVELOPING_COUNTRY as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMCOUNTRY\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProjectID\nDIMCOUNTRY select(mapColumn(\n\t\tCOUNTRY_SR_KEY,\n\t\tCOUNTRY_CODE,\n\t\tCOUNTRY_NAME_EN\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCountry\nProjectCountries, SelectProjectID lookup(upper(trim(ProjectID)) == upper(trim(PROJECT_ID)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProjectID\nLookupProjectID, SelectCountry lookup(upper(trim(Country)) == upper(trim(COUNTRY_NAME_EN)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCountry\nLookupCountry derive(BATCH_ID = 1,\n\t\tSOURCE = 'Project_countries.csv',\n\t\tCREATED_BY = 'Project_countries.csv',\n\t\tUPDATED_BY = 'Project_countries.csv',\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tCOUNTRY_SR_KEY,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactprojectCountry"
+        }
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "name": "DF_SME_DIM_COURSE",
+    "properties": {
+        "folder": {
+            "name": "SME_DWHToMART"
+        },
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "name": "allsmefiles"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "MART_DIM_COURSE",
+                        "type": "DatasetReference"
+                    },
+                    "name": "source1"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "MART_DIM_COURSE",
+                        "type": "DatasetReference"
+                    },
+                    "name": "dimcourse"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "Selectingcoursename"
+                },
+                {
+                    "name": "Aggregate1"
+                },
+                {
+                    "name": "DerivedColumn1"
+                },
+                {
+                    "name": "Selectcoursename"
+                },
+                {
+                    "name": "ExistingRecordHash"
+                },
+                {
+                    "name": "Sourcerecordhash"
+                },
+                {
+                    "name": "Exists1"
+                },
+                {
+                    "name": "AlterRow1"
+                }
+            ],
+            "script": "source(output(\n\t\tProjectID as string,\n\t\tContext as string,\n\t\t{Type of tool} as string,\n\t\t{Area of change} as string,\n\t\t{Service themes} as string,\n\t\t{Date of data collection} as string,\n\t\tid as string,\n\t\tCourse_name as string,\n\t\tUsername as string,\n\t\tEmail as string,\n\t\t{Phone number} as string,\n\t\tTitle as string,\n\t\t{First name} as string,\n\t\t{Middle name} as string,\n\t\t{Last name} as string,\n\t\tidnumber as string,\n\t\tGender as string,\n\t\t{Year of birth} as string,\n\t\t{Organization/ Company name} as string,\n\t\t{Type of entity} as string,\n\t\t{Sub-type of entity} as string,\n\t\t{Professional status} as string,\n\t\tFunctional_title as string,\n\t\tHowlong as string,\n\t\tPriorexperience as string,\n\t\tAddress as string,\n\t\tCityname as string,\n\t\tCountry as string,\n\t\t{Country code} as string,\n\t\tPobox as string,\n\t\tPostalcode as string,\n\t\tNationality as string,\n\t\tSkype as string,\n\t\tAim as string,\n\t\tYahoo as string,\n\t\tMsn as string,\n\t\tProfile_field_Supervisor as string,\n\t\t{Service theme} as string,\n\t\tCityregion as string,\n\t\t{Job title} as string,\n\t\tSize as string,\n\t\tCertification_date as string,\n\t\tCertified as string,\n\t\tCohort as string,\n\t\tUniqueid as string,\n\t\tUser_id as string,\n\t\tEnrol_time as string,\n\t\tFILE_NAME as string,\n\t\tLOAD_TIMESTAMP as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> allsmefiles\nsource(output(\n\t\tCOURSE_SR_KEY as integer,\n\t\tCOURSE_NAME as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nallsmefiles select(mapColumn(\n\t\tCOURSE_NAME = Course_name,\n\t\tFILE_NAME,\n\t\tLOAD_TIMESTAMP\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Selectingcoursename\nSelectingcoursename aggregate(groupBy(COURSE_NAME),\n\teach(match(name!='COURSE_NAME'), $$ = last($$))) ~> Aggregate1\nExists1 derive(BATCH_ID = 1,\n\t\tSOURCE = FILE_NAME,\n\t\tCREATED_BY = FILE_NAME,\n\t\tUPDATED_BY = FILE_NAME,\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> DerivedColumn1\nsource1 select(mapColumn(\n\t\tEXIST_COURSE_NAME = COURSE_NAME\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Selectcoursename\nSelectcoursename derive(EXIST_RECORD_HASH = sha2(256, EXIST_COURSE_NAME)) ~> ExistingRecordHash\nAggregate1 derive(Source_Record_Hash = sha2(256, COURSE_NAME)) ~> Sourcerecordhash\nSourcerecordhash, ExistingRecordHash exists(Source_Record_Hash == EXIST_RECORD_HASH,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nDerivedColumn1 alterRow(insertIf(1==1)) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tCOURSE_SR_KEY as integer,\n\t\tCOURSE_NAME as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tCOURSE_NAME,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> dimcourse"
+        }
+    }
+}

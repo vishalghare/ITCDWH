@@ -1,0 +1,71 @@
+{
+    "name": "DF_FACT_PROJECT_STAGE",
+    "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "dataset": {
+                        "referenceName": "MASTER_ProjectsList",
+                        "type": "DatasetReference"
+                    },
+                    "name": "projectlist"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "MART_DIM_PROJECT",
+                        "type": "DatasetReference"
+                    },
+                    "name": "DIMPROJECT"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "MART_DIM_PROJECT_STAGE",
+                        "type": "DatasetReference"
+                    },
+                    "name": "DIMPROJECTSTAGE"
+                },
+                {
+                    "dataset": {
+                        "referenceName": "MART_DIM_ITC_SECTION",
+                        "type": "DatasetReference"
+                    },
+                    "name": "DIMITCSECTION"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "MART_FACT_PROJECT_STAGE",
+                        "type": "DatasetReference"
+                    },
+                    "name": "FactProjectStage"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "SelectStage"
+                },
+                {
+                    "name": "SelectProject"
+                },
+                {
+                    "name": "LookupProject"
+                },
+                {
+                    "name": "LookupStage"
+                },
+                {
+                    "name": "SelectSection"
+                },
+                {
+                    "name": "LookupSection"
+                },
+                {
+                    "name": "RunInfo"
+                }
+            ],
+            "script": "source(output(\n\t\t{Variable Name|Question Title|Possible Options Code|Description} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> projectlist\nsource(output(\n\t\tPROJECT_SR_KEY as integer,\n\t\tPROJECT_ID as string,\n\t\tPROJECT_TITLE as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECT\nsource(output(\n\t\tPROJECT_STAGE_SR_KEY as integer,\n\t\tPROJECT_STAGE_CODE as string,\n\t\tPROJECT_STAGE_DESC as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMPROJECTSTAGE\nsource(output(\n\t\tITC_SECTION_SR_KEY as integer,\n\t\tITC_SECTION_CODE as string,\n\t\tITC_SECTION_DESC as string,\n\t\tITC_SECTION_DESC_LONG as string,\n\t\tBATCH_ID as integer,\n\t\tSOURCE as string,\n\t\tCREATED_BY as string,\n\t\tUPDATED_BY as string,\n\t\tDATE_CREATED as timestamp,\n\t\tDATE_UPDATED as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DIMITCSECTION\nDIMPROJECTSTAGE select(mapColumn(\n\t\tPROJECT_STAGE_SR_KEY,\n\t\tPROJECT_STAGE_CODE,\n\t\tPROJECT_STAGE_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectStage\nDIMPROJECT select(mapColumn(\n\t\tPROJECT_SR_KEY,\n\t\tPROJECT_ID,\n\t\tPROJECT_TITLE,\n\t\tCREATED_BY\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProject\nprojectlist, SelectProject lookup(upper(trim({Project Title})) == upper(trim(PROJECT_TITLE)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProject\nLookupProject, SelectStage lookup(upper(trim(Stage)) == upper(trim(PROJECT_STAGE_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupStage\nDIMITCSECTION select(mapColumn(\n\t\tITC_SECTION_SR_KEY,\n\t\tITC_SECTION_CODE,\n\t\tITC_SECTION_DESC\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSection\nLookupStage, SelectSection lookup(upper(trim(Section)) == upper(trim(ITC_SECTION_DESC)),\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupSection\nLookupSection derive(BATCH_ID = 1,\n\t\tSOURCE = 'ProjectsList.csv',\n\t\tCREATED_BY = 'ProjectsList.csv',\n\t\tUPDATED_BY = 'ProjectsList.csv',\n\t\tDATE_CREATED = currentDate(),\n\t\tDATE_UPDATED = currentDate()) ~> RunInfo\nRunInfo sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tITC_SECTION_SR_KEY,\n\t\tPROJECT_STAGE_SR_KEY,\n\t\tPROJECT_SR_KEY,\n\t\tBATCH_ID,\n\t\tSOURCE,\n\t\tCREATED_BY,\n\t\tUPDATED_BY,\n\t\tDATE_CREATED,\n\t\tDATE_UPDATED\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactProjectStage"
+        }
+    }
+}
